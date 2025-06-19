@@ -1,0 +1,27 @@
+[gd_scene load_steps=5 format=3 uid="uid://c6g8qj0v1w7vj"]
+
+[ext_resource type="Script" uid="uid://dwgta3t7x2j6u" path="res://src/entities/player/player.gd" id="1_qwer"]
+[ext_resource type="Texture2D" uid="uid://d0ebkhbqp4fhd" path="res://icon.svg" id="2_asdf"]
+[ext_resource type="PackedScene" uid="uid://b8j2k5n7naq1" path="res://src/ui/health_bar.tscn" id="3_muk8e"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(128, 128)
+
+[node name="Player" type="Area2D"]
+scale = Vector2(0.5, 0.5)
+collision_mask = 2
+script = ExtResource("1_qwer")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("2_asdf")
+
+[node name="HealthBarUI" parent="Sprite2D" instance=ExtResource("3_muk8e")]
+offset_left = -64.0
+offset_top = -48.0
+offset_right = 64.0
+offset_bottom = -28.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="Camera2D" type="Camera2D" parent="."]

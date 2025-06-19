@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://dkeamf7f6v0g1"]
+
+[ext_resource type="Script" uid="uid://ysstk5v75mkr" path="res://src/entities/enemies/types/enemy_melee.gd" id="1_md0e3"]
+[ext_resource type="Texture2D" uid="uid://d0ebkhbqp4fhd" path="res://icon.svg" id="2_fghij"]
+
+[node name="Enemy" type="Area2D"]
+scale = Vector2(0.5, 0.5)
+collision_layer = 2
+script = ExtResource("1_md0e3")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(1, 0.4, 0.4, 1)
+texture = ExtResource("2_fghij")
