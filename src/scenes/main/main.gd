@@ -8,9 +8,6 @@ extends Node2D
 @onready var performance_monitor: Control = $UI/PerformanceMonitor
 
 func _ready() -> void:
-	# 连接 EventBus 的伤害数字显示事件
-	EventBus.damage_number_requested.connect(_on_damage_number_requested)
-	
 	# 设置敌人生成器的场景列表
 	if enemy_spawner and not enemy_scenes.is_empty():
 		enemy_spawner.enemy_scenes = enemy_scenes
@@ -30,10 +27,3 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_accept") or (event is InputEventKey and event.keycode == KEY_F3 and event.pressed):
 		if performance_monitor:
 			performance_monitor.visible = not performance_monitor.visible
-
-## 处理伤害数字显示请求[br]
-## [param damage] 伤害数值[br]
-## [param world_position] 世界坐标位置[br]
-## [param color] 伤害数字颜色
-func _on_damage_number_requested(damage: int, world_position: Vector2, color: Color,parent:Node) -> void:
-	EventBus.create_damage_number(damage, world_position, color, parent)

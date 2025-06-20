@@ -43,7 +43,7 @@ func _physics_process(delta):
 func take_damage(damage: int) -> void:
 	super (damage)
 	# 通过 EventBus 显示伤害数字，玩家伤害使用橙色显示
-	EventBus.show_damage_number(damage, global_position, Color.ORANGE, self)
+	EventBus.show_damage_number(damage, global_position, Color.ORANGE)
 
 ## 重写Actor的死亡回调
 func _on_death() -> void:

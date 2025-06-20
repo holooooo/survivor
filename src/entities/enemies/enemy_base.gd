@@ -55,7 +55,7 @@ func take_damage(damage_amount: int) -> void:
 	EventBus.enemy_damaged.emit(self, damage_amount)
 	
 	# 通过 EventBus 显示伤害数字
-	EventBus.show_damage_number(damage_amount, global_position, Color.RED, self)
+	EventBus.show_damage_number(damage_amount, global_position, Color.RED)
 
 ## 重写Actor的死亡回调
 func _on_death() -> void:

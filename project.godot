@@ -57,8 +57,6 @@ move_down={
 
 [physics]
 
-common/physics_ticks_per_second=60
-common/max_physics_steps_per_frame=8
 common/enable_pause_aware_picking=true
 
 [rendering]

@@ -76,7 +76,7 @@ func spawn_enemy() -> void:
 			spawn_position = MathUtils.get_random_spawn_position(screen_size, total_spawn_distance)
 		
 		new_enemy.global_position = spawn_position
-		get_tree().current_scene.add_child(new_enemy)
+		add_child(new_enemy)
 		
 		# 更新敌人计数
 		current_enemy_count += 1

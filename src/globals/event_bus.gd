@@ -32,10 +32,11 @@ signal weapon_fired(weapon_type: String, position: Vector2)
 signal damage_dealt(target: Node2D, damage: int, position: Vector2)
 
 # 伤害数字显示事件
-signal damage_number_requested(damage: int, world_position: Vector2, color: Color, parent: Node)
+signal damage_number_requested(damage: int, world_position: Vector2, color: Color)
 
-# 伤害数字场景预加载
-var damage_number_scene: PackedScene = preload("res://src/scenes/common/prefabs/damage_number.tscn")
+
+func _ready() -> void:
+	pass
 
 ## 发射伤害事件并在指定位置显示伤害数字[br]
 ## [param target] 受伤目标[br]
@@ -49,31 +50,15 @@ func emit_damage_dealt(target: Node2D, damage: int, world_position: Vector2) -> 
 ## [param maximum] 最大血量
 func emit_player_health_changed(current: int, maximum: int) -> void:
 	player_health_changed.emit(current, maximum)
-	ui_health_update_requested.emit(current, maximum) 
+	ui_health_update_requested.emit(current, maximum)
 
 ## 显示伤害数字 - 统一的伤害数字显示逻辑[br]
 ## [param damage] 伤害数值[br]
 ## [param world_position] 世界坐标位置[br]
 ## [param color] 伤害数字颜色，默认为红色
-## [param parent] 父节点，用于添加伤害数字
-func show_damage_number(damage: int, world_position: Vector2, color: Color = Color.RED, parent: Node = null) -> void:
-	# 发射信号，让主场景或其他监听者处理具体的显示逻辑
-	damage_number_requested.emit(damage, world_position, color, parent)
+func show_damage_number(damage: int, world_position: Vector2, color: Color = Color.RED) -> void:
+	damage_number_requested.emit(damage, world_position, color)
 
-## 实际创建伤害数字节点的方法[br]
-## [param damage] 伤害数值[br]
-## [param world_position] 世界坐标位置[br]
-## [param color] 伤害数字颜色[br]
-## [param parent] 父节点，用于添加伤害数字
-func create_damage_number(damage: int, world_position: Vector2, color: Color, parent: Node) -> void:
-	var damage_number: Label = damage_number_scene.instantiate()
-	damage_number.set_damage(damage)
-	damage_number.set_color(color)
-	parent.add_child(damage_number)
-	
-	# 添加随机偏移避免重叠
-	var random_offset: Vector2 = MathUtils.get_random_offset_position(Vector2.ZERO, GameConstants.DAMAGE_NUMBER_OFFSET_RANGE)
-	damage_number.global_position = world_position + Vector2(0, -30) + random_offset
 
 ## 安全地切换场景[br]
 ## [param scene_path] 场景文件路径[br]
@@ -87,4 +72,4 @@ func change_scene_safely(scene_path: String, delay: float = 0.1) -> void:
 		if result != OK:
 			print("场景切换失败: ", scene_path, " 错误代码: ", result)
 	else:
-		print("错误：无法获取场景树，无法切换场景: ", scene_path) 
+		print("错误：无法获取场景树，无法切换场景: ", scene_path)
