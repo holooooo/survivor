@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ProjectileBase" load_steps=2 format=3 uid="uid://brgeudfvxavye"]
+
+[ext_resource type="Script" uid="uid://08phgdoonipe" path="res://src/equipment/projectile_base.gd" id="1_projectile_base"]
+
+[resource]
+script = ExtResource("1_projectile_base")
+projectile_name = "拳击投射物"
+damage_per_tick = 50
+lifetime = 2.0
+damage_ticks = 500
+projectile_color = Color(1, 1, 0, 0.6)

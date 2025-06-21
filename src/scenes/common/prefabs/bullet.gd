@@ -20,7 +20,6 @@ func _ready() -> void:
 		body_entered.connect(_on_body_entered)
 	
 	# 注册到物理优化器
-	PhysicsOptimizer.register_physics_object(self)
 
 func _physics_process(delta: float) -> void:
 	var movement = direction * speed * delta

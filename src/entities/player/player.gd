@@ -1,7 +1,9 @@
 extends Actor
+class_name Player
 
 ## 玩家控制器 - 处理玩家移动、血量管理和战斗逻辑[br]
 ## 使用事件系统与其他模块通信，避免直接依赖
+@onready var equipment_manager: PlayerEquipmentManager = $PlayerEquipmentManager
 
 func _ready() -> void:
 	super ()
@@ -10,6 +12,8 @@ func _ready() -> void:
 	# 将玩家添加到player组，便于其他系统获取玩家引用
 	add_to_group("player")
 	
+	# 添加装备管理器
+	equipment_manager.initialize(self as Player)
 	
 	# 连接Actor的信号到事件总线
 	health_changed.connect(_on_health_changed)
@@ -34,10 +38,7 @@ func _physics_process(delta):
 	# 使用Actor基类的移动方法
 	if direction != Vector2.ZERO:
 		move_by_direction(direction, delta)
-	
-	# 更新物理优化器的玩家位置
-	if has_node("/root/PhysicsOptimizer"):
-		get_node("/root/PhysicsOptimizer").update_player_position(global_position)
+
 
 ## 重写Actor的受伤方法，添加伤害数字显示
 func take_damage(damage: int) -> void:

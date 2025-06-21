@@ -21,6 +21,9 @@ func _ready() -> void:
 	super ()
 	current_health = max_health
 	
+	# 将敌人添加到enemies组，便于其他系统获取敌人引用
+	add_to_group("enemies")
+	
 	# 连接Actor的信号
 	died.connect(_on_died)
 	
