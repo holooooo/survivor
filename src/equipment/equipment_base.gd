@@ -12,6 +12,10 @@ class_name EquipmentBase
 @export var projectile_scene: PackedScene ## 发射的投射物场景
 @export var projectile_resource: ProjectileBase ## 投射物配置资源
 
+# 装备配置存储
+var aoe_config: Dictionary = {}
+var firearm_config: Dictionary = {}
+
 var owner_player: Player
 var last_use_time: float = 0.0
 
@@ -113,6 +117,26 @@ func get_remaining_cooldown() -> float:
 	var current_time: float = Time.get_ticks_msec() / 1000.0
 	var remaining: float = cooldown_time - (current_time - last_use_time)
 	return max(0.0, remaining)
+
+## 设置AOE配置[br]
+## [param config] AOE配置字典
+func set_aoe_config(config: Dictionary) -> void:
+	aoe_config = config
+
+## 设置枪械配置[br]
+## [param config] 枪械配置字典
+func set_firearm_config(config: Dictionary) -> void:
+	firearm_config = config
+
+## 获取AOE配置[br]
+## [returns] AOE配置字典
+func get_aoe_config() -> Dictionary:
+	return aoe_config
+
+## 获取枪械配置[br]
+## [returns] 枪械配置字典
+func get_firearm_config() -> Dictionary:
+	return firearm_config
 
 ## 创建装备实例 - 复制当前装备用于游戏中[br]
 ## [param player] 装备的拥有者[br]

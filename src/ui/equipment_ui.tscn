@@ -1,27 +1,26 @@
 [gd_scene load_steps=2 format=3 uid="uid://cyn32jhnmyvlc"]
 
-[ext_resource type="Script" path="res://src/ui/equipment_ui.gd" id="1_equipment_ui_script"]
+[ext_resource type="Script" uid="uid://tefwjh24ill" path="res://src/ui/equipment_ui.gd" id="1_equipment_ui_script"]
 
 [node name="EquipmentUI" type="Control"]
 layout_mode = 3
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 20.0
-offset_top = -100.0
-offset_right = 320.0
-offset_bottom = -20.0
+offset_left = 50.0
+offset_top = -120.0
+offset_right = 350.0
+offset_bottom = -40.0
 grow_vertical = 0
 script = ExtResource("1_equipment_ui_script")
 
 [node name="EquipmentContainer" type="HBoxContainer" parent="."]
 layout_mode = 1
-anchors_preset = 6
-anchor_left = 0.0
+anchors_preset = 4
 anchor_top = 0.5
-anchor_right = 0.0
 anchor_bottom = 0.5
 offset_top = -30.0
 offset_right = 300.0
 offset_bottom = 30.0
+grow_horizontal = 0
 grow_vertical = 2

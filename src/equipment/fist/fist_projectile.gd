@@ -11,6 +11,7 @@ var lifetime_timer: float = 0.0
 var player: Player  ## 投射物关联的玩家
 var operation_radius: float = 100.0  ## 操作半径，与装备的operation_radius保持一致
 var move_speed: float = 200.0  ## 移动速度
+var colliding_enemies: Array[Node] = []  ## 当前碰撞中的敌人集合
 
 @onready var sprite: Sprite2D = $Sprite2D
 
@@ -18,6 +19,12 @@ func _ready() -> void:
 	# 设置碰撞检测
 	collision_layer = 4 # 武器层
 	collision_mask = 2  # 敌人层
+	
+	# 连接碰撞信号
+	area_entered.connect(_on_area_entered)
+	area_exited.connect(_on_area_exited)
+	body_entered.connect(_on_body_entered)
+	body_exited.connect(_on_body_exited)
 	
 	# 添加到投射物组，便于性能监控
 	add_to_group("projectiles")
@@ -37,11 +44,35 @@ func _physics_process(delta: float) -> void:
 	# 持续跟随玩家并移动到最佳位置
 	_update_position(delta)
 	
-	# 定期造成伤害
+	# 定期对碰撞中的敌人造成伤害
 	if damage_timer >= projectile_resource.damage_interval and remaining_damage_ticks > 0:
-		_deal_damage_to_enemies()
+		_deal_damage_to_colliding_enemies()
 		damage_timer = 0.0
 		remaining_damage_ticks -= 1
+
+## 处理Area2D进入碰撞[br]
+## [param area] 进入的区域节点
+func _on_area_entered(area: Area2D) -> void:
+	if area.is_in_group("enemies") and area not in colliding_enemies:
+		colliding_enemies.append(area)
+
+## 处理Area2D离开碰撞[br]
+## [param area] 离开的区域节点
+func _on_area_exited(area: Area2D) -> void:
+	if area in colliding_enemies:
+		colliding_enemies.erase(area)
+
+## 处理RigidBody2D进入碰撞[br]
+## [param body] 进入的刚体节点
+func _on_body_entered(body: Node2D) -> void:
+	if body.is_in_group("enemies") and body not in colliding_enemies:
+		colliding_enemies.append(body)
+
+## 处理RigidBody2D离开碰撞[br]
+## [param body] 离开的刚体节点
+func _on_body_exited(body: Node2D) -> void:
+	if body in colliding_enemies:
+		colliding_enemies.erase(body)
 
 ## 从资源配置投射物[br]
 ## [param resource] 投射物资源[br]
@@ -98,31 +129,22 @@ func setup(direction: Vector2, damage: int, damage_ticks: int, proj_lifetime: fl
 	temp_resource.lifetime = proj_lifetime
 	temp_resource.projectile_color = Color.YELLOW
 	temp_resource.projectile_scale = Vector2(0.8, 0.8)
-	temp_resource.detection_range = 50.0
 	temp_resource.damage_interval = 0.1
 	
 	setup_from_resource(temp_resource, direction)
 
-## 对范围内的敌人造成伤害
-func _deal_damage_to_enemies() -> void:
+## 对碰撞中的敌人造成伤害
+func _deal_damage_to_colliding_enemies() -> void:
 	if not projectile_resource:
 		return
 	
-	# 检查场景树是否可用
-	var scene_tree = get_tree()
-	if not scene_tree:
-		return
+	# 清理无效的敌人引用
+	colliding_enemies = colliding_enemies.filter(func(enemy): return is_instance_valid(enemy))
 	
-	# 查找范围内的敌人
-	var enemies: Array[Node] = scene_tree.get_nodes_in_group("enemies")
-	
-	for enemy in enemies:
-		if enemy is Node2D and is_instance_valid(enemy):
-			var distance: float = global_position.distance_to(enemy.global_position)
-			if distance <= projectile_resource.detection_range:
-				# 对敌人造成伤害
-				if enemy.has_method("take_damage"):
-					enemy.take_damage(projectile_resource.damage_per_tick)
+	# 对所有碰撞中的敌人造成伤害
+	for enemy in colliding_enemies:
+		if enemy.has_method("take_damage"):
+			enemy.take_damage(projectile_resource.damage_per_tick)
 
 ## 更新投射物位置 - 跟随玩家并移动到最接近敌人的位置[br]
 ## [param delta] 时间增量
@@ -226,4 +248,7 @@ func _update_rotation() -> void:
 func _on_tree_exiting() -> void:
 	# 从投射物组中移除
 	if is_in_group("projectiles"):
-		remove_from_group("projectiles") 
+		remove_from_group("projectiles")
+	
+	# 清理敌人引用
+	colliding_enemies.clear() 

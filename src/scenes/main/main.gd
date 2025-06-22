@@ -27,3 +27,13 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_accept") or (event is InputEventKey and event.keycode == KEY_F3 and event.pressed):
 		if performance_monitor:
 			performance_monitor.visible = not performance_monitor.visible
+	
+	# 装备切换（数字键1和2）
+	if event is InputEventKey and event.pressed:
+		var player: Node = get_tree().get_first_node_in_group("player")
+		if player and player.has_node("PlayerEquipmentManager"):
+			var equipment_manager = player.get_node("PlayerEquipmentManager")
+			if event.keycode == KEY_1:
+				equipment_manager.switch_to_fist()
+			elif event.keycode == KEY_2:
+				equipment_manager.switch_to_pistol()

@@ -2,7 +2,7 @@ extends Control
 class_name EquipmentUI
 
 ## 装备栏UI - 显示和管理装备栏界面[br]
-## 在左下角显示玩家的装备栏状态，现在使用EquipmentSlot组件
+## 在左下角显示玩家的装备栏状态，使用EquipmentSlot组件和视觉遮罩显示冷却状态
 
 @onready var equipment_container: HBoxContainer = $EquipmentContainer
 var equipment_slots: Array[EquipmentSlot] = []

@@ -4,11 +4,19 @@ class_name FistEquipment
 ## 拳击装备 - 默认的近战攻击装备[br]
 ## 每隔1秒发射一个拳击投射物，对范围内敌人造成伤害
 
-
 func _ready() -> void:
-	# 设置投射物资源
-	if not projectile_resource:
-		projectile_resource = preload("res://src/equipment/fist/fist_projectile_resource.tres")
+	# 投射物资源现在通过EquipmentResource配置
+	pass
+
+## 设置AOE配置（重写基类方法以应用到装备逻辑）[br]
+## [param config] AOE配置字典
+func set_aoe_config(config: Dictionary) -> void:
+	super.set_aoe_config(config)
+	
+	# 应用AOE配置到装备行为
+	if config.has("duration"):
+		# 可以根据AOE配置调整装备行为
+		pass
 
 ## 获取拳击投射物生成位置 - 在距离玩家100px半径圆中最接近敌人的位置[br]
 ## [returns] 投射物生成的世界坐标

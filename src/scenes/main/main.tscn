@@ -1,27 +1,29 @@
-[gd_scene load_steps=10 format=3 uid="uid://bqlr0mdryjoek"]
+[gd_scene load_steps=12 format=3 uid="uid://bqlr0mdryjoek"]
 
 [ext_resource type="Script" uid="uid://etsay58j6v62" path="res://src/scenes/main/main.gd" id="1_main_script"]
 [ext_resource type="PackedScene" uid="uid://dkeamf7f6v0g1" path="res://src/entities/enemies/enemy.tscn" id="2_enemy_scene"]
 [ext_resource type="PackedScene" uid="uid://bexl2b5q5oopf" path="res://src/ui/performance_monitor.tscn" id="3_fub2y"]
 [ext_resource type="Script" uid="uid://cutwsom3s04lv" path="res://src/equipment/equipment_manager.gd" id="3_fup5m"]
 [ext_resource type="PackedScene" uid="uid://c6g8qj0v1w7vj" path="res://src/entities/player/player.tscn" id="3_player_scene"]
-
 [ext_resource type="PackedScene" uid="uid://cyn32jhnmyvlc" path="res://src/ui/equipment_ui.tscn" id="4_equipment_ui"]
-[ext_resource type="PackedScene" uid="uid://chdq3vvnuiwui" path="res://src/equipment/fist/fist_equipment.tscn" id="4_fist_equipment"]
+[ext_resource type="Script" uid="uid://fw5xx4bowcqs" path="res://src/equipment/equipment_resource.gd" id="4_f4xxn"]
 [ext_resource type="Script" uid="uid://dpfjfe2ivnncr" path="res://src/entities/enemies/enemy_spawner.gd" id="4_vw57g"]
+[ext_resource type="Resource" uid="uid://bark063g83suw" path="res://src/equipment/fist/fist_aoe_equipment_resource.tres" id="5_f4xxn"]
 [ext_resource type="Script" uid="uid://dpxqtnxm6umfg" path="res://src/globals/damage_number_pool.gd" id="6_3q0a4"]
+[ext_resource type="Resource" uid="uid://delmuo1o64jbh" path="res://src/equipment/pistol/pistol_firearm_equipment_resource.tres" id="6_cic45"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main_script")
 
 [node name="Player" parent="." instance=ExtResource("3_player_scene")]
 position = Vector2(576, 324)
-max_health = 1000000000
-speed = 800.0
+max_health = 1000
+speed = 600.0
 
 [node name="PlayerEquipmentManager" type="Node" parent="Player"]
 script = ExtResource("3_fup5m")
-default_equipment = ExtResource("4_fist_equipment")
+max_equipment_slots = 3
+default_equipments = Array[ExtResource("4_f4xxn")]([ExtResource("5_f4xxn"), ExtResource("6_cic45")])
 metadata/_custom_type_script = "uid://cutwsom3s04lv"
 
 [node name="UI" type="CanvasLayer" parent="."]
@@ -38,7 +40,7 @@ enemy_scenes = Array[PackedScene]([ExtResource("2_enemy_scene")])
 base_spawn_interval = 1.0
 min_spawn_interval = 0.1999999999970896
 enemies_per_spawn = 5
-max_enemies = 1000
+max_enemies = 200
 metadata/_custom_type_script = "uid://dpfjfe2ivnncr"
 
 [node name="Pool" type="Node2D" parent="."]

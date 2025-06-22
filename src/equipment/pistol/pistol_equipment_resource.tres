@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="EquipmentResource" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://src/equipment/equipment_resource.gd" id="1"]
+[ext_resource type="PackedScene" path="res://src/equipment/pistol/pistol_equipment.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://src/equipment/pistol/pistol_projectile.tscn" id="3"]
+[ext_resource type="Resource" path="res://src/equipment/pistol/pistol_projectile_resource.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+equipment_name = "基础手枪"
+equipment_id = "pistol_basic"
+icon_texture = null
+cooldown_time = 0.5
+operation_radius = 200.0
+equipment_scene = ExtResource("2")
+projectile_scene = ExtResource("3")
+projectile_resource = ExtResource("4")
+description = "基础的手枪装备，具有弹夹系统和连发射击功能" 

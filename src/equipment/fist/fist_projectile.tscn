@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://d0ebkhbqp4fhd" path="res://icon.svg" id="2_fist_texture"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qqxld"]
-size = Vector2(140, 40)
+size = Vector2(200, 60)
 
 [node name="FistProjectile" type="Area2D"]
 script = ExtResource("1_fist_script")
@@ -15,5 +15,6 @@ shape = SubResource("RectangleShape2D_qqxld")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 modulate = Color(1, 1, 0, 0.6)
-scale = Vector2(0.8, 0.8)
+position = Vector2(-21, -2.000001)
+scale = Vector2(1.5781249, 0.48437497)
 texture = ExtResource("2_fist_texture")
