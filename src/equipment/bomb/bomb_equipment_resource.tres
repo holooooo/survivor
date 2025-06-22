@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BombEquipmentResource" load_steps=3 format=3 uid="uid://c5tk1aw1s0bm1"]
+
+[ext_resource type="Script" uid="uid://bi8xi7hr16wwf" path="res://src/equipment/resources/bomb_equipment_resource.gd" id="1_bomb_resource_script"]
+[ext_resource type="PackedScene" path="res://src/equipment/bomb/bomb_equipment.tscn" id="2_bomb_equipment_scene"]
+
+[resource]
+script = ExtResource("1_bomb_resource_script")
+base_damage = 50
+detonation_time = 1.5
+explosion_radius = 120.0
+explosion_spread_speed = 600.0
+max_throw_distance = 500.0
+equipment_name = "集束炸弹"
+equipment_id = "bomb_cluster"
+cooldown_time = 3.0
+operation_radius = 500.0
+equipment_scene = ExtResource("2_bomb_equipment_scene")
+description = "投掷多枚会爆炸的炸弹"

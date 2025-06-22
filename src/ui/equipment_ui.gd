@@ -28,8 +28,9 @@ func _find_equipment_manager() -> void:
 	if player and player.has_node("PlayerEquipmentManager"):
 		equipment_manager = player.get_node("PlayerEquipmentManager")
 		print("找到装备管理器: ", equipment_manager)
-		equipment_manager.equipment_changed.connect(_on_equipment_changed)
-		print("已连接装备变化信号")
+		if not equipment_manager.equipment_changed.is_connected(_on_equipment_changed):
+			equipment_manager.equipment_changed.connect(_on_equipment_changed)
+			print("已连接装备变化信号")
 		
 		# 初始化完成后立即更新一次UI
 		_update_all_equipment_slots()

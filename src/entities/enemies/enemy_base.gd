@@ -52,7 +52,7 @@ func enemy_ai(delta: float):
 
 ## 重写Actor的受伤方法，添加伤害数字显示和事件发送
 func take_damage(damage_amount: int) -> void:
-	super (damage_amount)
+	super.take_damage(damage_amount)
 	
 	# 发送伤害事件
 	EventBus.enemy_damaged.emit(self, damage_amount)

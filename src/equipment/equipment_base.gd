@@ -15,6 +15,7 @@ class_name EquipmentBase
 # 装备配置存储
 var aoe_config: Dictionary = {}
 var firearm_config: Dictionary = {}
+var bomb_config: Dictionary = {}
 
 var owner_player: Player
 var last_use_time: float = 0.0
@@ -128,6 +129,11 @@ func set_aoe_config(config: Dictionary) -> void:
 func set_firearm_config(config: Dictionary) -> void:
 	firearm_config = config
 
+## 设置炸弹配置[br]
+## [param config] 炸弹配置字典
+func set_bomb_config(config: Dictionary) -> void:
+	bomb_config = config
+
 ## 获取AOE配置[br]
 ## [returns] AOE配置字典
 func get_aoe_config() -> Dictionary:
@@ -137,6 +143,11 @@ func get_aoe_config() -> Dictionary:
 ## [returns] 枪械配置字典
 func get_firearm_config() -> Dictionary:
 	return firearm_config
+
+## 获取炸弹配置[br]
+## [returns] 炸弹配置字典
+func get_bomb_config() -> Dictionary:
+	return bomb_config
 
 ## 创建装备实例 - 复制当前装备用于游戏中[br]
 ## [param player] 装备的拥有者[br]

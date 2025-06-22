@@ -61,11 +61,9 @@ func initialize(player: Player) -> void:
 		pistol_sprite.global_position = owner_player.global_position + Vector2(orbit_radius, 0)
 
 func _process(delta: float) -> void:
-	# 检查装填状态
 	if is_reloading:
 		_update_reload_progress()
 	
-	# 处理连发射击
 	if current_burst_count > 0:
 		burst_timer += delta
 		if burst_timer >= bullet_interval:
@@ -73,7 +71,6 @@ func _process(delta: float) -> void:
 			burst_timer = 0.0
 			current_burst_count -= 1
 	
-	# 更新手枪位置和朝向
 	_update_pistol_position_and_rotation()
 
 ## 检查是否可以使用装备[br]
@@ -93,7 +90,6 @@ func _execute_equipment_effect() -> void:
 	if not owner_player or current_ammo <= 0:
 		return
 	
-	# 消耗弹药
 	current_ammo -= 1
 	ammo_changed.emit(current_ammo, max_ammo)
 	
@@ -101,11 +97,9 @@ func _execute_equipment_effect() -> void:
 	current_burst_count = bullets_per_shot
 	burst_timer = 0.0
 	
-	# 立即发射第一颗子弹
 	_fire_single_bullet()
 	current_burst_count -= 1
 	
-	# 如果弹药用完，开始装填
 	if current_ammo <= 0:
 		_start_reload()
 
@@ -114,18 +108,13 @@ func _fire_single_bullet() -> void:
 	if not owner_player or not projectile_scene:
 		return
 	
-	# 创建投射物
 	var projectile: Node2D = projectile_scene.instantiate()
 	
-	# 获取主场景
 	var main_scene: Node2D = owner_player.get_parent()
 	if main_scene:
 		main_scene.add_child(projectile)
-		
-		# 设置投射物位置
 		projectile.global_position = _get_projectile_spawn_position()
 		
-		# 配置投射物
 		if projectile.has_method("setup_from_resource") and projectile_resource:
 			var target_direction: Vector2 = _get_target_direction()
 			projectile.setup_from_resource(projectile_resource, target_direction)
@@ -192,14 +181,11 @@ func _setup_pistol_sprite() -> void:
 	if not pistol_sprite:
 		return
 	
-	# 使用默认图标作为手枪外观
 	var default_texture: Texture2D = load("res://icon.svg")
 	if default_texture:
 		pistol_sprite.texture = default_texture
 		pistol_sprite.modulate = Color.WHITE
 		pistol_sprite.scale = Vector2(0.3, 0.3)
-	
-	# 初始位置将在初始化玩家引用后设置
 
 ## 更新手枪位置和朝向[br]
 func _update_pistol_position_and_rotation() -> void:

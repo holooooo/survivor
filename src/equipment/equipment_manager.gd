@@ -57,14 +57,12 @@ func equip_item(slot_index: int, equipment_resource: EquipmentResource) -> bool:
 		return false
 	
 	add_child(equipment_instance)
-	print("装备实例创建成功: ", equipment_instance, " 名称: ", equipment_instance.equipment_name, " 图标: ", equipment_instance.icon_texture)
 	
 	# 装备新装备
 	equipped_instances[slot_index] = equipment_instance
 	equipment_instance.equipment_used.connect(_on_equipment_used)
 	
 	equipment_changed.emit(slot_index, equipment_instance)
-	print("装备变化信号已发送，槽位: ", slot_index, " 装备: ", equipment_instance)
 	return true
 
 ## 卸载指定槽位的装备[br]
@@ -120,22 +118,18 @@ func _equip_default_equipment() -> void:
 
 ## 创建默认装备
 func _create_default_fist_equipment() -> void:
-	print("装备所有默认装备...")
 	if default_equipments.size() > 0:
 		# 装备所有默认装备
 		for i in range(min(default_equipments.size(), max_equipment_slots)):
 			if default_equipments[i]:
-				print("装备槽位 ", i, " 的默认装备: ", default_equipments[i])
 				equip_item(i, default_equipments[i])
 	else:
-		print("使用备用拳击装备...")
 		# 备用方案：创建默认拳击装备资源
 		var fist_equipment_resource: EquipmentResource = _create_fallback_fist_resource()
 		if fist_equipment_resource:
-			print("成功创建拳击装备资源: ", fist_equipment_resource.equipment_name)
 			equip_item(0, fist_equipment_resource)
 		else:
-			print("错误：无法创建拳击装备资源")
+			push_error("无法创建拳击装备资源")
 
 ## 检查所有槽位是否为空[br]
 ## [returns] 是否所有槽位都为空
@@ -156,6 +150,17 @@ func switch_to_fist() -> void:
 	var fist_equipment_resource: EquipmentResource = _create_fallback_fist_resource()
 	if fist_equipment_resource:
 		equip_item(0, fist_equipment_resource)
+
+## 切换到炸弹装备[br]
+func switch_to_bomb() -> void:
+	var bomb_resource: EquipmentResource = _create_fallback_bomb_resource()
+	if bomb_resource:
+		equip_item(0, bomb_resource)
+
+## 创建备用炸弹装备资源[br]
+## [returns] 炸弹装备资源
+func _create_fallback_bomb_resource() -> EquipmentResource:
+	return load("res://src/equipment/bomb/bomb_equipment_resource.tres")
 
 ## 创建备用拳击装备资源[br]
 ## [returns] 拳击装备资源

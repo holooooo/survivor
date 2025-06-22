@@ -1,10 +1,12 @@
 extends Area2D
 class_name FistProjectile
 
+const AoeProjectileResource = preload("res://src/equipment/resources/aoe_projectile_resource.gd")
+
 ## 拳击投射物 - 使用资源配置的投射物[br]
 ## 在存在期间定期对范围内敌人造成伤害
 
-var projectile_resource: ProjectileBase
+var projectile_resource: AoeProjectileResource
 var remaining_damage_ticks: int = 5
 var damage_timer: float = 0.0
 var lifetime_timer: float = 0.0
@@ -14,6 +16,7 @@ var move_speed: float = 200.0  ## 移动速度
 var colliding_enemies: Array[Node] = []  ## 当前碰撞中的敌人集合
 
 @onready var sprite: Sprite2D = $Sprite2D
+@onready var collision_shape: CollisionShape2D = $CollisionShape2D
 
 func _ready() -> void:
 	# 设置碰撞检测
@@ -45,7 +48,7 @@ func _physics_process(delta: float) -> void:
 	_update_position(delta)
 	
 	# 定期对碰撞中的敌人造成伤害
-	if damage_timer >= projectile_resource.damage_interval and remaining_damage_ticks > 0:
+	if projectile_resource.continuous_damage and damage_timer >= projectile_resource.damage_tick_interval and remaining_damage_ticks > 0:
 		_deal_damage_to_colliding_enemies()
 		damage_timer = 0.0
 		remaining_damage_ticks -= 1
@@ -77,26 +80,18 @@ func _on_body_exited(body: Node2D) -> void:
 ## 从资源配置投射物[br]
 ## [param resource] 投射物资源[br]
 ## [param direction] 移动方向（保留接口，但拳击投射物会智能跟随）
-func setup_from_resource(resource: Resource, direction: Vector2) -> void:
-	projectile_resource = resource
-	if not projectile_resource:
+func setup_from_resource(resource: AoeProjectileResource, direction: Vector2) -> void:
+	self.projectile_resource = resource
+	if not self.projectile_resource:
+		push_error("Fist projectile resource not set.")
+		queue_free()
 		return
 	
 	# 设置参数
-	remaining_damage_ticks = projectile_resource.damage_ticks
+	remaining_damage_ticks = self.projectile_resource.total_damage_ticks
 	
-	# 设置外观
-	if sprite and projectile_resource.projectile_texture:
-		sprite.texture = projectile_resource.projectile_texture
-		sprite.modulate = projectile_resource.projectile_color
-		sprite.scale = projectile_resource.projectile_scale
-	elif sprite:
-		# 使用默认外观
-		var default_texture: Texture2D = load("res://icon.svg")
-		if default_texture:
-			sprite.texture = default_texture
-			sprite.modulate = projectile_resource.projectile_color if projectile_resource else Color.YELLOW
-			sprite.scale = projectile_resource.projectile_scale if projectile_resource else Vector2(0.8, 0.8)
+	# 设置外观和碰撞范围
+	_setup_visuals()
 
 ## 设置投射物的玩家引用和操作半径[br]
 ## [param owner_player] 关联的玩家[br]
@@ -116,35 +111,16 @@ func set_player_reference(owner_player: Player, radius: float = 100.0) -> void:
 		# 设置初始旋转角度
 		_update_rotation()
 
-## 设置投射物参数（兼容旧接口）[br]
-## [param direction] 移动方向[br]
-## [param damage] 每次伤害数值[br]
-## [param damage_ticks] 造成伤害的次数[br]
-## [param proj_lifetime] 投射物存在时间
-func setup(direction: Vector2, damage: int, damage_ticks: int, proj_lifetime: float) -> void:
-	# 创建临时资源用于兼容
-	var temp_resource = preload("res://src/equipment/projectile_base.gd").new()
-	temp_resource.damage_per_tick = damage
-	temp_resource.damage_ticks = damage_ticks
-	temp_resource.lifetime = proj_lifetime
-	temp_resource.projectile_color = Color.YELLOW
-	temp_resource.projectile_scale = Vector2(0.8, 0.8)
-	temp_resource.damage_interval = 0.1
-	
-	setup_from_resource(temp_resource, direction)
-
 ## 对碰撞中的敌人造成伤害
 func _deal_damage_to_colliding_enemies() -> void:
 	if not projectile_resource:
 		return
 	
-	# 清理无效的敌人引用
 	colliding_enemies = colliding_enemies.filter(func(enemy): return is_instance_valid(enemy))
 	
-	# 对所有碰撞中的敌人造成伤害
 	for enemy in colliding_enemies:
 		if enemy.has_method("take_damage"):
-			enemy.take_damage(projectile_resource.damage_per_tick)
+			enemy.take_damage(projectile_resource.tick_damage)
 
 ## 更新投射物位置 - 跟随玩家并移动到最接近敌人的位置[br]
 ## [param delta] 时间增量
@@ -167,10 +143,7 @@ func _update_position(delta: float) -> void:
 		var move_direction: Vector2 = direction_to_target.normalized()
 		global_position += move_direction * move_speed * delta
 	
-	# 强制确保与玩家的距离始终为operation_radius
 	_enforce_distance_constraint()
-	
-	# 更新旋转角度，使投射物指向其相对玩家的方向
 	_update_rotation()
 
 ## 获取玩家周围最优位置 - 在固定半径圆周上最接近敌人的位置[br]
@@ -181,15 +154,12 @@ func _get_optimal_position_around_player() -> Vector2:
 	
 	var player_pos: Vector2 = player.global_position
 	
-	# 检查场景树是否可用
 	var scene_tree = get_tree()
 	if not scene_tree:
 		return player_pos + Vector2.RIGHT * operation_radius
 	
-	# 查找所有敌人
 	var enemies: Array[Node] = scene_tree.get_nodes_in_group("enemies")
 	if enemies.is_empty():
-		# 没有敌人时，保持在玩家右侧的圆周上
 		return player_pos + Vector2.RIGHT * operation_radius
 	
 	# 找到最近的敌人
@@ -204,12 +174,9 @@ func _get_optimal_position_around_player() -> Vector2:
 				nearest_enemy = enemy
 	
 	if nearest_enemy:
-		# 计算从玩家到敌人的方向
 		var direction_to_enemy: Vector2 = (nearest_enemy.global_position - player_pos).normalized()
-		# 严格在距离玩家operation_radius的圆周上
 		return player_pos + direction_to_enemy * operation_radius
 	else:
-		# 备用方案 - 在圆周上
 		return player_pos + Vector2.RIGHT * operation_radius
 
 ## 强制确保与玩家的距离约束[br]
@@ -235,20 +202,23 @@ func _update_rotation() -> void:
 	if not player or not is_instance_valid(player):
 		return
 	
-	# 计算投射物相对玩家的方向向量
 	var direction_from_player: Vector2 = (global_position - player.global_position).normalized()
-	
-	# 将方向向量转换为角度（弧度）
-	# atan2 返回的角度是以 Vector2.RIGHT (1, 0) 为0度的角度
 	var angle_rad: float = direction_from_player.angle()
-	
-	# 设置旋转角度（Godot使用弧度）
 	rotation = angle_rad
 
+func _setup_visuals() -> void:
+	if sprite:
+		if projectile_resource.projectile_texture:
+			sprite.texture = projectile_resource.projectile_texture
+		sprite.modulate = projectile_resource.projectile_color
+		sprite.scale = projectile_resource.projectile_scale
+	
+	if collision_shape and collision_shape.shape is CircleShape2D:
+		var shape: CircleShape2D = collision_shape.shape as CircleShape2D
+		shape.radius = projectile_resource.detection_radius
+
 func _on_tree_exiting() -> void:
-	# 从投射物组中移除
 	if is_in_group("projectiles"):
 		remove_from_group("projectiles")
 	
-	# 清理敌人引用
 	colliding_enemies.clear() 
