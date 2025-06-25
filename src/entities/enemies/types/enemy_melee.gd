@@ -9,6 +9,8 @@ func _ready():
 	enemy_type = GameConstants.EnemyType.MELEE
 	# 近战敌人的伤害冷却时间较短
 	damage_cooldown = 0.5
+	# 近战敌人奖励基础信用点
+	credit_reward = 10
 
 func enemy_ai(delta: float):
 	# 追击玩家，使用优化的移动方法

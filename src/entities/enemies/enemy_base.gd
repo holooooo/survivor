@@ -6,6 +6,7 @@ class_name EnemyBase
 
 @export var damage: int = 10
 @export var off_screen_speed_multiplier: float = GameConstants.ENEMY_OFF_SCREEN_SPEED_MULTIPLIER ## 屏幕外时的速度倍数
+@export var credit_reward: int = 10 ## 击杀敌人获得的信用点数量
 
 var player: Actor
 var current_speed_multiplier: float = 1.0 ## 当前速度倍数
@@ -20,27 +21,27 @@ var use_physics_movement: bool = false ## 是否使用物理移动（默认使�
 func _ready() -> void:
 	super ()
 	current_health = max_health
-	
+
 	# 将敌人添加到enemies组，便于其他系统获取敌人引用
 	add_to_group("enemies")
-	
+
 	# 连接Actor的信号
 	died.connect(_on_died)
-	
+
 	player = get_tree().get_root().find_child("Player", true, false)
 func _physics_process(delta):
 	if not player or is_dead:
 		return
-	
+
 	# 帧跳过优化 - 减少更新频率
 	frame_skip_counter += 1
 	if frame_skip_counter < GameConstants.ENEMY_UPDATE_SKIP_FRAMES:
 		return
 	frame_skip_counter = 0
-	
+
 	# 调整delta以补偿跳帧
 	var adjusted_delta: float = delta * GameConstants.ENEMY_UPDATE_SKIP_FRAMES
-	
+
 	update_screen_status()
 	enemy_ai(adjusted_delta)
 	check_distance_damage()
@@ -53,10 +54,10 @@ func enemy_ai(delta: float):
 ## 重写Actor的受伤方法，添加伤害数字显示和事件发送
 func take_damage(damage_amount: int) -> void:
 	super.take_damage(damage_amount)
-	
+
 	# 发送伤害事件
 	EventBus.enemy_damaged.emit(self, damage_amount)
-	
+
 	# 通过 EventBus 显示伤害数字
 	EventBus.show_damage_number(damage_amount, global_position, Color.RED)
 
@@ -84,25 +85,25 @@ func get_direction_to_player() -> Vector2:
 func check_distance_damage() -> void:
 	if not player or player.is_dead:
 		return
-	
+
 	var distance_to_player: float
 	if GameConstants.DISTANCE_CHECK_OPTIMIZATION:
 		# 优化：先使用简单的曼哈顿距离快速筛选
 		var diff: Vector2 = player.global_position - global_position
 		var manhattan_distance: float = abs(diff.x) + abs(diff.y)
 		var contact_distance: float = GameConstants.PLAYER_RADIUS + GameConstants.ENEMY_RADIUS
-		
+
 		# 如果曼哈顿距离太远，跳过精确计算
 		if manhattan_distance > contact_distance * 1.5:
 			return
-			
+
 		# 需要精确距离时才计算
 		distance_to_player = get_distance_to_player()
 	else:
 		distance_to_player = get_distance_to_player()
-	
+
 	var contact_distance: float = GameConstants.PLAYER_RADIUS + GameConstants.ENEMY_RADIUS
-	
+
 	# 如果距离小于角色半径之和，则造成伤害
 	if distance_to_player <= contact_distance:
 		attempt_damage_player()
@@ -132,7 +133,7 @@ func respawn_around_screen() -> void:
 			GameConstants.ENEMY_RESPAWN_DISTANCE_FROM_SCREEN
 		)
 		global_position = new_position
-		
+
 		# 发送敌人重生事件（可选，用于调试或其他系统）
 		EventBus.enemy_respawned.emit(self)
 
@@ -142,11 +143,11 @@ func update_screen_status() -> void:
 	var viewport: Viewport = get_viewport()
 	if not viewport:
 		return
-	
+
 	# 获取屏幕大小
 	var screen_size: Vector2 = viewport.get_visible_rect().size
 	var screen_rect: Rect2
-	
+
 	# 如果有相机，基于相机位置计算屏幕区域
 	var camera: Camera2D = viewport.get_camera_2d()
 	if camera:
@@ -165,13 +166,13 @@ func update_screen_status() -> void:
 		else:
 			# 备用方案
 			screen_rect = Rect2(Vector2.ZERO, screen_size)
-	
+
 	# 检查敌人是否在屏幕内（包含边距）
 	var screen_margin: float = 100.0 # 增加边距，避免频繁切换
 	var expanded_screen: Rect2 = screen_rect.grow(screen_margin)
 	var was_on_screen: bool = is_on_screen
 	is_on_screen = expanded_screen.has_point(global_position)
-	
+
 	# 根据屏幕状态调整速度倍数
 	if is_on_screen:
 		current_speed_multiplier = 1.0

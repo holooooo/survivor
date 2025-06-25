@@ -8,8 +8,9 @@ extends Node
 signal player_health_changed(current_health: int, max_health: int)
 signal player_died
 signal player_level_up(new_level: int)
+signal player_credits_changed(credits: int)
 
-# 敌人相关事件  
+# 敌人相关事件
 signal enemy_spawned(enemy: Node2D)
 signal enemy_died(enemy: Node2D)
 signal enemy_damaged(enemy: Node2D, damage: int)
@@ -25,6 +26,7 @@ signal wave_completed(wave_number: int)
 # UI事件
 signal ui_health_update_requested(current_health: int, max_health: int)
 signal ui_score_update_requested(new_score: int)
+signal ui_credits_update_requested(credits: int)
 signal performance_update_requested(fps: int, characters: int, projectiles: int)
 
 # 武器/战斗事件
@@ -40,7 +42,7 @@ func _ready() -> void:
 
 ## 发射伤害事件并在指定位置显示伤害数字[br]
 ## [param target] 受伤目标[br]
-## [param damage] 伤害数值[br] 
+## [param damage] 伤害数值[br]
 ## [param world_position] 世界坐标位置
 func emit_damage_dealt(target: Node2D, damage: int, world_position: Vector2) -> void:
 	damage_dealt.emit(target, damage, world_position)
@@ -66,7 +68,7 @@ func show_damage_number(damage: int, world_position: Vector2, color: Color = Col
 func change_scene_safely(scene_path: String, delay: float = 0.1) -> void:
 	# 延迟执行场景切换，确保当前帧完成
 	await get_tree().create_timer(delay).timeout
-	
+
 	if get_tree():
 		var result = get_tree().change_scene_to_file(scene_path)
 		if result != OK:

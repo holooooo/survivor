@@ -21,6 +21,7 @@ EventBus="*res://src/globals/event_bus.gd"
 GameManager="*res://src/globals/game_manager.gd"
 GameConstants="*res://src/globals/constants.gd"
 MathUtils="*res://src/globals/math_utils.gd"
+CreditManager="*res://src/globals/credit_manager.gd"
 
 [debug]
 
