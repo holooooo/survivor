@@ -56,3 +56,21 @@ enum GameState {
 	PAUSED, ## 游戏暂停状态
 	GAME_OVER ## 游戏结束状态
 }
+
+## 装备位置枚举
+enum EquipmentPosition {
+	OUTPUT = 0,    ## 输出位置 - 攻击型装备
+	MOBILITY = 1,  ## 移动位置 - 移动增强装备  
+	TRANSFORM = 2, ## 转化位置 - 效果转化装备
+	DEFENSE = 3,   ## 防御位置 - 防护型装备
+	UNIVERSAL = 4  ## 通用位置 - 可装备任意类型
+}
+
+## 装备槽位配置
+const EQUIPMENT_SLOT_CONFIG = {
+	EquipmentPosition.OUTPUT: 3,    ## 输出槽位数量
+	EquipmentPosition.MOBILITY: 3,  ## 移动槽位数量
+	EquipmentPosition.TRANSFORM: 3, ## 转化槽位数量
+	EquipmentPosition.DEFENSE: 3,   ## 防御槽位数量
+	EquipmentPosition.UNIVERSAL: 2  ## 通用槽位数量
+}

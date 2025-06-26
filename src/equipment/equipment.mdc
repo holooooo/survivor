@@ -1,0 +1,580 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# 装备开发规范 (Equipment.MDC)
+
+> **重要说明**: 本文档详细描述了在 geometry-survivor 项目中新增装备的开发规范。装备系统已完成 Firearm/AOE → Emitter 统一架构迁移，所有新装备必须遵循此规范以确保系统一致性和可维护性。
+
+## 🎯 开发规范概览
+
+```mermaid
+flowchart TB
+    A[装备开发流程] --> B[1. 确定装备类型和位置]
+    A --> C[2. 创建目录结构]
+    A --> D[3. 开发资源类]
+    A --> E[4. 开发装备类]
+    A --> F[5. 开发投射物类]
+    A --> G[6. 创建场景文件]
+    A --> H[7. 配置资源文件]
+    A --> I[8. 测试槽位系统]
+
+    B --> B1[装备类型: AOE/Firearm/Bomb/Custom]
+    B --> B2[装备位置: 输出/移动/转化/防御]
+
+    C --> C1[装备名称目录]
+    C --> C2[.gd/.tscn文件]
+    C --> C3[.tres资源文件]
+```
+
+## 🎲 装备位置分类系统
+
+### 装备位置类型
+
+```mermaid
+graph TB
+    subgraph "装备位置分类"
+        A[装备位置系统]
+        A --> B1[输出位置 - 3槽位]
+        A --> B2[移动位置 - 3槽位]
+        A --> B3[转化位置 - 3槽位]
+        A --> B4[防御位置 - 3槽位]
+        A --> B5[通用位置 - 2槽位]
+    end
+    
+    subgraph "槽位分配规则"
+        C[装备请求]
+        C --> D{查找对应类型槽位}
+        D -->|有空槽位| E[装备到专用槽位]
+        D -->|无空槽位| F{查找通用槽位}
+        F -->|有空槽位| G[装备到通用槽位]
+        F -->|无空槽位| H[装备失败]
+    end
+    
+    style B1 fill:#ff6b6b
+    style B2 fill:#4ecdc4
+    style B3 fill:#45b7d1
+    style B4 fill:#f9ca24
+    style B5 fill:#f0f0f0
+```
+
+### 位置类型定义
+
+| 位置类型 | 枚举值 | 描述 | 适用装备类型 | UI颜色 |
+|---------|--------|------|-------------|--------|
+| **输出** | 0 | 主要攻击和伤害输出装备 | 武器、法术攻击 | 红色 |
+| **移动** | 1 | 移动增强和位移相关装备 | 靴子、翅膀、传送装备 | 绿色 |
+| **转化** | 2 | 效果转化和增益装备 | 附魔、变换、增益法术 | 蓝色 |
+| **防御** | 3 | 防护和减伤装备 | 护盾、护甲、防御法术 | 黄色 |
+| **通用** | 4 | 可装备任意类型的万能槽位 | 所有类型 | 白色 |
+
+### 槽位系统架构
+
+```mermaid
+graph TB
+    subgraph "槽位管理架构"
+        A[EquipmentSlotManager]
+        A --> B[SlotData数组管理]
+        A --> C[位置类型计数]
+        A --> D[智能槽位分配]
+        
+        E[PlayerEquipmentManager]
+        E --> F[装备业务逻辑]
+        E --> G[槽位状态监控]
+        
+        H[EquipmentUI]
+        H --> I[分行显示系统]
+        H --> J[通用槽位动态显示]
+    end
+    
+    A --> E
+    E --> H
+```
+
+## 📁 目录结构规范
+
+### 必需文件结构
+每个新装备必须创建以下文件结构：
+
+```
+src/equipment/[装备名称]/
+├── [装备名称]_equipment.gd          # 装备逻辑类
+├── [装备名称]_equipment.tscn        # 装备场景文件
+├── [装备名称]_equipment_resource.tres # 装备资源配置
+├── [装备名称]_projectile.gd         # 投射物逻辑类（如需要）
+├── [装备名称]_projectile.tscn       # 投射物场景文件（如需要）
+└── [装备名称]_projectile_resource.tres # 投射物资源配置（如需要）
+```
+
+### 命名约定
+- **文件夹**: 使用小写+下划线的 snake_case，例如：`magic_staff`
+- **类文件**: `[装备名称]_equipment.gd` 和 `[装备名称]_projectile.gd`
+- **场景文件**: `[装备名称]_equipment.tscn` 和 `[装备名称]_projectile.tscn`
+- **资源文件**: `[装备名称]_equipment_resource.tres` 和 `[装备名称]_projectile_resource.tres`
+
+## 🏗️ 装备类型与继承关系
+
+```mermaid
+graph TB
+    EB[EquipmentBase 装备基类] --> EE[Emitter装备]
+    EB --> BE[Bomb装备]
+    EB --> CE[自定义装备]
+
+    ER[EquipmentResource 基础资源] --> EER[EmitterEquipmentResource]
+    ER --> BER[BombEquipmentResource]
+
+    PB[ProjectileBase 投射物基类] --> EPR[EmitterProjectileResource]
+
+    EER --> |emitter_type| ET1[PROJECTILE 投射物发射]
+    EER --> |emitter_type| ET2[AOE 范围攻击]
+    EER --> |emitter_type| ET3[BEAM 光束攻击]
+    EER --> |emitter_type| ET4[BURST 爆发攻击]
+
+    EPR --> |projectile_type| PT1[BULLET 子弹类型]
+    EPR --> |projectile_type| PT2[AOE 范围类型]
+    EPR --> |projectile_type| PT3[BEAM 光束类型]
+    EPR --> |projectile_type| PT4[EXPLOSIVE 爆炸类型]
+```
+
+### 装备类型选择指南
+
+| 装备类型 | 适用场景 | 资源类型 | 发射器类型 | 投射物特点 | 推荐位置 |
+|---------|---------|---------|------------|------------|----------|
+| **Emitter-PROJECTILE** | 直线射击武器，如手枪、步枪 | `EmitterEquipmentResource` | PROJECTILE | 直线飞行，命中单体目标，支持穿透 | 输出 |
+| **Emitter-AOE** | 范围持续伤害，如拳击、法术光环 | `EmitterEquipmentResource` | AOE | 跟随玩家，持续时间内造成多次伤害 | 输出/转化 |
+| **Emitter-BEAM** | 光束攻击，如激光武器 | `EmitterEquipmentResource` | BEAM | 持续光束，瞬时命中，持续伤害 | 输出 |
+| **Emitter-BURST** | 爆发攻击，如散弹枪 | `EmitterEquipmentResource` | BURST | 多方向同时发射，范围覆盖 | 输出 |
+| **Bomb** | 爆炸型武器，如炸弹、手雷 | `BombEquipmentResource` | - | 延时爆炸，范围一次性伤害 | 输出 |
+| **Mobility** | 移动增强装备，如冲刺靴 | 继承 `EquipmentResource` | - | 无投射物或特殊移动效果 | 移动 |
+| **Defense** | 防御装备，如护盾 | 继承 `EquipmentResource` | - | 护盾效果或减伤光环 | 防御 |
+| **Transform** | 转化装备，如增益法术 | 继承 `EquipmentResource` | - | 状态效果或属性增强 | 转化 |
+
+## 📝 开发步骤详解
+
+### 步骤 1: 确定装备类型和位置
+
+在开始编码之前，明确以下问题：
+- **装备位置**: 输出/移动/转化/防御（影响槽位分配）
+- **装备类型**: AOE/直线/爆炸/特殊（影响继承关系）
+- **投射物行为**: 跟随/直线/抛物线/静态
+- **伤害模式**: 持续/一次性/多段
+- **视觉效果需求**: 特效、动画、UI反馈
+
+### 步骤 2: 创建目录和基础文件
+
+```bash
+mkdir src/equipment/[装备名称]
+cd src/equipment/[装备名称]
+```
+
+### 步骤 3: 开发装备资源类
+
+根据装备类型选择合适的基类，**必须设置装备位置**：
+
+#### 发射器类装备资源示例（PROJECTILE类型）：
+```gdscript
+extends EmitterEquipmentResource
+class_name [装备名称]EquipmentResource
+
+## [装备名称]装备资源 - 投射物发射装备[br]
+## 继承发射器装备资源，提供投射物发射能力，归类为输出装备
+
+# 重写或添加特定属性
+@export var special_property: float = 1.0 ## 特殊属性说明
+
+func _init():
+	super._init()
+	# 设置装备位置类型
+	equipment_position = EquipmentPosition.OUTPUT
+	# 设置发射器类型为投射物
+	emitter_type = EmitterType.PROJECTILE
+
+func _apply_config_to_instance(instance: EquipmentBase) -> void:
+	super._apply_config_to_instance(instance)
+	# 应用特殊配置逻辑
+```
+
+#### 发射器类装备资源示例（AOE类型）：
+```gdscript
+extends EmitterEquipmentResource
+class_name [装备名称]EquipmentResource
+
+## [装备名称]装备资源 - 范围攻击装备[br]
+## 继承发射器装备资源，提供范围持续攻击能力
+
+@export var special_aoe_property: float = 1.0 ## AOE特殊属性
+
+func _init():
+	super._init()
+	# 设置装备位置类型
+	equipment_position = EquipmentPosition.OUTPUT
+	# 设置发射器类型为AOE
+	emitter_type = EmitterType.AOE
+	# 配置AOE特有参数
+	follow_caster = true
+	range_indicator = true
+```
+
+#### 移动类装备资源示例：
+```gdscript
+extends EquipmentResource
+class_name [装备名称]EquipmentResource
+
+## [装备名称]装备资源 - 移动增强装备[br]
+## 提供移动速度提升或特殊移动能力
+
+@export var speed_boost: float = 50.0 ## 移动速度加成
+@export var dash_distance: float = 200.0 ## 冲刺距离
+
+func _init():
+	super._init()
+	# 设置装备位置类型
+	equipment_position = EquipmentPosition.MOBILITY
+```
+
+#### 防御类装备资源示例：
+```gdscript
+extends EquipmentResource
+class_name [装备名称]EquipmentResource
+
+## [装备名称]装备资源 - 防御装备[br]
+## 提供护盾或减伤效果
+
+@export var shield_points: int = 100 ## 护盾点数
+@export var damage_reduction: float = 0.2 ## 伤害减免比例
+
+func _init():
+	super._init()
+	# 设置装备位置类型
+	equipment_position = EquipmentPosition.DEFENSE
+```
+
+### 步骤 4: 开发装备逻辑类
+
+所有装备类必须继承 `EquipmentBase`：
+
+```gdscript
+extends EquipmentBase
+class_name [装备名称]Equipment
+
+## [装备名称]装备 - 详细描述装备功能和机制[br]
+## 具体说明攻击方式、冷却时间、特殊效果等
+
+func _ready() -> void:
+	super._ready()
+	# 装备初始化逻辑
+	pass
+
+## 重写获取投射物生成位置（如需要）[br]
+## [returns] 投射物生成的世界坐标
+func _get_projectile_spawn_position() -> Vector2:
+	# 自定义生成位置逻辑
+	return super._get_projectile_spawn_position()
+
+## 重写执行装备效果（如需要）
+func _execute_equipment_effect() -> void:
+	# 自定义装备效果逻辑
+	super._execute_equipment_effect()
+
+## 自定义配置方法（如需要）[br]
+## [param config] 配置字典
+func set_custom_config(config: Dictionary) -> void:
+	# 处理特殊配置
+	pass
+```
+
+### 步骤 5: 开发投射物类
+
+如果装备需要投射物，创建投射物类：
+
+#### AOE投射物示例：
+```gdscript
+extends Area2D
+class_name [装备名称]Projectile
+
+## [装备名称]投射物 - 详细描述投射物行为[br]
+## 说明移动方式、伤害机制、生命周期等
+
+var projectile_resource: [投射物资源类型]
+var remaining_damage_ticks: int
+var damage_timer: float = 0.0
+var lifetime_timer: float = 0.0
+
+@onready var sprite: Sprite2D = $Sprite2D
+@onready var collision_shape: CollisionShape2D = $CollisionShape2D
+
+func _ready() -> void:
+	# 设置碰撞层级
+	collision_layer = 4 # 武器层
+	collision_mask = 2  # 敌人层
+	
+	# 连接信号
+	area_entered.connect(_on_area_entered)
+	area_exited.connect(_on_area_exited)
+	
+	# 添加到组
+	add_to_group("projectiles")
+
+func _physics_process(delta: float) -> void:
+	# 更新计时器
+	lifetime_timer += delta
+	damage_timer += delta
+	
+	# 检查生命周期
+	if lifetime_timer >= projectile_resource.lifetime:
+		queue_free()
+		return
+	
+	# 自定义更新逻辑
+	_update_projectile_behavior(delta)
+
+## 从资源配置投射物[br]
+## [param resource] 投射物资源[br]
+## [param direction] 移动方向
+func setup_from_resource(resource: Resource, direction: Vector2) -> void:
+	self.projectile_resource = resource
+	# 应用资源配置
+	_setup_visuals()
+
+## 自定义投射物行为更新[br]
+## [param delta] 时间增量
+func _update_projectile_behavior(delta: float) -> void:
+	# 实现具体的投射物行为
+	pass
+
+func _on_area_entered(area: Area2D) -> void:
+	# 处理碰撞进入
+	pass
+
+func _on_area_exited(area: Area2D) -> void:
+	# 处理碰撞离开
+	pass
+```
+
+### 步骤 6: 创建场景文件
+
+#### 装备场景 (.tscn)
+- 根节点: `Node2D`，脚本: `[装备名称]_equipment.gd`
+- 子节点: 根据需要添加 Sprite2D、AnimationPlayer 等
+
+#### 投射物场景 (.tscn)
+- 根节点: `Area2D`，脚本: `[装备名称]_projectile.gd`
+- 必需子节点:
+  - `Sprite2D`: 视觉表现
+  - `CollisionShape2D`: 碰撞检测
+
+### 步骤 7: 配置资源文件
+
+#### 装备资源配置 (.tres)
+**重要**: 必须设置 `equipment_position` 属性！
+
+```tres
+[gd_resource type="[装备名称]EquipmentResource" script_class="[装备名称]EquipmentResource" format=3]
+
+[resource]
+equipment_name = "[装备中文名称]"
+equipment_id = "[装备英文ID]"
+equipment_position = 0  # 0=输出, 1=移动, 2=转化, 3=防御
+cooldown_time = 1.0
+operation_radius = 100.0
+equipment_scene = preload("res://src/equipment/[装备名称]/[装备名称]_equipment.tscn")
+projectile_scene = preload("res://src/equipment/[装备名称]/[装备名称]_projectile.tscn")
+projectile_resource = preload("res://src/equipment/[装备名称]/[装备名称]_projectile_resource.tres")
+description = "[装备详细描述]"
+```
+
+#### 投射物资源配置 (.tres)
+```tres
+[gd_resource type="[投射物资源类型]" script_class="[投射物资源类型]" format=3]
+
+[resource]
+projectile_name = "[投射物名称]"
+damage_per_tick = 3
+damage_interval = 0.1
+lifetime = 0.5
+detection_range = 50.0
+```
+
+## 🎮 槽位系统集成
+
+### UI显示规则
+
+```mermaid
+graph TB
+    subgraph "UI显示系统"
+        A[装备UI - VBoxContainer]
+        A --> B1[输出装备行 - 红色标题]
+        A --> B2[移动装备行 - 绿色标题]
+        A --> B3[转化装备行 - 蓝色标题]
+        A --> B4[防御装备行 - 黄色标题]
+        
+        B1 --> C1[输出槽位1-3]
+        B1 --> C2[通用槽位 - 条件显示]
+        
+        B2 --> D1[移动槽位1-3]
+        B2 --> D2[通用槽位 - 条件显示]
+    end
+```
+
+### 槽位分配逻辑
+
+1. **优先级**: 专用槽位 > 通用槽位
+2. **显示规则**: 通用槽位默认隐藏，只在专用槽位用完时显示
+3. **位置规则**: 通用槽位显示在对应类型行的后方
+4. **颜色规则**: 通用槽位使用所在行的颜色主题
+
+### 测试槽位系统
+
+装备开发完成后，验证以下功能：
+
+```gdscript
+# 测试代码示例
+func test_equipment_slot_system():
+	var equipment_manager = get_equipment_manager()
+	
+	# 1. 测试专用槽位装备
+	var slot_index = equipment_manager.equip_item(your_equipment_resource)
+	assert(slot_index != -1, "装备应该成功装备到专用槽位")
+	
+	# 2. 测试槽位信息
+	var slot_info = equipment_manager.get_slot_info()
+	print("槽位信息: ", slot_info)
+	
+	# 3. 测试通用槽位使用
+	# 装备多个同类型装备直到专用槽位用完，验证通用槽位是否正确显示
+```
+
+## 🔧 开发注意事项
+
+### 槽位系统相关
+
+1. **装备位置**: 必须在资源文件中正确设置 `equipment_position`
+2. **UI兼容**: 确保装备在分行UI中正确显示
+3. **槽位逻辑**: 理解专用槽位和通用槽位的分配机制
+4. **视觉反馈**: 确保装备位置颜色编码正确
+
+### 必须遵循的规范
+
+1. **文档注释**: 所有新函数必须添加文档注释，使用 `[br]` 换行
+2. **类型提示**: 使用严格的 GDScript 类型提示
+3. **错误处理**: 添加适当的空值检查和错误处理
+4. **性能优化**: 避免在 `_physics_process` 中进行重复计算
+
+### 代码质量要求
+
+1. **单一职责**: 每个类只负责一个明确的功能
+2. **最小依赖**: 避免不必要的模块间依赖
+3. **配置驱动**: 通过资源文件配置，避免硬编码
+4. **信号通信**: 使用 EventBus 进行模块间通信
+
+## 📋 检查清单
+
+新装备开发完成后，请确认以下项目：
+
+### 📄 文件结构
+- [ ] 创建了正确的目录结构
+- [ ] 文件命名符合规范
+- [ ] 所有必需文件都已创建
+
+### 🎲 槽位系统
+- [ ] 正确设置了 `equipment_position` 属性
+- [ ] 装备能够正确分配到对应类型槽位
+- [ ] 在UI中显示在正确的行
+- [ ] 通用槽位逻辑工作正常
+
+### 💻 代码质量
+- [ ] 继承了正确的基类
+- [ ] 添加了完整的文档注释
+- [ ] 使用了类型提示
+- [ ] 错误处理完整
+
+### 🔗 系统集成
+- [ ] 在 EquipmentSlotManager 中可以正常分配
+- [ ] 与现有UI系统兼容
+- [ ] 事件总线通信正常
+- [ ] 槽位信息正确更新
+
+### 🎮 游戏体验
+- [ ] 装备功能符合设计预期
+- [ ] 视觉效果正常显示
+- [ ] 槽位显示符合位置类型
+- [ ] 与其他装备无冲突
+
+### ⚡ 性能要求
+- [ ] 投射物正确设置碰撞层级
+- [ ] 及时清理无效节点
+- [ ] 避免内存泄漏
+- [ ] UI更新效率良好
+
+## 🚀 示例参考
+
+可以参考现有装备实现：
+- **Fist**: AOE类型输出装备的标准实现，展示跟随玩家的投射物机制
+- **Pistol**: Firearm类型输出装备的参考，展示直线射击实现
+- **Bomb**: Bomb类型输出装备的示例，展示爆炸型攻击
+
+### 不同位置类型的装备示例
+
+```gdscript
+# 输出位置装备示例 - 火球术
+equipment_position = EquipmentPosition.OUTPUT
+equipment_name = "火球术"
+# 提供直接伤害输出
+
+# 移动位置装备示例 - 风之靴
+equipment_position = EquipmentPosition.MOBILITY  
+equipment_name = "风之靴"
+# 提供移动速度加成或冲刺能力
+
+# 转化位置装备示例 - 力量药剂
+equipment_position = EquipmentPosition.TRANSFORM
+equipment_name = "力量药剂"
+# 提供攻击力或暴击率加成
+
+# 防御位置装备示例 - 能量护盾
+equipment_position = EquipmentPosition.DEFENSE
+equipment_name = "能量护盾"
+# 提供护盾点数或伤害减免
+```
+
+## 📊 系统架构图
+
+```mermaid
+graph TB
+    subgraph "装备位置分类系统架构"
+        A[EquipmentResource]
+        A -->|设置位置| B[EquipmentPosition]
+        B --> C1[输出装备]
+        B --> C2[移动装备]
+        B --> C3[转化装备]
+        B --> C4[防御装备]
+        
+        D[EquipmentSlotManager]
+        D --> E[槽位分配算法]
+        D --> F[位置类型计数]
+        
+        G[PlayerEquipmentManager]
+        G --> H[装备业务逻辑]
+        G --> I[槽位状态监控]
+        
+        J[EquipmentUI]
+        J --> K[分行显示系统]
+        J --> L[通用槽位动态管理]
+    end
+    
+    A --> G
+    D --> G
+    G --> J
+```
+
+## 📝 更新记录
+
+- **v2.0** (2024): 添加装备位置分类系统和智能槽位管理
+- **v1.0** (2024): 基础装备开发规范
+
+---
+
+**最后更新**: 2024年
+**维护者**: 开发团队
+**版本**: 2.0 - 装备位置分类系统

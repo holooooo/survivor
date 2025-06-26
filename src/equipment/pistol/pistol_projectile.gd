@@ -7,7 +7,7 @@ class_name PistolProjectile
 const TRAIL_LENGTH: int = 20 ## 拖尾长度
 const TRAIL_INTERVAL: float = 0.02 ## 拖尾更新间隔
 
-var projectile_resource: BulletProjectileResource
+var projectile_resource: EmitterProjectileResource
 var direction: Vector2 = Vector2.RIGHT ## 飞行方向
 var current_speed: float = 800.0 ## 当前飞行速度
 var lifetime_timer: float = 0.0 ## 存活时间计时器
@@ -47,7 +47,7 @@ func _physics_process(delta: float) -> void:
 ## 从资源配置投射物[br]
 ## [param resource] 投射物资源[br]
 ## [param fly_direction] 飞行方向
-func setup_from_resource(resource: BulletProjectileResource, fly_direction: Vector2) -> void:
+func setup_from_resource(resource: EmitterProjectileResource, fly_direction: Vector2) -> void:
 	self.projectile_resource = resource
 	direction = fly_direction.normalized()
 	
@@ -58,7 +58,7 @@ func setup_from_resource(resource: BulletProjectileResource, fly_direction: Vect
 	
 	# 初始化参数
 	pierce_left = self.projectile_resource.pierce_count
-	current_speed = self.projectile_resource.bullet_speed
+	current_speed = self.projectile_resource.projectile_speed
 	
 	# 设置外观
 	_setup_visuals()

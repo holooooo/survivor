@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://mukmnwmhd818" path="res://src/equipment/fist/fist_equipment.gd" id="1_fist_script"]
 [ext_resource type="Texture2D" uid="uid://d0ebkhbqp4fhd" path="res://icon.svg" id="2_icon"]
 [ext_resource type="PackedScene" uid="uid://bru7130l7n5va" path="res://src/equipment/fist/fist_projectile.tscn" id="3_projectile"]
-[ext_resource type="Resource" uid="uid://brgeudfvxavye" path="res://src/equipment/fist/fist_projectile_resource.tres" id="4_2rof3"]
+[ext_resource type="Resource" uid="uid://ec7d3n02wsag" path="res://src/equipment/fist/fist_emitter_projectile_resource.tres" id="4_2rof3"]
 
 [node name="FistEquipment" type="Node2D"]
 script = ExtResource("1_fist_script")

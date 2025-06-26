@@ -4,8 +4,17 @@ class_name EquipmentResource
 ## 装备资源 - 存储装备的基础信息和场景引用[br]
 ## 支持装备实例化和配置管理
 
+enum EquipmentPosition {
+	OUTPUT = 0,    ## 输出位置 - 攻击型装备
+	MOBILITY = 1,  ## 移动位置 - 移动增强装备  
+	TRANSFORM = 2, ## 转化位置 - 效果转化装备
+	DEFENSE = 3,   ## 防御位置 - 防护型装备
+	UNIVERSAL = 4  ## 通用位置 - 可装备任意类型
+}
+
 @export var equipment_name: String = "基础装备" ## 装备名称
 @export var equipment_id: String = "" ## 装备唯一标识
+@export var equipment_position: EquipmentPosition = EquipmentPosition.OUTPUT ## 装备位置类型
 @export var icon_texture: Texture2D ## 装备图标
 @export var cooldown_time: float = 1.0 ## 冷却时间（秒）
 @export var operation_radius: float = 100.0 ## 装备操作半径
@@ -45,6 +54,7 @@ func _apply_config_to_instance(instance: EquipmentBase) -> void:
 	# 设置基础属性
 	instance.equipment_name = equipment_name
 	instance.equipment_id = equipment_id
+	instance.equipment_position = equipment_position
 	instance.icon_texture = icon_texture
 	instance.cooldown_time = cooldown_time
 	instance.operation_radius = operation_radius

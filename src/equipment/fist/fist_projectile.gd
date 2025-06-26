@@ -1,12 +1,10 @@
 extends Area2D
 class_name FistProjectile
 
-const AoeProjectileResource = preload("res://src/equipment/resources/aoe_projectile_resource.gd")
-
-## 拳击投射物 - 使用资源配置的投射物[br]
+## 拳击投射物 - 使用发射器投射物资源配置的投射物[br]
 ## 在存在期间定期对范围内敌人造成伤害
 
-var projectile_resource: AoeProjectileResource
+var projectile_resource: EmitterProjectileResource
 var remaining_damage_ticks: int = 5
 var damage_timer: float = 0.0
 var lifetime_timer: float = 0.0
@@ -52,6 +50,11 @@ func _physics_process(delta: float) -> void:
 		_deal_damage_to_colliding_enemies()
 		damage_timer = 0.0
 		remaining_damage_ticks -= 1
+		
+		# 如果伤害次数耗尽，销毁投射物
+		if remaining_damage_ticks <= 0:
+			queue_free()
+			return
 
 ## 处理Area2D进入碰撞[br]
 ## [param area] 进入的区域节点
@@ -80,7 +83,7 @@ func _on_body_exited(body: Node2D) -> void:
 ## 从资源配置投射物[br]
 ## [param resource] 投射物资源[br]
 ## [param direction] 移动方向（保留接口，但拳击投射物会智能跟随）
-func setup_from_resource(resource: AoeProjectileResource, direction: Vector2) -> void:
+func setup_from_resource(resource: EmitterProjectileResource, direction: Vector2) -> void:
 	self.projectile_resource = resource
 	if not self.projectile_resource:
 		push_error("Fist projectile resource not set.")
@@ -213,9 +216,15 @@ func _setup_visuals() -> void:
 		sprite.modulate = projectile_resource.projectile_color
 		sprite.scale = projectile_resource.projectile_scale
 	
-	if collision_shape and collision_shape.shape is CircleShape2D:
-		var shape: CircleShape2D = collision_shape.shape as CircleShape2D
-		shape.radius = projectile_resource.detection_radius
+	# 处理不同类型的碰撞形状
+	if collision_shape and collision_shape.shape:
+		if collision_shape.shape is CircleShape2D:
+			var shape: CircleShape2D = collision_shape.shape as CircleShape2D
+			shape.radius = projectile_resource.detection_radius
+		elif collision_shape.shape is RectangleShape2D:
+			var shape: RectangleShape2D = collision_shape.shape as RectangleShape2D
+			var size = projectile_resource.detection_radius * 2
+			shape.size = Vector2(size, size)
 
 func _on_tree_exiting() -> void:
 	if is_in_group("projectiles"):

@@ -6,6 +6,7 @@ class_name EquipmentBase
 
 @export var equipment_name: String = "基础装备"
 @export var equipment_id: String = ""
+@export var equipment_position: EquipmentResource.EquipmentPosition = EquipmentResource.EquipmentPosition.OUTPUT ## 装备位置类型
 @export var icon_texture: Texture2D
 @export var cooldown_time: float = 1.0 ## 冷却时间（秒）
 @export var operation_radius: float = 100.0 ## 装备操作半径，用于投射物生成和跟随
