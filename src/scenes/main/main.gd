@@ -28,20 +28,3 @@ func _input(event: InputEvent) -> void:
 		if performance_monitor:
 			performance_monitor.visible = not performance_monitor.visible
 	
-	# 装备切换（数字键1、2、3、4）
-	if event is InputEventKey and event.pressed:
-		var player: Node = get_tree().get_first_node_in_group("player")
-		if player and player.has_node("PlayerEquipmentManager"):
-			var equipment_manager = player.get_node("PlayerEquipmentManager")
-			if event.keycode == KEY_1:
-				print("主场景: 按下数字键1 - 切换到拳击")
-				equipment_manager.switch_to_fist()
-			elif event.keycode == KEY_2:
-				print("主场景: 按下数字键2 - 切换到手枪")
-				equipment_manager.switch_to_pistol()
-			elif event.keycode == KEY_3:
-				print("主场景: 按下数字键3 - 切换到炸弹")
-				equipment_manager.switch_to_bomb()
-			elif event.keycode == KEY_4:
-				print("主场景: 按下数字键4 - 切换到电弧塔")
-				equipment_manager.switch_to_arc_tower()

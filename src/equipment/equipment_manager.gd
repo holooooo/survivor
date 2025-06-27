@@ -4,14 +4,12 @@ class_name PlayerEquipmentManager
 ## 装备管理器 - 管理玩家的装备栏[br]
 ## 处理装备的装备、卸载和使用，支持装备位置分类和槽位管理
 
-# 预加载槽位管理器脚本
-const EquipmentSlotManagerScript = preload("res://src/equipment/equipment_slot_manager.gd")
 
 @export var default_equipments: Array[EquipmentResource] = [] ## 默认装备资源数组
 @export var combat_equipment_resources: Array[EquipmentResource] = [] ## 战斗装备资源数组
 
 var player: Player
-var slot_manager
+var slot_manager: EquipmentSlotManager
 
 signal equipment_changed(slot_index: int, equipment_instance: EquipmentBase, position_type: EquipmentResource.EquipmentPosition)
 signal equipment_used(equipment_instance: EquipmentBase)
@@ -19,7 +17,7 @@ signal slot_info_changed(slot_info: Dictionary)
 
 func _ready() -> void:
 	# 初始化槽位管理器
-	slot_manager = EquipmentSlotManagerScript.new()
+	slot_manager = EquipmentSlotManager.new()
 	slot_manager.slot_changed.connect(_on_slot_changed)
 	
 func _process(delta: float) -> void:
@@ -169,83 +167,20 @@ func _create_default_fist_equipment() -> void:
 	else:
 		push_error("无法创建拳击装备资源")
 
-## 切换到手枪装备[br]
-func switch_to_pistol() -> void:
-	var pistol_equipment_resource: EquipmentResource = _create_fallback_pistol_resource()
-	if pistol_equipment_resource:
-		equip_item(pistol_equipment_resource)
-
-## 切换到拳头装备[br]
-func switch_to_fist() -> void:
-	var fist_equipment_resource: EquipmentResource = _create_fallback_fist_resource()
-	if fist_equipment_resource:
-		equip_item(fist_equipment_resource)
-
-## 切换到炸弹装备[br]
-func switch_to_bomb() -> void:
-	var bomb_resource: EquipmentResource = _create_fallback_bomb_resource()
-	if bomb_resource:
-		equip_item(bomb_resource)
-
-## 切换到电弧塔装备[br]
-func switch_to_arc_tower() -> void:
-	var arc_tower_resource: EquipmentResource = _create_fallback_arc_tower_resource()
-	if arc_tower_resource:
-		var result = equip_item(arc_tower_resource)
+## 创建备用拳击装备资源[br]
+## [returns] 拳击装备资源
+func _create_fallback_fist_resource() -> EquipmentResource:
+	# 直接加载新的Emitter装备资源文件
+	var fist_resource: EquipmentResource = load("res://src/equipment/output/fist/fist_emitter_equipment_resource.tres")
+	if fist_resource:
+		return fist_resource
+	return null
 
 ## 槽位变化回调
 func _on_slot_changed(slot_index: int, equipment_instance: EquipmentBase, position_type: EquipmentResource.EquipmentPosition) -> void:
 	equipment_changed.emit(slot_index, equipment_instance, position_type)
 	slot_info_changed.emit(slot_manager.get_slot_info())
 
-## 创建备用炸弹装备资源[br]
-## [returns] 炸弹装备资源
-func _create_fallback_bomb_resource() -> EquipmentResource:
-	return load("res://src/equipment/bomb/bomb_equipment_resource.tres")
-
-## 创建备用电弧塔装备资源[br]
-## [returns] 电弧塔装备资源
-func _create_fallback_arc_tower_resource() -> EquipmentResource:
-	var resource = load("res://src/equipment/arc_tower/arc_tower_equipment_resource.tres")
-	return resource
-
-## 创建备用拳击装备资源[br]
-## [returns] 拳击装备资源
-func _create_fallback_fist_resource() -> EquipmentResource:
-	# 直接加载新的Emitter装备资源文件
-	var fist_resource: EquipmentResource = load("res://src/equipment/fist/fist_emitter_equipment_resource.tres")
-	if fist_resource:
-		return fist_resource
-	
-	# 备用方案：如果文件不存在，使用基础资源
-	fist_resource = EquipmentResource.new()
-	fist_resource.equipment_name = "基础拳击"
-	fist_resource.equipment_id = "fist_basic"
-	fist_resource.cooldown_time = 1.0
-	fist_resource.equipment_scene = preload("res://src/equipment/fist/fist_equipment.tscn")
-	fist_resource.projectile_scene = preload("res://src/equipment/fist/fist_projectile.tscn")
-	fist_resource.description = "基础的拳击攻击装备"
-	
-	return fist_resource
-
-## 创建备用手枪装备资源[br]
-## [returns] 手枪装备资源
-func _create_fallback_pistol_resource() -> EquipmentResource:
-	# 直接加载新的Emitter装备资源文件
-	var pistol_resource: EquipmentResource = load("res://src/equipment/pistol/pistol_emitter_equipment_resource.tres")
-	if pistol_resource:
-		return pistol_resource
-	
-	# 备用方案：如果文件不存在，使用基础资源
-	pistol_resource = EquipmentResource.new()
-	pistol_resource.equipment_name = "基础手枪"
-	pistol_resource.equipment_id = "pistol_basic"
-	pistol_resource.cooldown_time = 0.5
-	pistol_resource.equipment_scene = preload("res://src/equipment/pistol/pistol_equipment.tscn")
-	pistol_resource.projectile_scene = preload("res://src/equipment/pistol/pistol_projectile.tscn")
-	pistol_resource.description = "基础的手枪射击装备"
-	
-	return pistol_resource
 
 ## 装备使用回调
 func _on_equipment_used(equipment_instance) -> void:

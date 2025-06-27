@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="EmitterEquipmentResource" load_steps=5 format=3 uid="uid://bxmn7rak4pqw8"]
 
 [ext_resource type="Script" uid="uid://cnwq8e5vm7df2" path="res://src/equipment/resources/emitter_equipment_resource.gd" id="1"]
-[ext_resource type="PackedScene" uid="uid://chdq3vvnuiwui" path="res://src/equipment/fist/fist_equipment.tscn" id="2"]
-[ext_resource type="PackedScene" uid="uid://bru7130l7n5va" path="res://src/equipment/fist/fist_projectile.tscn" id="3"]
-[ext_resource type="Resource" uid="uid://ec7d3n02wsag" path="res://src/equipment/fist/fist_emitter_projectile_resource.tres" id="4"]
+[ext_resource type="PackedScene" uid="uid://chdq3vvnuiwui" path="res://src/equipment/output/fist/fist_equipment.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://bru7130l7n5va" path="res://src/equipment/output/fist/fist_projectile.tscn" id="3"]
+[ext_resource type="Resource" uid="uid://ec7d3n02wsag" path="res://src/equipment/output/fist/fist_emitter_projectile_resource.tres" id="4"]
 
 [resource]
 script = ExtResource("1")

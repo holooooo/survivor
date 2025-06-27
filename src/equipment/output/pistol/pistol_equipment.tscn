@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://c7nak4j2f8p1x"]
 
-[ext_resource type="Script" uid="uid://b8x3lan2p7m4l" path="res://src/equipment/pistol/pistol_equipment.gd" id="1"]
-[ext_resource type="PackedScene" uid="uid://dqh8b3k5r7x2m" path="res://src/equipment/pistol/pistol_projectile.tscn" id="2"]
-[ext_resource type="Resource" uid="uid://c5n8m3k4p7qxw" path="res://src/equipment/pistol/pistol_emitter_projectile_resource.tres" id="3"]
+[ext_resource type="Script" uid="uid://b8x3lan2p7m4l" path="res://src/equipment/output/pistol/pistol_equipment.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://dqh8b3k5r7x2m" path="res://src/equipment/output/pistol/pistol_projectile.tscn" id="2"]
+[ext_resource type="Resource" uid="uid://c5n8m3k4p7qxw" path="res://src/equipment/output/pistol/pistol_emitter_projectile_resource.tres" id="3"]
 [ext_resource type="Texture2D" uid="uid://d0ebkhbqp4fhd" path="res://icon.svg" id="4_rg78i"]
 
 [node name="PistolEquipment" type="Node2D"]

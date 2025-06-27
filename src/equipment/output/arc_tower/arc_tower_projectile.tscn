@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://d9pn2k5x8q1mr"]
+[gd_scene load_steps=2 format=3 uid="uid://fbshi8poj5u0"]
 
-[ext_resource type="Script" path="res://src/equipment/arc_tower/arc_tower_projectile.gd" id="1"]
+[ext_resource type="Script" uid="uid://bsmiq6qygmqlf" path="res://src/equipment/output/arc_tower/arc_tower_projectile.gd" id="1"]
 
 [node name="ArcTowerProjectile" type="Area2D"]
 script = ExtResource("1")

@@ -9,9 +9,9 @@
 [ext_resource type="Script" uid="uid://fw5xx4bowcqs" path="res://src/equipment/equipment_resource.gd" id="4_f4xxn"]
 [ext_resource type="Script" uid="uid://dpfjfe2ivnncr" path="res://src/entities/enemies/enemy_spawner.gd" id="4_vw57g"]
 [ext_resource type="Script" uid="uid://dpxqtnxm6umfg" path="res://src/globals/damage_number_pool.gd" id="6_3q0a4"]
-[ext_resource type="Resource" uid="uid://dxknm8f2vboac" path="res://src/equipment/pistol/pistol_emitter_equipment_resource.tres" id="6_cic45"]
-[ext_resource type="Resource" uid="uid://canx5q7r8t4kw" path="res://src/equipment/arc_tower/arc_tower_equipment_resource.tres" id="6_ek26i"]
-[ext_resource type="Resource" uid="uid://bxmn7rak4pqw8" path="res://src/equipment/fist/fist_emitter_equipment_resource.tres" id="7_ek26i"]
+[ext_resource type="Resource" uid="uid://dxknm8f2vboac" path="res://src/equipment/output/pistol/pistol_emitter_equipment_resource.tres" id="6_cic45"]
+[ext_resource type="Resource" uid="uid://canx5q7r8t4kw" path="res://src/equipment/output/arc_tower/arc_tower_equipment_resource.tres" id="6_ek26i"]
+[ext_resource type="Resource" uid="uid://bxmn7rak4pqw8" path="res://src/equipment/output/fist/fist_emitter_equipment_resource.tres" id="7_ek26i"]
 [ext_resource type="PackedScene" uid="uid://bhdq3r65eieyf" path="res://src/ui/credits_display.tscn" id="8_credits"]
 
 [node name="Main" type="Node2D"]
