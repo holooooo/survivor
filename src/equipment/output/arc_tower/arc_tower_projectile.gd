@@ -52,7 +52,7 @@ func setup_arc_attack(start_pos: Vector2, end_pos: Vector2, resource: EmitterPro
 	
 	if resource:
 		# 直接访问属性，如果不存在则使用默认值
-		arc_damage = resource.hit_damage if resource.hit_damage else 15
+		arc_damage = resource.base_damage if resource.base_damage else 15
 		lifetime = resource.lifetime if resource.lifetime else 0.3
 	
 	# 设置位置和方向
@@ -67,7 +67,7 @@ func setup_from_resource(resource: Resource, direction: Vector2) -> void:
 	projectile_resource = resource
 	if resource:
 		# 直接访问属性，如果不存在则使用默认值
-		arc_damage = resource.hit_damage if resource.hit_damage else 15
+		arc_damage = resource.base_damage if resource.base_damage else 15
 		lifetime = resource.lifetime if resource.lifetime else 0.3
 
 ## 设置碰撞检测

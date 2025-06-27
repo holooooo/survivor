@@ -3,7 +3,6 @@ extends EquipmentBase
 ## 炸弹装备 - 实现炸弹投射逻辑[br]
 ## 在指定范围内随机投掷多个炸弹
 
-
 func _execute_equipment_effect() -> void:
 	if not owner_player or bomb_config.is_empty():
 		push_warning("炸弹装备缺少所有者或配置")

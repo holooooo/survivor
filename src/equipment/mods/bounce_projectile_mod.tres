@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="ModResource" load_steps=2 format=3 uid="uid://chk8pm4nq7fw1"]
+
+[ext_resource type="Script" path="res://src/equipment/mod_resource.gd" id="1_mod_resource"]
+
+[resource]
+script = ExtResource("1_mod_resource")
+mod_name = "弹射子弹"
+mod_id = "bounce_projectile"
+description = "使子弹在命中敌人后弹射到其他敌人，最多弹射3次"
+compatible_tags = Array[int]([4, 0])
+priority = 5
+effect_type = 1
+effect_config = {
+"bounce_count": 3,
+"bounce_range": 200.0,
+"damage_reduction_per_bounce": 0.1,
+"effect_name": "bounce_projectile"
+}

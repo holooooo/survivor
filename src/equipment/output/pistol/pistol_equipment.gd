@@ -23,6 +23,11 @@ signal reload_finished()
 @onready var pistol_sprite: Sprite2D = $PistolSprite
 
 func _ready() -> void:
+	# 调用基类的_ready方法，初始化模组系统
+	super._ready()
+	
+	# 装备标签现在通过EquipmentResource配置，不需要手动设置
+	
 	# 投射物资源和冷却时间现在通过EquipmentResource配置
 	
 	# 初始化弹药（将在配置应用后更新）
@@ -32,24 +37,6 @@ func _ready() -> void:
 	# 设置手枪精灵
 	_setup_pistol_sprite()
 
-## 设置枪械配置（重写基类方法以应用到手枪逻辑）[br]
-## [param config] 枪械配置字典
-func set_firearm_config(config: Dictionary) -> void:
-	super.set_firearm_config(config)
-	
-	# 应用枪械配置到手枪属性
-	if config.has("bullets_per_shot"):
-		bullets_per_shot = config.bullets_per_shot
-	if config.has("magazine_capacity"):
-		max_ammo = config.magazine_capacity
-		current_ammo = min(current_ammo, max_ammo)
-	if config.has("reload_time"):
-		reload_time = config.reload_time
-	if config.has("bullet_interval"):
-		bullet_interval = config.bullet_interval
-	
-	# 更新弹药UI
-	ammo_changed.emit(current_ammo, max_ammo)
 
 ## 设置发射器配置（同时应用到手枪）[br]
 ## [param config] 发射器配置字典
@@ -94,7 +81,9 @@ func can_use() -> bool:
 	if is_reloading:
 		return false
 	
-	if current_ammo <= 0:
+	# 检查无限弹药特殊效果
+	var has_infinite_ammo = has_special_effect("infinite_ammo")
+	if not has_infinite_ammo and current_ammo <= 0:
 		_start_reload()
 		return false
 	
@@ -110,11 +99,16 @@ func can_use() -> bool:
 
 ## 执行装备效果 - 开始连发射击[br]
 func _execute_equipment_effect() -> void:
-	if not owner_player or current_ammo <= 0:
+	if not owner_player:
 		return
 	
-	current_ammo -= 1
-	ammo_changed.emit(current_ammo, max_ammo)
+	# 检查无限弹药效果
+	var has_infinite_ammo = has_special_effect("infinite_ammo")
+	if not has_infinite_ammo:
+		if current_ammo <= 0:
+			return
+		current_ammo -= 1
+		ammo_changed.emit(current_ammo, max_ammo)
 	
 	# 开始连发射击
 	current_burst_count = bullets_per_shot
@@ -123,7 +117,7 @@ func _execute_equipment_effect() -> void:
 	_fire_single_bullet()
 	current_burst_count -= 1
 	
-	if current_ammo <= 0:
+	if not has_infinite_ammo and current_ammo <= 0:
 		_start_reload()
 
 ## 发射单颗子弹[br]
@@ -140,7 +134,14 @@ func _fire_single_bullet() -> void:
 		
 		if projectile.has_method("setup_from_resource") and projectile_resource:
 			var target_direction: Vector2 = _get_target_direction()
-			projectile.setup_from_resource(projectile_resource, target_direction)
+			# 传递装备修改后的属性到投射物
+			var equipment_stats = {}
+			if mod_manager:
+				equipment_stats = mod_manager.get_modified_stats()
+			projectile.setup_from_resource(projectile_resource, target_direction, equipment_stats)
+		
+		# 应用模组效果到投射物
+		_apply_mods_to_projectile(projectile)
 
 ## 开始装填弹药[br]
 func _start_reload() -> void:

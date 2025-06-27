@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ModResource" load_steps=2 format=3 uid="uid://brq7tk4fw8hm5"]
+
+[ext_resource type="Script" path="res://src/equipment/mod_resource.gd" id="1_mod_resource"]
+
+[resource]
+script = ExtResource("1_mod_resource")
+mod_name = "无限弹药"
+mod_id = "infinite_ammo"
+description = "使装备拥有无限弹药，不再需要装填"
+compatible_tags = Array[int]([0, 13])
+priority = 100
+effect_type = 2
+effect_config = {
+"effect_name": "infinite_ammo"
+}

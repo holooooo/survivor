@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ModResource" load_steps=2 format=3 uid="uid://dxsank3fm5wh2"]
+
+[ext_resource type="Script" path="res://src/equipment/mod_resource.gd" id="1_mod_resource"]
+
+[resource]
+script = ExtResource("1_mod_resource")
+mod_name = "分裂子弹"
+mod_id = "split_projectile"
+description = "使子弹命中敌人后分裂为3发子弹，分裂后的子弹不继承此模组"
+compatible_tags = Array[int]([4, 0, 3, 6])
+priority = 8
+effect_type = 1
+effect_config = {
+"damage_multiplier": 0.8,
+"effect_name": "split_projectile",
+"inherit_mods": false,
+"split_angle_spread": 45.0,
+"split_count": 3
+}

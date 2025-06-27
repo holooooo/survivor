@@ -1,6 +1,7 @@
 extends Area2D
 class_name PistolProjectile
 
+
 ## 手枪子弹投射物 - 直线飞行的子弹[br]
 ## 以直线方式飞向目标，具备穿透和伤害衰减能力
 
@@ -14,13 +15,18 @@ var lifetime_timer: float = 0.0 ## 存活时间计时器
 var pierce_left: int = 1 ## 剩余穿透次数
 var trail_timer: float = 0.0 ## 拖尾更新计时器
 
+# 模组效果支持
+var mod_effects: Array[Dictionary] = [] ## 应用的模组效果
+var equipment_stats: Dictionary = {} ## 装备修改后的属性
+signal projectile_hit(hit_target: Node2D) ## 投射物命中信号
+
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var trail: Line2D = $Trail
 
 func _ready() -> void:
 	# 设置碰撞检测
 	collision_layer = 4 # 武器层
-	collision_mask = 2  # 敌人层
+	collision_mask = 2 # 敌人层
 	
 	# 添加到投射物组
 	add_to_group("projectiles")
@@ -46,9 +52,11 @@ func _physics_process(delta: float) -> void:
 
 ## 从资源配置投射物[br]
 ## [param resource] 投射物资源[br]
-## [param fly_direction] 飞行方向
-func setup_from_resource(resource: EmitterProjectileResource, fly_direction: Vector2) -> void:
+## [param fly_direction] 飞行方向[br]
+## [param equipment_stats] 装备修改后的属性（可选）
+func setup_from_resource(resource: EmitterProjectileResource, fly_direction: Vector2, equipment_stats: Dictionary = {}) -> void:
 	self.projectile_resource = resource
+	self.equipment_stats = equipment_stats
 	direction = fly_direction.normalized()
 	
 	if not self.projectile_resource:
@@ -56,9 +64,9 @@ func setup_from_resource(resource: EmitterProjectileResource, fly_direction: Vec
 		queue_free()
 		return
 	
-	# 初始化参数
-	pierce_left = self.projectile_resource.pierce_count
-	current_speed = self.projectile_resource.projectile_speed
+	# 初始化参数，优先使用装备修改后的属性
+	pierce_left = equipment_stats.get("pierce_count", self.projectile_resource.pierce_count)
+	current_speed = equipment_stats.get("projectile_speed", self.projectile_resource.projectile_speed)
 	
 	# 设置外观
 	_setup_visuals()
@@ -81,11 +89,17 @@ func _hit_enemy(enemy: Node) -> void:
 		return
 
 	var current_pierce = projectile_resource.pierce_count - pierce_left
-	var damage = projectile_resource.get_pierce_damage(current_pierce)
+
+	# 优先使用装备修改后的base_damage，如果没有则使用投射物资源的
+	var base_damage = equipment_stats.get("base_damage", projectile_resource.base_damage)
+	var damage = _calculate_pierce_damage(base_damage, current_pierce)
 
 	# 对敌人造成伤害
 	if enemy.has_method("take_damage"):
 		enemy.take_damage(damage)
+	
+	# 发射命中信号，触发模组效果
+	projectile_hit.emit(enemy)
 	
 	# 减少穿透次数
 	pierce_left -= 1
@@ -145,4 +159,29 @@ func _create_trail_curve() -> Curve:
 	curve.add_point(Vector2(0.0, 0.0))
 	curve.add_point(Vector2(0.2, 1.0))
 	curve.add_point(Vector2(1.0, 1.0))
-	return curve 
+	return curve
+
+## 添加模组效果到投射物[br]
+## [param effects] 模组效果数组
+func add_mod_effects(effects: Array[Dictionary]) -> void:
+	mod_effects = effects
+	ProjectileModifier.apply_mod_effects_to_projectile(self, mod_effects)
+
+## 计算当前穿透后的伤害（复制自投射物资源的逻辑）[br]
+## [param base_damage] 基础伤害[br]
+## [param current_pierce] 当前穿透次数[br]
+## [returns] 计算后的伤害值
+func _calculate_pierce_damage(base_damage: int, current_pierce: int) -> int:
+	if current_pierce <= 0:
+		return base_damage
+	
+	var pierce_damage_reduction = equipment_stats.get("pierce_damage_reduction", projectile_resource.pierce_damage_reduction)
+	var damage_multiplier: float = 1.0 - (pierce_damage_reduction * current_pierce)
+	damage_multiplier = max(damage_multiplier, 0.1) # 最少保留10%伤害
+	
+	return int(base_damage * damage_multiplier)
+
+## 获取投射物资源[br]
+## [returns] 投射物资源
+func get_projectile_resource() -> EmitterProjectileResource:
+	return projectile_resource

@@ -210,7 +210,6 @@ func _init():
 	# 设置发射器类型为AOE
 	emitter_type = EmitterType.AOE
 	# 配置AOE特有参数
-	follow_caster = true
 	range_indicator = true
 ```
 

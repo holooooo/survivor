@@ -5,19 +5,6 @@ class_name FistEquipment
 ## 每隔1秒发射一个拳击投射物，对范围内敌人造成伤害
 @export var orbit_radius: float = 50.0 ## 围绕玩家的轨道半径
 
-func _ready() -> void:
-	# 投射物资源现在通过EquipmentResource配置
-	pass
-
-## 设置AOE配置（重写基类方法以应用到装备逻辑）[br]
-## [param config] AOE配置字典
-func set_aoe_config(config: Dictionary) -> void:
-	super.set_aoe_config(config)
-	
-	# 应用AOE配置到装备行为
-	if config.has("duration"):
-		# 可以根据AOE配置调整装备行为
-		pass
 
 ## 设置发射器配置（处理攻击距离检查）[br]
 ## [param config] 发射器配置字典

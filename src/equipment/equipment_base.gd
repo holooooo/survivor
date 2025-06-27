@@ -12,11 +12,20 @@ class_name EquipmentBase
 @export var projectile_scene: PackedScene ## 发射的投射物场景
 @export var projectile_resource: ProjectileBase ## 投射物配置资源
 
+@export_group("模组系统")
+@export var equipment_tags: Array[EquipmentTags.Tag] = [] ## 装备标签数组，用于模组兼容性检查
+@export var mods: Array[ModResource] = [] ## 预设模组数组
+
 # 装备配置存储
 var aoe_config: Dictionary = {}
 var firearm_config: Dictionary = {}
 var bomb_config: Dictionary = {}
 var emitter_config: Dictionary = {}
+
+# 模组系统
+var mod_manager: ModManager ## 模组管理器
+var base_stats: Dictionary = {} ## 基础属性
+var modified_stats: Dictionary = {} ## 模组修改后的属性
 
 var owner_player: Player
 var last_use_time: float = 0.0
@@ -24,13 +33,74 @@ var last_use_time: float = 0.0
 signal equipment_used(equipment_instance)
 
 func _ready() -> void:
-	pass
+	_initialize_mod_system()
 
 ## 初始化装备[br]
 ## [param player] 装备拥有者
 func initialize(player: Player) -> void:
 	owner_player = player
 	name = equipment_name + "_Instance"
+
+## 初始化模组系统
+func _initialize_mod_system() -> void:
+	if not mod_manager:
+		mod_manager = ModManager.new(self)
+		mod_manager.stats_updated.connect(_on_stats_updated)
+
+## 设置基础属性
+func _setup_base_stats() -> void:
+	base_stats = {
+		"cooldown_time": cooldown_time,
+		"attack_range": emitter_config.get("attack_range", 300.0),
+		"base_damage": emitter_config.get("base_damage", 10),
+		"projectile_speed": emitter_config.get("projectile_speed", 800.0),
+		"magazine_capacity": emitter_config.get("magazine_capacity", 0),
+		"pierce_count": emitter_config.get("pierce_count", 0)
+	}
+	
+	if mod_manager:
+		mod_manager.set_base_stats(base_stats)
+
+## 安装预设模组
+func _install_preset_mods() -> void:
+	if not mod_manager:
+		print("警告: 模组管理器未初始化")
+		return
+
+	for i in range(mods.size()):
+		var mod_resource = mods[i]
+		if mod_resource:
+			print("  安装模组 ", i + 1, ": ", mod_resource.mod_name)
+			var slot = mod_manager.install_mod(mod_resource)
+			if slot != -1:
+				print("    ✓ 安装成功，槽位: ", slot)
+			else:
+				print("    ✗ 安装失败")
+		else:
+			print("  模组 ", i + 1, " 为空")
+
+## 属性更新回调
+func _on_stats_updated(new_stats: Dictionary) -> void:
+	modified_stats = new_stats
+	_apply_modified_stats()
+
+## 应用修改后的属性到装备
+func _apply_modified_stats() -> void:
+	# 应用冷却时间修改
+	if modified_stats.has("cooldown_time"):
+		cooldown_time = modified_stats.cooldown_time
+	
+	# 更新emitter_config中的属性
+	if modified_stats.has("attack_range"):
+		emitter_config["attack_range"] = modified_stats.attack_range
+	if modified_stats.has("base_damage"):
+		emitter_config["base_damage"] = modified_stats.base_damage
+	if modified_stats.has("projectile_speed"):
+		emitter_config["projectile_speed"] = modified_stats.projectile_speed
+	if modified_stats.has("magazine_capacity"):
+		emitter_config["magazine_capacity"] = modified_stats.magazine_capacity
+	if modified_stats.has("pierce_count"):
+		emitter_config["pierce_count"] = modified_stats.pierce_count
 
 ## 使用装备[br]
 ## [returns] 是否成功使用
@@ -72,7 +142,14 @@ func _execute_equipment_effect() -> void:
 		# 如果投射物有设置方法，配置参数
 		if projectile.has_method("setup_from_resource") and projectile_resource:
 			var target_direction: Vector2 = _get_target_direction()
-			projectile.setup_from_resource(projectile_resource, target_direction)
+			# 传递装备修改后的属性到投射物
+			var equipment_stats = {}
+			if mod_manager:
+				equipment_stats = mod_manager.get_modified_stats()
+			projectile.setup_from_resource(projectile_resource, target_direction, equipment_stats)
+		
+		# 应用模组效果到投射物
+		_apply_mods_to_projectile(projectile)
 
 ## 获取目标方向 - 优先选择攻击距离内最近的敌人[br]
 ## [returns] 目标方向向量
@@ -110,15 +187,6 @@ func get_remaining_cooldown() -> float:
 	var remaining: float = cooldown_time - (current_time - last_use_time)
 	return max(0.0, remaining)
 
-## 设置AOE配置[br]
-## [param config] AOE配置字典
-func set_aoe_config(config: Dictionary) -> void:
-	aoe_config = config
-
-## 设置枪械配置[br]
-## [param config] 枪械配置字典
-func set_firearm_config(config: Dictionary) -> void:
-	firearm_config = config
 
 ## 设置炸弹配置[br]
 ## [param config] 炸弹配置字典
@@ -150,6 +218,57 @@ func get_bomb_config() -> Dictionary:
 func get_emitter_config() -> Dictionary:
 	return emitter_config
 
+## 应用模组效果到投射物[br]
+## [param projectile] 投射物实例
+func _apply_mods_to_projectile(projectile: Node2D) -> void:
+	if not mod_manager:
+		return
+	
+	
+	# 获取投射物模组效果
+	var projectile_effects = mod_manager.get_projectile_effects()
+	
+	
+	# 为投射物添加效果处理器
+	if projectile.has_method("add_mod_effects"):
+		projectile.add_mod_effects(projectile_effects)
+
+## 获取模组管理器[br]
+## [returns] 模组管理器实例
+func get_mod_manager() -> ModManager:
+	return mod_manager
+
+## 安装模组[br]
+## [param mod_resource] 模组资源[br]
+## [param slot_index] 槽位索引，-1表示自动寻找[br]
+## [returns] 安装成功的槽位索引
+func install_mod(mod_resource: ModResource, slot_index: int = -1) -> int:
+	if not mod_manager:
+		return -1
+	return mod_manager.install_mod(mod_resource, slot_index)
+
+## 卸载模组[br]
+## [param slot_index] 槽位索引[br]
+## [returns] 是否成功卸载
+func uninstall_mod(slot_index: int) -> bool:
+	if not mod_manager:
+		return false
+	return mod_manager.uninstall_mod(slot_index)
+
+## 检查是否有特殊效果[br]
+## [param effect_name] 效果名称[br]
+## [returns] 是否有此效果
+func has_special_effect(effect_name: String) -> bool:
+	if not mod_manager:
+		return false
+	
+	var special_effects = mod_manager.get_special_effects()
+	for effect in special_effects:
+		if effect.effect_config.get("effect_name", "") == effect_name:
+			return true
+	
+	return false
+
 ## 检查攻击距离内是否有敌人[br]
 ## [returns] 是否有敌人在攻击距离内
 func has_enemies_in_attack_range() -> bool:
@@ -159,11 +278,9 @@ func has_enemies_in_attack_range() -> bool:
 	# 检查是否启用攻击距离检查
 	var range_check_enabled: bool = emitter_config.get("range_check_enabled", true)
 	if not range_check_enabled:
-		return true  # 如果未启用检查，始终返回true
-	var attack_range: float = emitter_config.get("attack_range", 300.0)
-	if attack_range <= 0:
-		return true  # 如果攻击距离无效，始终返回true
-	
+		return true # 如果未启用检查，始终返回true
+	var attack_range: float = max(emitter_config.get("attack_range", 300.0), 0.0)
+
 	# 检查场景树是否可用
 	var scene_tree = owner_player.get_tree()
 	if not scene_tree:
@@ -190,9 +307,7 @@ func get_nearest_enemy_in_attack_range() -> Node2D:
 	if not owner_player:
 		return null
 	
-	var attack_range: float = emitter_config.get("attack_range", 300.0)
-	if attack_range <= 0:
-		return _get_nearest_enemy()  # 如果攻击距离无效，返回最近敌人
+	var attack_range: float = max(emitter_config.get("attack_range", 300.0), 0.0)
 	
 	# 检查场景树是否可用
 	var scene_tree = owner_player.get_tree()

@@ -15,7 +15,7 @@ class_name EmitterProjectileResource
 @export var trajectory_curve: float = 0.0 ## 轨迹弯曲度
 
 @export_group("伤害配置")
-@export var hit_damage: int = 10 ## 命中伤害
+@export var base_damage: int = 10 ## 命中伤害
 @export var tick_damage: int = 3 ## 持续伤害（AOE类型）
 @export var hit_knockback: float = 0.0 ## 击退力度
 
@@ -69,7 +69,7 @@ func get_projectile_config() -> Dictionary:
 		"max_travel_distance": max_travel_distance,
 		"gravity_affected": gravity_affected,
 		"trajectory_curve": trajectory_curve,
-		"hit_damage": hit_damage,
+		"base_damage": base_damage,
 		"tick_damage": tick_damage,
 		"hit_knockback": hit_knockback,
 		"continuous_damage": continuous_damage,
@@ -96,12 +96,12 @@ func get_projectile_config() -> Dictionary:
 ## [returns] 计算后的伤害值
 func get_pierce_damage(current_pierce: int) -> int:
 	if current_pierce <= 0:
-		return hit_damage
+		return base_damage
 	
 	var damage_multiplier: float = 1.0 - (pierce_damage_reduction * current_pierce)
 	damage_multiplier = max(damage_multiplier, 0.1) # 最少保留10%伤害
 	
-	return int(hit_damage * damage_multiplier)
+	return int(base_damage * damage_multiplier)
 
 ## 计算当前穿透后的速度[br]
 ## [param current_pierce] 当前穿透次数[br]
@@ -129,7 +129,7 @@ func is_valid_projectile_config() -> bool:
 				return false
 			if max_travel_distance <= 0:
 				return false
-			if hit_damage <= 0:
+			if base_damage <= 0:
 				return false
 			if pierce_count < 0:
 				return false

@@ -36,6 +36,7 @@ func initialize(owner_player: Player) -> void:
 ## [returns] 装备成功的槽位索引，失败返回-1
 func equip_item(equipment_resource: EquipmentResource) -> int:
 	if not equipment_resource or not player:
+		print("装备失败：装备资源或玩家为空")
 		return -1
 	
 	# 验证装备资源
@@ -151,18 +152,19 @@ func _auto_use_equipment() -> void:
 ## 装备默认装备
 func _equip_default_equipment() -> void:
 	if default_equipments.size() > 0:
-		# 装备所有默认装备
 		for equipment_resource in default_equipments:
-			if equipment_resource:
-				equip_item(equipment_resource)
+			equip_item(equipment_resource)
 	else:
+		print("没有默认装备，使用备用方案")
 		# 备用方案：创建默认拳击装备资源
 		_create_default_fist_equipment()
 
 ## 创建默认装备
 func _create_default_fist_equipment() -> void:
+	print("创建默认装备...")
 	var fist_equipment_resource: EquipmentResource = _create_fallback_fist_resource()
 	if fist_equipment_resource:
+		print("成功创建装备资源: ", fist_equipment_resource.equipment_name)
 		equip_item(fist_equipment_resource)
 	else:
 		push_error("无法创建拳击装备资源")
@@ -170,7 +172,6 @@ func _create_default_fist_equipment() -> void:
 ## 创建备用拳击装备资源[br]
 ## [returns] 拳击装备资源
 func _create_fallback_fist_resource() -> EquipmentResource:
-	# 直接加载新的Emitter装备资源文件
 	var fist_resource: EquipmentResource = load("res://src/equipment/output/fist/fist_emitter_equipment_resource.tres")
 	if fist_resource:
 		return fist_resource

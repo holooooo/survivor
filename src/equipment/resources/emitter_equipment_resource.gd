@@ -29,10 +29,6 @@ class_name EmitterEquipmentResource
 @export var pierce_damage_reduction: float = 0.2 ## 穿透伤害衰减
 @export var gravity_affected: bool = false ## 是否受重力影响
 
-@export_group("范围配置")
-@export var effect_radius: float = 50.0 ## 效果半径（AOE/BEAM类型）
-@export var follow_caster: bool = true ## 是否跟随施法者（AOE类型）
-
 @export_group("视觉效果")
 @export var effect_color: Color = Color.WHITE ## 效果颜色
 @export var muzzle_flash: bool = true ## 枪口闪光效果
@@ -67,8 +63,6 @@ func get_emitter_config() -> Dictionary:
 		"pierce_count": pierce_count,
 		"pierce_damage_reduction": pierce_damage_reduction,
 		"gravity_affected": gravity_affected,
-		"effect_radius": effect_radius,
-		"follow_caster": follow_caster,
 		"effect_color": effect_color,
 		"muzzle_flash": muzzle_flash,
 		"trail_effect": trail_effect,
@@ -141,8 +135,6 @@ func is_valid() -> bool:
 			if damage_interval <= 0:
 				return false
 			if max_damage_ticks <= 0:
-				return false
-			if effect_radius <= 0:
 				return false
 		EmitterType.AUTO_TARGETING:
 			if base_damage <= 0:

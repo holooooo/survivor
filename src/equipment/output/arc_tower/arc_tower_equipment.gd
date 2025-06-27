@@ -27,6 +27,7 @@ signal arc_attack_executed(target: Node2D, damage: int)
 
 func _ready() -> void:
 	super._ready()
+	
 	_setup_range_detection()
 	# 初始化弹药系统
 	current_ammo = magazine_capacity  # 开始时满弹药

@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="EmitterEquipmentResource" load_steps=5 format=3 uid="uid://bxmn7rak4pqw8"]
+[gd_resource type="Resource" script_class="EmitterEquipmentResource" load_steps=6 format=3 uid="uid://bxmn7rak4pqw8"]
 
 [ext_resource type="Script" uid="uid://cnwq8e5vm7df2" path="res://src/equipment/resources/emitter_equipment_resource.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://chdq3vvnuiwui" path="res://src/equipment/output/fist/fist_equipment.tscn" id="2"]
+[ext_resource type="Script" path="res://src/equipment/mod_resource.gd" id="2_nkhub"]
 [ext_resource type="PackedScene" uid="uid://bru7130l7n5va" path="res://src/equipment/output/fist/fist_projectile.tscn" id="3"]
 [ext_resource type="Resource" uid="uid://ec7d3n02wsag" path="res://src/equipment/output/fist/fist_emitter_projectile_resource.tres" id="4"]
 
@@ -15,7 +16,6 @@ damage_interval = 0.15
 max_damage_ticks = 6
 projectile_speed = 0.0
 pierce_damage_reduction = 0.0
-effect_radius = 60.0
 effect_color = Color(1, 1, 0, 0.7)
 muzzle_flash = false
 trail_effect = false
@@ -27,3 +27,4 @@ equipment_scene = ExtResource("2")
 projectile_scene = ExtResource("3")
 projectile_resource = ExtResource("4")
 description = "发射器类拳击装备，在80米攻击距离内有敌人时释放持续范围伤害效果"
+equipment_tags = Array[int]([1, 7, 5, 4, 9])
