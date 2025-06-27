@@ -14,7 +14,6 @@ max_throw_distance = 500.0
 equipment_name = "集束炸弹"
 equipment_id = "bomb_cluster"
 cooldown_time = 3.0
-operation_radius = 500.0
 equipment_scene = ExtResource("2_bomb_equipment_scene")
 projectile_resource = ExtResource("2_pouoh")
 description = "投掷多枚会爆炸的炸弹"

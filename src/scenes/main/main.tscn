@@ -10,7 +10,7 @@
 [ext_resource type="Script" uid="uid://dpfjfe2ivnncr" path="res://src/entities/enemies/enemy_spawner.gd" id="4_vw57g"]
 [ext_resource type="Script" uid="uid://dpxqtnxm6umfg" path="res://src/globals/damage_number_pool.gd" id="6_3q0a4"]
 [ext_resource type="Resource" uid="uid://dxknm8f2vboac" path="res://src/equipment/pistol/pistol_emitter_equipment_resource.tres" id="6_cic45"]
-[ext_resource type="Resource" uid="uid://c5tk1aw1s0bm1" path="res://src/equipment/bomb/bomb_equipment_resource.tres" id="7_cic45"]
+[ext_resource type="Resource" uid="uid://canx5q7r8t4kw" path="res://src/equipment/arc_tower/arc_tower_equipment_resource.tres" id="6_ek26i"]
 [ext_resource type="Resource" uid="uid://bxmn7rak4pqw8" path="res://src/equipment/fist/fist_emitter_equipment_resource.tres" id="7_ek26i"]
 [ext_resource type="PackedScene" uid="uid://bhdq3r65eieyf" path="res://src/ui/credits_display.tscn" id="8_credits"]
 
@@ -24,7 +24,7 @@ speed = 600.0
 
 [node name="PlayerEquipmentManager" type="Node" parent="Player"]
 script = ExtResource("3_fup5m")
-default_equipments = Array[ExtResource("4_f4xxn")]([ExtResource("6_cic45"), ExtResource("7_cic45"), ExtResource("7_ek26i")])
+default_equipments = Array[ExtResource("4_f4xxn")]([ExtResource("6_ek26i"), ExtResource("7_ek26i"), ExtResource("6_cic45")])
 metadata/_custom_type_script = "uid://cutwsom3s04lv"
 
 [node name="UI" type="CanvasLayer" parent="."]

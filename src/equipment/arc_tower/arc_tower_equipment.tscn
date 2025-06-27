@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://b8qy3n4x7m2kp"]
+
+[ext_resource type="Script" uid="uid://cg2yt3h7iqgni" path="res://src/equipment/arc_tower/arc_tower_equipment.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://d0ebkhbqp4fhd" path="res://icon.svg" id="2"]
+
+[node name="ArcTowerEquipment" type="Node2D"]
+script = ExtResource("1")
+equipment_name = "电弧塔"
+equipment_id = "arc_tower"
+cooldown_time = 0.2
+
+[node name="TowerSprite" type="Sprite2D" parent="."]
+visible = false
+modulate = Color(0.5, 0.8, 1, 0.9)
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("2")
+
+[node name="RangeIndicator" type="Node2D" parent="."]
+
+[node name="RangeCircle" type="Line2D" parent="RangeIndicator"]
+width = 2.0
+default_color = Color(0.5, 0.8, 1, 0.3)

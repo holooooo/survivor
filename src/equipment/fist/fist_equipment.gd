@@ -3,6 +3,7 @@ class_name FistEquipment
 
 ## 拳击装备 - 默认的近战攻击装备[br]
 ## 每隔1秒发射一个拳击投射物，对范围内敌人造成伤害
+@export var orbit_radius: float = 50.0 ## 围绕玩家的轨道半径
 
 func _ready() -> void:
 	# 投射物资源现在通过EquipmentResource配置
@@ -18,6 +19,11 @@ func set_aoe_config(config: Dictionary) -> void:
 		# 可以根据AOE配置调整装备行为
 		pass
 
+## 设置发射器配置（处理攻击距离检查）[br]
+## [param config] 发射器配置字典
+func set_emitter_config(config: Dictionary) -> void:
+	super.set_emitter_config(config)
+
 ## 获取拳击投射物生成位置 - 在距离玩家100px半径圆中最接近敌人的位置[br]
 ## [returns] 投射物生成的世界坐标
 func _get_projectile_spawn_position() -> Vector2:
@@ -28,9 +34,22 @@ func _get_projectile_spawn_position() -> Vector2:
 	var target_direction: Vector2 = _get_target_direction()
 	
 	# 在玩家周围operation_radius半径的圆上，找到最接近敌人的点
-	var spawn_position: Vector2 = player_pos + target_direction * operation_radius
+	var spawn_position: Vector2 = player_pos + target_direction * orbit_radius
 	
 	return spawn_position
+
+## 检查是否可以使用装备[br]
+## [returns] 是否可以使用
+func can_use() -> bool:
+	# 检查基类冷却
+	if not super.can_use():
+		return false
+	
+	# 检查攻击距离内是否有敌人
+	if not has_enemies_in_attack_range():
+		return false
+	
+	return true
 
 ## 执行拳击攻击效果 - 重写基类方法
 func _execute_equipment_effect() -> void:
@@ -59,34 +78,16 @@ func _execute_equipment_effect() -> void:
 		
 		# 设置玩家引用和跟随半径
 		if projectile.has_method("set_player_reference"):
-			projectile.set_player_reference(owner_player, operation_radius)
+			projectile.set_player_reference(owner_player, orbit_radius)
 
-## 获取目标方向 - 优先选择最近的敌人[br]
+## 获取目标方向 - 优先选择攻击距离内最近的敌人[br]
 ## [returns] 目标方向向量
 func _get_target_direction() -> Vector2:
 	if not owner_player:
 		return Vector2.RIGHT
 	
-	# 检查场景树是否可用
-	var scene_tree = owner_player.get_tree()
-	if not scene_tree:
-		return Vector2.RIGHT
-	
-	# 查找所有敌人
-	var enemies: Array[Node] = scene_tree.get_nodes_in_group("enemies")
-	if enemies.is_empty():
-		return Vector2.RIGHT # 默认向右
-	
-	# 找到最近的敌人
-	var nearest_enemy: Node2D = null
-	var nearest_distance: float = INF
-	
-	for enemy in enemies:
-		if enemy is Node2D and is_instance_valid(enemy):
-			var distance: float = owner_player.global_position.distance_to(enemy.global_position)
-			if distance < nearest_distance:
-				nearest_distance = distance
-				nearest_enemy = enemy
+	# 优先获取攻击距离内的最近敌人
+	var nearest_enemy: Node2D = get_nearest_enemy_in_attack_range()
 	
 	if nearest_enemy:
 		return (nearest_enemy.global_position - owner_player.global_position).normalized()

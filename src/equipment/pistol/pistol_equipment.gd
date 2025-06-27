@@ -51,6 +51,21 @@ func set_firearm_config(config: Dictionary) -> void:
 	# 更新弹药UI
 	ammo_changed.emit(current_ammo, max_ammo)
 
+## 设置发射器配置（同时应用到手枪）[br]
+## [param config] 发射器配置字典
+func set_emitter_config(config: Dictionary) -> void:
+	super.set_emitter_config(config)
+	
+	# 如果发射器配置包含弹药系统参数，应用到手枪
+	if config.has("magazine_capacity"):
+		max_ammo = config.magazine_capacity
+		current_ammo = min(current_ammo, max_ammo)
+	if config.has("reload_time"):
+		reload_time = config.reload_time
+	
+	# 更新弹药UI
+	ammo_changed.emit(current_ammo, max_ammo)
+
 ## 重写初始化方法，设置手枪初始位置[br]
 ## [param player] 装备拥有者
 func initialize(player: Player) -> void:
@@ -83,7 +98,15 @@ func can_use() -> bool:
 		_start_reload()
 		return false
 	
-	return super.can_use()
+	# 检查基类冷却
+	if not super.can_use():
+		return false
+	
+	# 检查攻击距离内是否有敌人
+	if not has_enemies_in_attack_range():
+		return false
+	
+	return true
 
 ## 执行装备效果 - 开始连发射击[br]
 func _execute_equipment_effect() -> void:
@@ -232,4 +255,18 @@ func _update_pistol_position_and_rotation() -> void:
 	pistol_sprite.global_position = player_pos + new_direction * orbit_radius
 	
 	# 设置手枪朝向（指向目标方向）
-	pistol_sprite.rotation = new_angle 
+	pistol_sprite.rotation = new_angle
+
+## 获取目标方向 - 优先选择攻击距离内最近的敌人[br]
+## [returns] 目标方向向量
+func _get_target_direction() -> Vector2:
+	if not owner_player:
+		return Vector2.RIGHT
+	
+	# 优先获取攻击距离内的最近敌人
+	var nearest_enemy: Node2D = get_nearest_enemy_in_attack_range()
+	
+	if nearest_enemy:
+		return (nearest_enemy.global_position - owner_player.global_position).normalized()
+	else:
+		return Vector2.RIGHT 

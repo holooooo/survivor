@@ -17,7 +17,6 @@ enum EquipmentPosition {
 @export var equipment_position: EquipmentPosition = EquipmentPosition.OUTPUT ## 装备位置类型
 @export var icon_texture: Texture2D ## 装备图标
 @export var cooldown_time: float = 1.0 ## 冷却时间（秒）
-@export var operation_radius: float = 100.0 ## 装备操作半径
 @export var equipment_scene: PackedScene ## 装备场景引用
 @export var projectile_scene: PackedScene ## 发射的投射物场景
 @export var projectile_resource: ProjectileBase ## 投射物配置资源
@@ -57,7 +56,6 @@ func _apply_config_to_instance(instance: EquipmentBase) -> void:
 	instance.equipment_position = equipment_position
 	instance.icon_texture = icon_texture
 	instance.cooldown_time = cooldown_time
-	instance.operation_radius = operation_radius
 	
 	# 设置投射物相关
 	if projectile_scene:
@@ -74,8 +72,6 @@ func is_valid() -> bool:
 		return false
 	if cooldown_time < 0:
 		return false
-	if operation_radius < 0:
-		return false
 	return true
 
 ## 获取装备信息字典[br]
@@ -86,6 +82,5 @@ func get_equipment_info() -> Dictionary:
 		"id": equipment_id,
 		"description": description,
 		"cooldown": cooldown_time,
-		"operation_radius": operation_radius,
 		"has_projectile": projectile_scene != null
 	} 

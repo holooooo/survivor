@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EmitterProjectileResource" load_steps=2 format=3 uid="uid://c7x8k9m3n5pqw"]
+
+[ext_resource type="Script" path="res://src/equipment/resources/emitter_projectile_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+projectile_type = 3
+projectile_speed = 0.0
+max_travel_distance = 200.0
+hit_damage = 18
+hit_knockback = 5.0
+continuous_damage = false
+damage_tick_interval = 0.0
+total_damage_ticks = 1
+pierce_count = 0
+pierce_damage_reduction = 0.0
+pierce_speed_reduction = 0.0
+detection_method = 0
+detection_radius = 5.0
+affected_groups = ["enemies"]
+trail_length = 0.0
+trail_color = Color(0.5, 0.8, 1, 0)
+show_range_indicator = false
+range_indicator_color = Color(0.5, 0.8, 1, 0.3)
+impact_effect = true
+fade_out = true
+projectile_name = "电弧塔电弧"
+damage_per_tick = 18
+lifetime = 0.3
+detection_range = 200.0
+damage_ticks = 1
+projectile_color = Color(0.5, 0.8, 1, 1)
+projectile_scale = Vector2(1, 1) 

@@ -187,6 +187,12 @@ func switch_to_bomb() -> void:
 	if bomb_resource:
 		equip_item(bomb_resource)
 
+## 切换到电弧塔装备[br]
+func switch_to_arc_tower() -> void:
+	var arc_tower_resource: EquipmentResource = _create_fallback_arc_tower_resource()
+	if arc_tower_resource:
+		var result = equip_item(arc_tower_resource)
+
 ## 槽位变化回调
 func _on_slot_changed(slot_index: int, equipment_instance: EquipmentBase, position_type: EquipmentResource.EquipmentPosition) -> void:
 	equipment_changed.emit(slot_index, equipment_instance, position_type)
@@ -196,6 +202,12 @@ func _on_slot_changed(slot_index: int, equipment_instance: EquipmentBase, positi
 ## [returns] 炸弹装备资源
 func _create_fallback_bomb_resource() -> EquipmentResource:
 	return load("res://src/equipment/bomb/bomb_equipment_resource.tres")
+
+## 创建备用电弧塔装备资源[br]
+## [returns] 电弧塔装备资源
+func _create_fallback_arc_tower_resource() -> EquipmentResource:
+	var resource = load("res://src/equipment/arc_tower/arc_tower_equipment_resource.tres")
+	return resource
 
 ## 创建备用拳击装备资源[br]
 ## [returns] 拳击装备资源
@@ -210,7 +222,6 @@ func _create_fallback_fist_resource() -> EquipmentResource:
 	fist_resource.equipment_name = "基础拳击"
 	fist_resource.equipment_id = "fist_basic"
 	fist_resource.cooldown_time = 1.0
-	fist_resource.operation_radius = 100.0
 	fist_resource.equipment_scene = preload("res://src/equipment/fist/fist_equipment.tscn")
 	fist_resource.projectile_scene = preload("res://src/equipment/fist/fist_projectile.tscn")
 	fist_resource.description = "基础的拳击攻击装备"
@@ -230,7 +241,6 @@ func _create_fallback_pistol_resource() -> EquipmentResource:
 	pistol_resource.equipment_name = "基础手枪"
 	pistol_resource.equipment_id = "pistol_basic"
 	pistol_resource.cooldown_time = 0.5
-	pistol_resource.operation_radius = 200.0
 	pistol_resource.equipment_scene = preload("res://src/equipment/pistol/pistol_equipment.tscn")
 	pistol_resource.projectile_scene = preload("res://src/equipment/pistol/pistol_projectile.tscn")
 	pistol_resource.description = "基础的手枪射击装备"

@@ -9,7 +9,7 @@ var remaining_damage_ticks: int = 5
 var damage_timer: float = 0.0
 var lifetime_timer: float = 0.0
 var player: Player  ## 投射物关联的玩家
-var operation_radius: float = 100.0  ## 操作半径，与装备的operation_radius保持一致
+var orbit_radius: float = 100.0  ## 操作半径，与装备的operation_radius保持一致
 var move_speed: float = 200.0  ## 移动速度
 var colliding_enemies: Array[Node] = []  ## 当前碰撞中的敌人集合
 
@@ -99,9 +99,8 @@ func setup_from_resource(resource: EmitterProjectileResource, direction: Vector2
 ## 设置投射物的玩家引用和操作半径[br]
 ## [param owner_player] 关联的玩家[br]
 ## [param radius] 操作半径
-func set_player_reference(owner_player: Player, radius: float = 100.0) -> void:
+func set_player_reference(owner_player: Player, orbit_radius: float) -> void:
 	player = owner_player
-	operation_radius = radius
 	
 	# 立即调整到正确的距离
 	if player:
@@ -109,7 +108,7 @@ func set_player_reference(owner_player: Player, radius: float = 100.0) -> void:
 		var current_direction: Vector2 = (global_position - player_pos).normalized()
 		if current_direction == Vector2.ZERO:
 			current_direction = Vector2.RIGHT
-		global_position = player_pos + current_direction * operation_radius
+		global_position = player_pos + current_direction * orbit_radius
 		
 		# 设置初始旋转角度
 		_update_rotation()
@@ -159,11 +158,11 @@ func _get_optimal_position_around_player() -> Vector2:
 	
 	var scene_tree = get_tree()
 	if not scene_tree:
-		return player_pos + Vector2.RIGHT * operation_radius
+		return player_pos + Vector2.RIGHT * orbit_radius
 	
 	var enemies: Array[Node] = scene_tree.get_nodes_in_group("enemies")
 	if enemies.is_empty():
-		return player_pos + Vector2.RIGHT * operation_radius
+		return player_pos + Vector2.RIGHT * orbit_radius
 	
 	# 找到最近的敌人
 	var nearest_enemy: Node2D = null
@@ -178,9 +177,9 @@ func _get_optimal_position_around_player() -> Vector2:
 	
 	if nearest_enemy:
 		var direction_to_enemy: Vector2 = (nearest_enemy.global_position - player_pos).normalized()
-		return player_pos + direction_to_enemy * operation_radius
+		return player_pos + direction_to_enemy * orbit_radius
 	else:
-		return player_pos + Vector2.RIGHT * operation_radius
+		return player_pos + Vector2.RIGHT * orbit_radius
 
 ## 强制确保与玩家的距离约束[br]
 ## 确保投射物始终在距离玩家operation_radius的圆周上
@@ -193,12 +192,12 @@ func _enforce_distance_constraint() -> void:
 	var distance_to_player: float = player_pos.distance_to(current_pos)
 	
 	# 如果距离不等于operation_radius，强制调整到圆周上
-	if abs(distance_to_player - operation_radius) > 0.1:  # 允许小误差
+	if abs(distance_to_player - orbit_radius) > 0.1:  # 允许小误差
 		var direction_from_player: Vector2 = (current_pos - player_pos).normalized()
 		if direction_from_player == Vector2.ZERO:
 			# 如果投射物与玩家位置完全重叠，使用默认方向
 			direction_from_player = Vector2.RIGHT
-		global_position = player_pos + direction_from_player * operation_radius
+		global_position = player_pos + direction_from_player * orbit_radius
 
 ## 更新投射物旋转角度 - 让投射物像时钟分针一样指向其相对玩家的方向[br]
 func _update_rotation() -> void:

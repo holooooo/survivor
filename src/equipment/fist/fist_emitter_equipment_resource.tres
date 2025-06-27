@@ -1,39 +1,29 @@
 [gd_resource type="Resource" script_class="EmitterEquipmentResource" load_steps=5 format=3 uid="uid://bxmn7rak4pqw8"]
 
-[ext_resource type="Script" uid="uid://b6xffh5lvfa4s" path="res://src/equipment/resources/emitter_equipment_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://cnwq8e5vm7df2" path="res://src/equipment/resources/emitter_equipment_resource.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://chdq3vvnuiwui" path="res://src/equipment/fist/fist_equipment.tscn" id="2"]
 [ext_resource type="PackedScene" uid="uid://bru7130l7n5va" path="res://src/equipment/fist/fist_projectile.tscn" id="3"]
-[ext_resource type="Resource" uid="uid://d8q2x5k9m4nz7" path="res://src/equipment/fist/fist_emitter_projectile_resource.tres" id="4"]
+[ext_resource type="Resource" uid="uid://ec7d3n02wsag" path="res://src/equipment/fist/fist_emitter_projectile_resource.tres" id="4"]
 
 [resource]
 script = ExtResource("1")
 emitter_type = 1
-emit_count = 1
 emit_interval = 0.15
 base_damage = 5
-emit_range = 60.0
-magazine_capacity = 0
-reload_time = 2.0
-auto_reload = true
-duration = 1.0
+attack_range = 80.0
 damage_interval = 0.15
 max_damage_ticks = 6
 projectile_speed = 0.0
-pierce_count = 0
 pierce_damage_reduction = 0.0
-gravity_affected = false
 effect_radius = 60.0
-follow_caster = true
 effect_color = Color(1, 1, 0, 0.7)
 muzzle_flash = false
 trail_effect = false
 range_indicator = true
 equipment_name = "发射器拳击手套"
 equipment_id = "fist_emitter"
-equipment_position = 0
 cooldown_time = 2.0
-operation_radius = 200.0
 equipment_scene = ExtResource("2")
 projectile_scene = ExtResource("3")
 projectile_resource = ExtResource("4")
-description = "发射器类拳击装备，具有持续范围伤害效果" 
+description = "发射器类拳击装备，在80米攻击距离内有敌人时释放持续范围伤害效果"

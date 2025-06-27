@@ -10,7 +10,8 @@ class_name EmitterEquipmentResource
 @export var emit_count: int = 1 ## 单次发射数量
 @export var emit_interval: float = 0.1 ## 发射间隔（秒）
 @export var base_damage: int = 10 ## 基础伤害
-@export var emit_range: float = 500.0 ## 发射范围/最大射程
+@export var attack_range: float = 300.0 ## 攻击距离（只有在此距离内有敌人时才进行攻击）
+@export var range_check_enabled: bool = true ## 是否启用攻击距离检查
 
 @export_group("弹药系统")
 @export var magazine_capacity: int = 0 ## 弹夹容量（0=无限弹药）
@@ -43,7 +44,7 @@ enum EmitterType {
 	PROJECTILE, ## 投射物发射
 	AOE, ## 范围持续攻击
 	BEAM, ## 光束攻击
-	BURST ## 爆发攻击
+	AUTO_TARGETING, ## 自动锁定攻击
 }
 
 ## 获取发射器配置信息[br]
@@ -54,7 +55,8 @@ func get_emitter_config() -> Dictionary:
 		"emit_count": emit_count,
 		"emit_interval": emit_interval,
 		"base_damage": base_damage,
-		"emit_range": emit_range,
+		"attack_range": attack_range,
+		"range_check_enabled": range_check_enabled,
 		"magazine_capacity": magazine_capacity,
 		"reload_time": reload_time,
 		"auto_reload": auto_reload,
@@ -117,8 +119,6 @@ func is_valid() -> bool:
 		return false
 	if base_damage <= 0:
 		return false
-	if emit_range <= 0:
-		return false
 	
 	# 弹药系统验证
 	if magazine_capacity < 0:
@@ -143,6 +143,14 @@ func is_valid() -> bool:
 			if max_damage_ticks <= 0:
 				return false
 			if effect_radius <= 0:
+				return false
+		EmitterType.AUTO_TARGETING:
+			if base_damage <= 0:
+				return false
+			# 弹药系统验证
+			if magazine_capacity <= 0:
+				return false
+			if reload_time <= 0:
 				return false
 	
 	return true

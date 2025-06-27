@@ -129,7 +129,6 @@ graph TB
     EER --> |emitter_type| ET1[PROJECTILE 投射物发射]
     EER --> |emitter_type| ET2[AOE 范围攻击]
     EER --> |emitter_type| ET3[BEAM 光束攻击]
-    EER --> |emitter_type| ET4[BURST 爆发攻击]
 
     EPR --> |projectile_type| PT1[BULLET 子弹类型]
     EPR --> |projectile_type| PT2[AOE 范围类型]
@@ -144,7 +143,6 @@ graph TB
 | **Emitter-PROJECTILE** | 直线射击武器，如手枪、步枪 | `EmitterEquipmentResource` | PROJECTILE | 直线飞行，命中单体目标，支持穿透 | 输出 |
 | **Emitter-AOE** | 范围持续伤害，如拳击、法术光环 | `EmitterEquipmentResource` | AOE | 跟随玩家，持续时间内造成多次伤害 | 输出/转化 |
 | **Emitter-BEAM** | 光束攻击，如激光武器 | `EmitterEquipmentResource` | BEAM | 持续光束，瞬时命中，持续伤害 | 输出 |
-| **Emitter-BURST** | 爆发攻击，如散弹枪 | `EmitterEquipmentResource` | BURST | 多方向同时发射，范围覆盖 | 输出 |
 | **Bomb** | 爆炸型武器，如炸弹、手雷 | `BombEquipmentResource` | - | 延时爆炸，范围一次性伤害 | 输出 |
 | **Mobility** | 移动增强装备，如冲刺靴 | 继承 `EquipmentResource` | - | 无投射物或特殊移动效果 | 移动 |
 | **Defense** | 防御装备，如护盾 | 继承 `EquipmentResource` | - | 护盾效果或减伤光环 | 防御 |
@@ -377,7 +375,6 @@ equipment_name = "[装备中文名称]"
 equipment_id = "[装备英文ID]"
 equipment_position = 0  # 0=输出, 1=移动, 2=转化, 3=防御
 cooldown_time = 1.0
-operation_radius = 100.0
 equipment_scene = preload("res://src/equipment/[装备名称]/[装备名称]_equipment.tscn")
 projectile_scene = preload("res://src/equipment/[装备名称]/[装备名称]_projectile.tscn")
 projectile_resource = preload("res://src/equipment/[装备名称]/[装备名称]_projectile_resource.tres")

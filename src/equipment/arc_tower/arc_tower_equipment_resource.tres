@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EmitterEquipmentResource" load_steps=5 format=3 uid="uid://canx5q7r8t4kw"]
+
+[ext_resource type="Script" uid="uid://cnwq8e5vm7df2" path="res://src/equipment/resources/emitter_equipment_resource.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://b8qy3n4x7m2kp" path="res://src/equipment/arc_tower/arc_tower_equipment.tscn" id="2"]
+[ext_resource type="PackedScene" uid="uid://fbshi8poj5u0" path="res://src/equipment/arc_tower/arc_tower_projectile.tscn" id="3"]
+[ext_resource type="Resource" uid="uid://c7x8lam3n5pqw" path="res://src/equipment/arc_tower/arc_tower_projectile_resource.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+emitter_type = 3
+emit_interval = 0.2
+base_damage = 18
+attack_range = 200.0
+magazine_capacity = 5
+reload_time = 0.2
+duration = 0.3
+damage_interval = 0.2
+max_damage_ticks = 1
+projectile_speed = 0.0
+pierce_damage_reduction = 0.0
+effect_radius = 200.0
+follow_caster = false
+effect_color = Color(0.5, 0.8, 1, 1)
+muzzle_flash = false
+trail_effect = false
+range_indicator = true
+equipment_name = "电弧塔"
+equipment_id = "arc_tower"
+cooldown_time = 0.2
+equipment_scene = ExtResource("2")
+projectile_scene = ExtResource("3")
+projectile_resource = ExtResource("4")
+description = "自动锁定攻击装备，在200米攻击距离内有敌人时发起电弧攻击。弹夹容量5发，每0.2秒自动装填1发弹药。"
