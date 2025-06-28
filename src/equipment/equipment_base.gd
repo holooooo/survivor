@@ -53,9 +53,7 @@ func _setup_base_stats() -> void:
 		"cooldown_time": cooldown_time,
 		"attack_range": emitter_config.get("attack_range", 300.0),
 		"base_damage": emitter_config.get("base_damage", 10),
-		"projectile_speed": emitter_config.get("projectile_speed", 800.0),
-		"magazine_capacity": emitter_config.get("magazine_capacity", 0),
-		"pierce_count": emitter_config.get("pierce_count", 0)
+		"magazine_capacity": emitter_config.get("magazine_capacity", 0)
 	}
 	
 	if mod_manager:
@@ -95,12 +93,8 @@ func _apply_modified_stats() -> void:
 		emitter_config["attack_range"] = modified_stats.attack_range
 	if modified_stats.has("base_damage"):
 		emitter_config["base_damage"] = modified_stats.base_damage
-	if modified_stats.has("projectile_speed"):
-		emitter_config["projectile_speed"] = modified_stats.projectile_speed
 	if modified_stats.has("magazine_capacity"):
 		emitter_config["magazine_capacity"] = modified_stats.magazine_capacity
-	if modified_stats.has("pierce_count"):
-		emitter_config["pierce_count"] = modified_stats.pierce_count
 
 ## 使用装备[br]
 ## [returns] 是否成功使用
@@ -270,6 +264,7 @@ func has_special_effect(effect_name: String) -> bool:
 	return false
 
 ## 检查攻击距离内是否有敌人[br]
+## 使用敌人缓存的距离信息提高性能[br]
 ## [returns] 是否有敌人在攻击距离内
 func has_enemies_in_attack_range() -> bool:
 	if not owner_player:
@@ -279,6 +274,7 @@ func has_enemies_in_attack_range() -> bool:
 	var range_check_enabled: bool = emitter_config.get("range_check_enabled", true)
 	if not range_check_enabled:
 		return true # 如果未启用检查，始终返回true
+	
 	var attack_range: float = max(emitter_config.get("attack_range", 300.0), 0.0)
 
 	# 检查场景树是否可用
@@ -291,17 +287,16 @@ func has_enemies_in_attack_range() -> bool:
 	if enemies.is_empty():
 		return false
 	
-	# 检查是否有敌人在攻击距离内
-	var player_pos: Vector2 = owner_player.global_position
+	# 检查是否有敌人在攻击距离内，使用敌人缓存的距离信息
 	for enemy in enemies:
-		if enemy is Node2D and is_instance_valid(enemy):
-			var distance: float = player_pos.distance_to(enemy.global_position)
-			if distance <= attack_range:
+		if enemy is EnemyBase and is_instance_valid(enemy):
+			if enemy.is_within_distance_of_player(attack_range):
 				return true
 	
 	return false
 
 ## 获取攻击距离内最近的敌人[br]
+## 使用敌人缓存的距离信息提高性能[br]
 ## [returns] 最近的敌人节点，如果没有则返回null
 func get_nearest_enemy_in_attack_range() -> Node2D:
 	if not owner_player:
@@ -319,21 +314,23 @@ func get_nearest_enemy_in_attack_range() -> Node2D:
 	if enemies.is_empty():
 		return null
 	
-	# 找到攻击距离内最近的敌人
+	# 找到攻击距离内最近的敌人，使用敌人缓存的距离信息
 	var nearest_enemy: Node2D = null
 	var nearest_distance: float = INF
-	var player_pos: Vector2 = owner_player.global_position
 	
 	for enemy in enemies:
-		if enemy is Node2D and is_instance_valid(enemy):
-			var distance: float = player_pos.distance_to(enemy.global_position)
-			if distance <= attack_range and distance < nearest_distance:
-				nearest_distance = distance
-				nearest_enemy = enemy
+		if enemy is EnemyBase and is_instance_valid(enemy):
+			# 使用敌人缓存的距离信息
+			if enemy.is_within_distance_of_player(attack_range):
+				var cached_distance: float = enemy.get_cached_distance_to_player()
+				if cached_distance < nearest_distance:
+					nearest_distance = cached_distance
+					nearest_enemy = enemy
 	
 	return nearest_enemy
 
 ## 获取最近的敌人（无距离限制）[br]
+## 使用敌人缓存的距离信息提高性能[br]
 ## [returns] 最近的敌人节点，如果没有则返回null
 func _get_nearest_enemy() -> Node2D:
 	if not owner_player:
@@ -349,16 +346,15 @@ func _get_nearest_enemy() -> Node2D:
 	if enemies.is_empty():
 		return null
 	
-	# 找到最近的敌人
+	# 找到最近的敌人，使用敌人缓存的距离信息
 	var nearest_enemy: Node2D = null
 	var nearest_distance: float = INF
-	var player_pos: Vector2 = owner_player.global_position
 	
 	for enemy in enemies:
-		if enemy is Node2D and is_instance_valid(enemy):
-			var distance: float = player_pos.distance_to(enemy.global_position)
-			if distance < nearest_distance:
-				nearest_distance = distance
+		if enemy is EnemyBase and is_instance_valid(enemy):
+			var cached_distance: float = enemy.get_cached_distance_to_player()
+			if cached_distance < nearest_distance:
+				nearest_distance = cached_distance
 				nearest_enemy = enemy
 	
 	return nearest_enemy

@@ -1,45 +1,17 @@
-extends Area2D
+extends ProjectileNodeBase
 class_name ArcTowerProjectile
 
 ## 电弧塔投射物 - 电弧攻击的视觉和伤害实现[br]
 ## 从起点到终点创建电弧效果，对目标造成即时伤害[br]
 ## 具备电弧特效和命中反馈
 
-var projectile_resource: EmitterProjectileResource
 var start_position: Vector2
 var end_position: Vector2
-var arc_damage: int = 15
 var has_hit_target: bool = false
-var lifetime: float = 0.3 ## 电弧持续时间
 
 @onready var line_renderer: Node2D = null
 @onready var hit_effect: Node2D = $HitEffect
 @onready var audio_player: AudioStreamPlayer2D = $AudioPlayer
-
-signal target_hit(target: Node2D, damage: int)
-
-func _ready() -> void:
-	# 设置碰撞检测
-	collision_layer = 4 # 武器层
-	collision_mask = 2 # 敌人层
-	
-	# 连接信号
-	area_entered.connect(_on_area_entered)
-	
-	# 添加到投射物组
-	add_to_group("projectiles")
-	
-	# 设置自动销毁
-	var timer = Timer.new()
-	timer.wait_time = lifetime
-	timer.one_shot = true
-	timer.timeout.connect(queue_free)
-	add_child(timer)
-	timer.start()
-
-func _process(delta: float) -> void:
-	# 更新电弧视觉效果
-	_update_arc_visual()
 
 ## 设置电弧攻击参数[br]
 ## [param start_pos] 起始位置[br]
@@ -48,27 +20,36 @@ func _process(delta: float) -> void:
 func setup_arc_attack(start_pos: Vector2, end_pos: Vector2, resource: EmitterProjectileResource) -> void:
 	start_position = start_pos
 	end_position = end_pos
-	projectile_resource = resource
-	
-	if resource:
-		# 直接访问属性，如果不存在则使用默认值
-		arc_damage = resource.base_damage if resource.base_damage else 15
-		lifetime = resource.lifetime if resource.lifetime else 0.3
 	
 	# 设置位置和方向
 	global_position = start_position
 	_setup_collision_detection()
 	_create_arc_effect()
 
-## 从资源配置投射物（兼容方法）[br]
-## [param resource] 投射物资源[br]
-## [param direction] 方向（被忽略，使用目标位置）
-func setup_from_resource(resource: Resource, direction: Vector2) -> void:
-	projectile_resource = resource
-	if resource:
-		# 直接访问属性，如果不存在则使用默认值
-		arc_damage = resource.base_damage if resource.base_damage else 15
-		lifetime = resource.lifetime if resource.lifetime else 0.3
+## 实现抽象方法：初始化特定逻辑[br]
+## [param direction] 初始方向（电弧攻击忽略方向）
+func _initialize_specific(direction: Vector2) -> void:
+	# 电弧攻击在setup_arc_attack中处理位置，这里不需要额外操作
+	# 禁用传统的碰撞检测，使用自己的目标检测逻辑
+	if collision_shape:
+		collision_shape.disabled = true
+
+## 实现抽象方法：更新移动逻辑[br]
+## [param delta] 时间增量
+func _update_movement(delta: float) -> void:
+	# 电弧攻击是即时的，不需要移动
+	pass
+
+## 实现抽象方法：获取投射物类型[br]
+## [returns] 类型标识
+func _get_projectile_type() -> String:
+	return "arc"
+
+## 重写自定义更新逻辑[br]
+## [param delta] 时间增量
+func _update_custom(delta: float) -> void:
+	# 更新电弧视觉效果
+	_update_arc_visual()
 
 ## 设置碰撞检测
 func _setup_collision_detection() -> void:
@@ -102,13 +83,25 @@ func _update_arc_visual() -> void:
 	# 着色器会自动处理电弧动画效果，这里不需要额外更新
 	pass
 
-## 碰撞检测回调
-func _on_area_entered(area: Area2D) -> void:
-	var target = area.get_parent()
+## 重写目标进入处理 - 电弧攻击的即时命中[br]
+## [param target] 进入的目标
+func _on_target_entered(target: Node) -> void:
+	if has_hit_target:
+		return
 	
-	# 检查是否为敌人且未被命中
-	if not has_hit_target and target and target.is_in_group("enemies"):
-		_hit_target(target)
+	has_hit_target = true
+	
+	# 造成伤害
+	_deal_damage_to_target(target, current_damage)
+	
+	# 创建命中特效
+	_create_hit_effect(target.global_position)
+	
+	# 播放音效
+	_play_hit_sound()
+	
+	# 电弧命中后快速消失
+	_fade_out_quickly()
 
 ## 检查终点位置的目标
 func _check_target_at_end_position() -> void:
@@ -128,35 +121,7 @@ func _check_target_at_end_position() -> void:
 				min_distance = distance
 	
 	if target_found:
-		_hit_target(target_found)
-	else:
-		pass
-
-## 命中目标处理[br]
-## [param target] 被命中的目标
-func _hit_target(target: Node2D) -> void:
-	if has_hit_target:
-		return
-	
-	has_hit_target = true
-	
-	# 造成伤害
-	if target.has_method("take_damage"):
-		target.take_damage(arc_damage)
-	else:
-		pass
-	
-	# 创建命中特效
-	_create_hit_effect(target.global_position)
-	
-	# 播放音效
-	_play_hit_sound()
-	
-	# 发射信号
-	target_hit.emit(target, arc_damage)
-	
-	# 电弧命中后快速消失
-	_fade_out_quickly()
+		_on_target_entered(target_found)
 
 ## 创建命中特效[br]
 ## [param hit_pos] 命中位置
@@ -189,16 +154,4 @@ func _play_hit_sound() -> void:
 func _fade_out_quickly() -> void:
 	var tween = create_tween()
 	tween.tween_property(self, "modulate:a", 0.0, 0.1)
-	tween.tween_callback(queue_free)
-
-## 获取投射物状态信息[br]
-## [returns] 状态信息字典
-func get_projectile_info() -> Dictionary:
-	return {
-		"type": "arc",
-		"damage": arc_damage,
-		"start_pos": start_position,
-		"end_pos": end_position,
-		"has_hit": has_hit_target,
-		"lifetime_remaining": lifetime
-	}
+	tween.tween_callback(_destroy_projectile)

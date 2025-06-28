@@ -16,6 +16,11 @@ var damage_cooldown: float = 1.0 ## 伤害冷却时间（秒）
 var frame_skip_counter: int = 0 ## 帧跳过计数器
 var use_physics_movement: bool = false ## 是否使用物理移动（默认使用简单移动）
 
+# 距离缓存系统
+var cached_distance_to_player: float = 0.0 ## 缓存的与玩家的距离
+var distance_cache_counter: int = 0 ## 距离缓存更新计数器
+var distance_cache_update_frames: int = 3 ## 每几帧更新一次距离缓存
+
 @export var enemy_type: GameConstants.EnemyType = GameConstants.EnemyType.MELEE
 
 func _ready() -> void:
@@ -29,6 +34,11 @@ func _ready() -> void:
 	died.connect(_on_died)
 
 	player = get_tree().get_root().find_child("Player", true, false)
+	
+	# 初始化距离缓存
+	if player:
+		cached_distance_to_player = global_position.distance_to(player.global_position)
+
 func _physics_process(delta):
 	if not player or is_dead:
 		return
@@ -42,10 +52,33 @@ func _physics_process(delta):
 	# 调整delta以补偿跳帧
 	var adjusted_delta: float = delta * GameConstants.ENEMY_UPDATE_SKIP_FRAMES
 
+	# 距离缓存更新
+	distance_cache_counter += 1
+	if distance_cache_counter >= distance_cache_update_frames:
+		update_distance_cache()
+		distance_cache_counter = 0
+
 	update_screen_status()
 	enemy_ai(adjusted_delta)
 	check_distance_damage()
 	check_distance_and_respawn()
+
+## 更新距离缓存[br]
+## 定期计算与玩家的距离并缓存，提高性能
+func update_distance_cache() -> void:
+	if player and not is_dead:
+		cached_distance_to_player = global_position.distance_to(player.global_position)
+
+## 获取缓存的与玩家的距离[br]
+## [returns] 缓存的距离值
+func get_cached_distance_to_player() -> float:
+	return cached_distance_to_player
+
+## 检查是否在指定距离内[br]
+## [param max_distance] 最大距离[br]
+## [returns] 是否在距离内
+func is_within_distance_of_player(max_distance: float) -> bool:
+	return cached_distance_to_player <= max_distance
 
 # 子类需要重写这个方法来实现不同的AI行为
 func enemy_ai(delta: float):
@@ -72,7 +105,7 @@ func _on_died(actor: Actor) -> void:
 
 func get_distance_to_player() -> float:
 	if player:
-		return global_position.distance_to(player.global_position)
+		return cached_distance_to_player
 	return 0.0
 
 func get_direction_to_player() -> Vector2:
@@ -86,22 +119,7 @@ func check_distance_damage() -> void:
 	if not player or player.is_dead:
 		return
 
-	var distance_to_player: float
-	if GameConstants.DISTANCE_CHECK_OPTIMIZATION:
-		# 优化：先使用简单的曼哈顿距离快速筛选
-		var diff: Vector2 = player.global_position - global_position
-		var manhattan_distance: float = abs(diff.x) + abs(diff.y)
-		var contact_distance: float = GameConstants.PLAYER_RADIUS + GameConstants.ENEMY_RADIUS
-
-		# 如果曼哈顿距离太远，跳过精确计算
-		if manhattan_distance > contact_distance * 1.5:
-			return
-
-		# 需要精确距离时才计算
-		distance_to_player = get_distance_to_player()
-	else:
-		distance_to_player = get_distance_to_player()
-
+	var distance_to_player: float = cached_distance_to_player
 	var contact_distance: float = GameConstants.PLAYER_RADIUS + GameConstants.ENEMY_RADIUS
 
 	# 如果距离小于角色半径之和，则造成伤害
@@ -120,7 +138,7 @@ func attempt_damage_player() -> void:
 ## 检查与玩家的距离并在必要时重新刷新位置[br]
 ## 当敌人距离玩家超过最大距离时，将其重新定位到屏幕外周围
 func check_distance_and_respawn() -> void:
-	var distance_to_player: float = get_distance_to_player()
+	var distance_to_player: float = cached_distance_to_player
 	if distance_to_player > GameConstants.ENEMY_MAX_DISTANCE_FROM_PLAYER:
 		respawn_around_screen()
 

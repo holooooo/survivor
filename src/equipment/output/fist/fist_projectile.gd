@@ -1,100 +1,53 @@
-extends Area2D
+extends ProjectileNodeBase
 class_name FistProjectile
 
 ## 拳击投射物 - 使用发射器投射物资源配置的投射物[br]
 ## 在存在期间定期对范围内敌人造成伤害
 
-var projectile_resource: EmitterProjectileResource
 var remaining_damage_ticks: int = 5
 var damage_timer: float = 0.0
-var lifetime_timer: float = 0.0
 var player: Player  ## 投射物关联的玩家
-var orbit_radius: float = 100.0  ## 操作半径，与装备的operation_radius保持一致
+var orbit_radius: float = 100.0  ## 操作半径，与装备的orbit_radius保持一致
 var move_speed: float = 200.0  ## 移动速度
-var colliding_enemies: Array[Node] = []  ## 当前碰撞中的敌人集合
 
-@onready var sprite: Sprite2D = $Sprite2D
-@onready var collision_shape: CollisionShape2D = $CollisionShape2D
+## 实现抽象方法：初始化特定逻辑[br]
+## [param direction] 初始方向（拳击投射物会智能跟随）
+func _initialize_specific(direction: Vector2) -> void:
+	# 设置参数
+	remaining_damage_ticks = projectile_resource.total_damage_ticks
 
-func _ready() -> void:
-	# 设置碰撞检测
-	collision_layer = 4 # 武器层
-	collision_mask = 2  # 敌人层
-	
-	# 连接碰撞信号
-	area_entered.connect(_on_area_entered)
-	area_exited.connect(_on_area_exited)
-	body_entered.connect(_on_body_entered)
-	body_exited.connect(_on_body_exited)
-	
-	# 添加到投射物组，便于性能监控
-	add_to_group("projectiles")
-
-func _physics_process(delta: float) -> void:
-	if not projectile_resource:
-		return
-	
-	lifetime_timer += delta
-	damage_timer += delta
-	
-	# 生存时间到期时销毁
-	if lifetime_timer >= projectile_resource.lifetime:
-		queue_free()
-		return
-	
+## 实现抽象方法：更新移动逻辑[br]
+## [param delta] 时间增量
+func _update_movement(delta: float) -> void:
 	# 持续跟随玩家并移动到最佳位置
 	_update_position(delta)
+
+## 实现抽象方法：获取投射物类型[br]
+## [returns] 类型标识
+func _get_projectile_type() -> String:
+	return "fist"
+
+## 重写自定义更新逻辑 - 持续伤害处理[br]
+## [param delta] 时间增量
+func _update_custom(delta: float) -> void:
+	damage_timer += delta
 	
 	# 定期对碰撞中的敌人造成伤害
 	if projectile_resource.continuous_damage and damage_timer >= projectile_resource.damage_tick_interval and remaining_damage_ticks > 0:
-		_deal_damage_to_colliding_enemies()
+		_deal_damage_to_colliding_targets()
 		damage_timer = 0.0
 		remaining_damage_ticks -= 1
 		
 		# 如果伤害次数耗尽，销毁投射物
 		if remaining_damage_ticks <= 0:
-			queue_free()
+			_destroy_projectile()
 			return
 
-## 处理Area2D进入碰撞[br]
-## [param area] 进入的区域节点
-func _on_area_entered(area: Area2D) -> void:
-	if area.is_in_group("enemies") and area not in colliding_enemies:
-		colliding_enemies.append(area)
-
-## 处理Area2D离开碰撞[br]
-## [param area] 离开的区域节点
-func _on_area_exited(area: Area2D) -> void:
-	if area in colliding_enemies:
-		colliding_enemies.erase(area)
-
-## 处理RigidBody2D进入碰撞[br]
-## [param body] 进入的刚体节点
-func _on_body_entered(body: Node2D) -> void:
-	if body.is_in_group("enemies") and body not in colliding_enemies:
-		colliding_enemies.append(body)
-
-## 处理RigidBody2D离开碰撞[br]
-## [param body] 离开的刚体节点
-func _on_body_exited(body: Node2D) -> void:
-	if body in colliding_enemies:
-		colliding_enemies.erase(body)
-
-## 从资源配置投射物[br]
-## [param resource] 投射物资源[br]
-## [param direction] 移动方向（保留接口，但拳击投射物会智能跟随）
-func setup_from_resource(resource: EmitterProjectileResource, direction: Vector2) -> void:
-	self.projectile_resource = resource
-	if not self.projectile_resource:
-		push_error("Fist projectile resource not set.")
-		queue_free()
-		return
-	
-	# 设置参数
-	remaining_damage_ticks = self.projectile_resource.total_damage_ticks
-	
-	# 设置外观和碰撞范围
-	_setup_visuals()
+## 重写目标进入处理 - 拳击投射物不立即造成伤害[br]
+## [param target] 进入的目标
+func _on_target_entered(target: Node) -> void:
+	# 拳击投射物依靠持续伤害系统，目标进入时不立即造成伤害
+	pass
 
 ## 设置投射物的玩家引用和操作半径[br]
 ## [param owner_player] 关联的玩家[br]
@@ -113,16 +66,16 @@ func set_player_reference(owner_player: Player, orbit_radius: float) -> void:
 		# 设置初始旋转角度
 		_update_rotation()
 
-## 对碰撞中的敌人造成伤害
-func _deal_damage_to_colliding_enemies() -> void:
+## 对碰撞中的目标造成伤害
+func _deal_damage_to_colliding_targets() -> void:
 	if not projectile_resource:
 		return
 	
-	colliding_enemies = colliding_enemies.filter(func(enemy): return is_instance_valid(enemy))
+	# 清理无效目标
+	colliding_targets = colliding_targets.filter(func(target): return is_instance_valid(target))
 	
-	for enemy in colliding_enemies:
-		if enemy.has_method("take_damage"):
-			enemy.take_damage(projectile_resource.tick_damage)
+	for target in colliding_targets:
+		_deal_damage_to_target(target, projectile_resource.tick_damage)
 
 ## 更新投射物位置 - 跟随玩家并移动到最接近敌人的位置[br]
 ## [param delta] 时间增量
@@ -208,25 +161,3 @@ func _update_rotation() -> void:
 	var angle_rad: float = direction_from_player.angle()
 	rotation = angle_rad
 
-func _setup_visuals() -> void:
-	if sprite:
-		if projectile_resource.projectile_texture:
-			sprite.texture = projectile_resource.projectile_texture
-		sprite.modulate = projectile_resource.projectile_color
-		sprite.scale = projectile_resource.projectile_scale
-	
-	# 处理不同类型的碰撞形状
-	if collision_shape and collision_shape.shape:
-		if collision_shape.shape is CircleShape2D:
-			var shape: CircleShape2D = collision_shape.shape as CircleShape2D
-			shape.radius = projectile_resource.detection_radius
-		elif collision_shape.shape is RectangleShape2D:
-			var shape: RectangleShape2D = collision_shape.shape as RectangleShape2D
-			var size = projectile_resource.detection_radius * 2
-			shape.size = Vector2(size, size)
-
-func _on_tree_exiting() -> void:
-	if is_in_group("projectiles"):
-		remove_from_group("projectiles")
-	
-	colliding_enemies.clear() 

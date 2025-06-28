@@ -9,15 +9,19 @@
 
 [resource]
 script = ExtResource("1")
+emit_count = 3
 base_damage = 12
 attack_range = 1000.0
 magazine_capacity = 9
+reload_time = 2.0
+reload_mode = 0
+reload_amount = 1
 equipment_name = "手枪"
 equipment_id = "pistol"
 cooldown_time = 0.5
 equipment_scene = ExtResource("2")
 projectile_scene = ExtResource("3")
 projectile_resource = ExtResource("4")
-description = "自动瞄准手枪，在250米攻击距离内有敌人时进行射击"
+description = "自动瞄准手枪，在1000米攻击距离内有敌人时进行射击，单次发射3发子弹"
 equipment_tags = Array[int]([0, 8, 13, 4])
 mods = Array[ExtResource("2_ao1bv")]([ExtResource("3_ao1bv")])

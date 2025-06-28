@@ -8,18 +8,14 @@
 
 [resource]
 script = ExtResource("1")
-emitter_type = 1
 emit_interval = 0.15
 base_damage = 5
 attack_range = 80.0
-damage_interval = 0.15
-max_damage_ticks = 6
-projectile_speed = 0.0
-pierce_damage_reduction = 0.0
+magazine_capacity = 2
+reload_time = 10.0
+reload_mode = 1
+reload_amount = 1
 effect_color = Color(1, 1, 0, 0.7)
-muzzle_flash = false
-trail_effect = false
-range_indicator = true
 equipment_name = "发射器拳击手套"
 equipment_id = "fist_emitter"
 cooldown_time = 2.0

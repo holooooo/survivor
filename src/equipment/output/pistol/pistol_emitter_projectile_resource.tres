@@ -5,11 +5,8 @@
 
 [resource]
 script = ExtResource("1_projectile_base")
-projectile_speed = 1000.0
-max_travel_distance = 600.0
+projectile_speed = 1500.0
 base_damage = 12
-hit_knockback = 10.0
-total_damage_ticks = 1
 pierce_count = 2
 pierce_damage_reduction = 0.15
 trail_length = 30.0

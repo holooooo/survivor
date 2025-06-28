@@ -4,23 +4,13 @@
 
 [resource]
 script = ExtResource("1_projectile_base")
-projectile_type = 1
 projectile_speed = 0.0
-max_travel_distance = 60.0
 base_damage = 5
-tick_damage = 5
-continuous_damage = true
-damage_tick_interval = 0.15
-total_damage_ticks = 6
 pierce_damage_reduction = 0.0
 pierce_speed_reduction = 0.0
-detection_method = 1
 detection_radius = 100.0
 trail_length = 0.0
 trail_color = Color(1, 1, 1, 0)
-show_range_indicator = true
-range_indicator_color = Color(1, 1, 0, 0.3)
-impact_effect = false
 fade_out = true
 projectile_name = "发射器拳击投射物"
 damage_per_tick = 5
