@@ -14,7 +14,7 @@ var move_speed: float = 200.0  ## 移动速度
 ## [param direction] 初始方向（拳击投射物会智能跟随）
 func _initialize_specific(direction: Vector2) -> void:
 	# 设置参数
-	remaining_damage_ticks = projectile_resource.total_damage_ticks
+	remaining_damage_ticks = projectile_resource.damage_ticks
 
 ## 实现抽象方法：更新移动逻辑[br]
 ## [param delta] 时间增量
@@ -32,8 +32,8 @@ func _get_projectile_type() -> String:
 func _update_custom(delta: float) -> void:
 	damage_timer += delta
 	
-	# 定期对碰撞中的敌人造成伤害
-	if projectile_resource.continuous_damage and damage_timer >= projectile_resource.damage_tick_interval and remaining_damage_ticks > 0:
+	# 定期对碰撞中的敌人造成伤害 - 拳击投射物始终进行持续伤害
+	if damage_timer >= projectile_resource.damage_interval and remaining_damage_ticks > 0:
 		_deal_damage_to_colliding_targets()
 		damage_timer = 0.0
 		remaining_damage_ticks -= 1
@@ -75,7 +75,7 @@ func _deal_damage_to_colliding_targets() -> void:
 	colliding_targets = colliding_targets.filter(func(target): return is_instance_valid(target))
 	
 	for target in colliding_targets:
-		_deal_damage_to_target(target, projectile_resource.tick_damage)
+		_deal_damage_to_target(target, projectile_resource.damage_per_tick)
 
 ## 更新投射物位置 - 跟随玩家并移动到最接近敌人的位置[br]
 ## [param delta] 时间增量

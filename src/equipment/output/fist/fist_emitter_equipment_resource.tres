@@ -14,7 +14,6 @@ attack_range = 80.0
 magazine_capacity = 2
 reload_time = 10.0
 reload_mode = 1
-reload_amount = 1
 effect_color = Color(1, 1, 0, 0.7)
 equipment_name = "发射器拳击手套"
 equipment_id = "fist_emitter"

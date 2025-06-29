@@ -10,7 +10,7 @@
 script = ExtResource("1")
 emit_interval = 0.2
 base_damage = 18
-attack_range = 800.0
+attack_range = 200.0
 magazine_capacity = 5
 reload_time = 1.0
 reload_mode = 1

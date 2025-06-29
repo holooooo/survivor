@@ -6,15 +6,27 @@ class_name EquipmentResource
 
 enum EquipmentPosition {
 	OUTPUT = 0,    ## 输出位置 - 攻击型装备
-	MOBILITY = 1,  ## 移动位置 - 移动增强装备  
+	MOBILITY = 1,  ## 移动位置 - 移动增强装备
 	TRANSFORM = 2, ## 转化位置 - 效果转化装备
 	DEFENSE = 3,   ## 防御位置 - 防护型装备
 	UNIVERSAL = 4  ## 通用位置 - 可装备任意类型
 }
 
+## 装备品质
+## 装备品质影响装备的属性、效果
+## 分为民用级企业级专业级军用级和传说级
+enum EquipmentQuality{
+	COMMERCIAL,
+	ENTERPRISE,
+	PROFESSIONAL,
+	ARMY,
+	LEGENDARY
+}
+
 @export var equipment_name: String = "基础装备" ## 装备名称
 @export var equipment_id: String = "" ## 装备唯一标识
 @export var equipment_position: EquipmentPosition = EquipmentPosition.OUTPUT ## 装备位置类型
+@export var equipment_quality: EquipmentQuality = EquipmentQuality.COMMERCIAL ## 装备品质
 @export var icon_texture: Texture2D ## 装备图标
 @export var cooldown_time: float = 1.0 ## 冷却时间（秒）
 @export var equipment_scene: PackedScene ## 装备场景引用
@@ -30,8 +42,6 @@ enum EquipmentPosition {
 ## [param player] 装备的拥有者[br]
 ## [returns] 装备实例，失败返回null
 func create_equipment_instance(player: Player) -> EquipmentBase:
-	print("开始创建装备实例: ", equipment_name, " 预设模组数量: ", mods.size())
-	
 	if not equipment_scene:
 		push_error("装备资源缺少场景引用: " + equipment_name)
 		return null
@@ -42,28 +52,19 @@ func create_equipment_instance(player: Player) -> EquipmentBase:
 		push_error("无法实例化装备场景: " + equipment_name)
 		return null
 	
-	print("装备场景实例化成功，开始应用配置")
-	
 	# 应用资源配置到装备实例
 	_apply_config_to_instance(equipment_instance)
-	
-	print("配置应用完成，开始初始化装备")
 	
 	# 初始化装备
 	equipment_instance.initialize(player)
 
-		# 确保模组管理器已初始化，如果没有则初始化
+	# 确保模组管理器已初始化，如果没有则初始化
 	if not equipment_instance.mod_manager:
-		print("⚠️ 模组管理器未初始化，开始初始化")
 		equipment_instance._initialize_mod_system()
-	else:
-		print("✅ 模组管理器已存在，实例ID: ", equipment_instance.mod_manager.get_instance_id())
 	
 	# 立即重新设置基础属性并安装模组
 	equipment_instance._setup_base_stats()
 	equipment_instance._install_preset_mods()
-	
-	print("装备 ", equipment_name, " 创建完成")
 	
 	return equipment_instance
 
@@ -75,6 +76,7 @@ func _apply_config_to_instance(instance: EquipmentBase) -> void:
 	
 	# 设置基础属性
 	instance.equipment_name = equipment_name
+	instance.equipment_quality = equipment_quality
 	instance.equipment_id = equipment_id
 	instance.equipment_position = equipment_position
 	instance.icon_texture = icon_texture

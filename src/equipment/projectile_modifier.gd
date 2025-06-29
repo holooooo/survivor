@@ -49,17 +49,18 @@ static func _setup_bounce_effect(projectile: Node2D, config: Dictionary) -> void
 		"bounced_enemies": []
 	})
 	
-	# 连接命中信号处理弹射
+	# 延迟连接命中信号处理弹射，确保投射物完全初始化
 	if projectile.has_signal("projectile_hit"):
 		if not projectile.projectile_hit.is_connected(_on_projectile_bounce_hit):
-			projectile.projectile_hit.connect(_on_projectile_bounce_hit.bind(projectile))
-			print("    ✓ 弹射效果信号连接成功")
+			# 使用call_deferred确保在投射物完全准备好后连接信号
+			projectile.call_deferred("connect", "projectile_hit", _on_projectile_bounce_hit.bind(projectile))
+			print("    ✓ 弹射效果信号连接已安排（延迟）")
 		else:
 			print("    ⚠ 弹射效果信号已连接")
 	elif projectile.has_method("_on_area_entered"):
 		# 如果没有自定义信号，监听碰撞
-		_setup_bounce_collision_monitor(projectile)
-		print("    ✓ 弹射效果碰撞监听设置成功")
+		projectile.call_deferred("call", "_setup_bounce_collision_monitor", projectile)
+		print("    ✓ 弹射效果碰撞监听设置已安排（延迟）")
 	else:
 		print("    ✗ 弹射效果设置失败：没有可用的信号或方法")
 
@@ -83,16 +84,17 @@ static func _setup_split_effect(projectile: Node2D, config: Dictionary) -> void:
 		"has_split": false
 	})
 	
-	# 连接命中信号处理分裂
+	# 延迟连接命中信号处理分裂，确保投射物完全初始化
 	if projectile.has_signal("projectile_hit"):
 		if not projectile.projectile_hit.is_connected(_on_projectile_split_hit):
-			projectile.projectile_hit.connect(_on_projectile_split_hit.bind(projectile))
-			print("    ✓ 分裂效果信号连接成功")
+			# 使用call_deferred确保在投射物完全准备好后连接信号
+			projectile.call_deferred("connect", "projectile_hit", _on_projectile_split_hit.bind(projectile))
+			print("    ✓ 分裂效果信号连接已安排（延迟）")
 		else:
 			print("    ⚠ 分裂效果信号已连接")
 	elif projectile.has_method("_on_area_entered"):
-		_setup_split_collision_monitor(projectile)
-		print("    ✓ 分裂效果碰撞监听设置成功")
+		projectile.call_deferred("call", "_setup_split_collision_monitor", projectile)
+		print("    ✓ 分裂效果碰撞监听设置已安排（延迟）")
 	else:
 		print("    ✗ 分裂效果设置失败：没有可用的信号或方法")
 
@@ -220,22 +222,9 @@ static func _find_bounce_target(projectile: Node2D, current_target: Node2D, boun
 ## [param to_target] 目标[br]
 ## [param bounce_data] 弹射数据
 static func _create_bounce_projectile(original: Node2D, from_target: Node2D, to_target: Node2D, bounce_data: Dictionary) -> void:
-	# 检查原始投射物是否有创建副本的方法
-	var new_projectile: Node2D = null
-	
-	# 方法1：通过类名创建新实例
-	if original.has_method("get_script"):
-		var script = original.get_script()
-		if script:
-			# 获取投射物的场景文件（通过类型检查）
-			if original is PistolProjectile:
-				var pistol_scene = load("res://src/equipment/output/pistol/pistol_projectile.tscn")
-				if pistol_scene:
-					new_projectile = pistol_scene.instantiate()
-	
-	# 方法2：通过复制创建（备用方案）
-	if not new_projectile:
-		new_projectile = original.duplicate()
+	# 直接复制原始投射物创建弹射投射物
+	var new_projectile: Node2D = original.duplicate()
+	print("  创建弹射投射物通过复制")
 	
 	if not new_projectile:
 		push_error("无法创建弹射投射物")
@@ -292,19 +281,11 @@ static func _create_split_projectiles(original: Node2D, hit_target: Node2D, spli
 	var start_angle = -split_angle * 0.5
 	
 	for i in range(split_count):
-		var new_projectile: Node2D = null
-		
-		# 通过类型创建新的投射物实例
-		if original is PistolProjectile:
-			var pistol_scene = load("res://src/equipment/output/pistol/pistol_projectile.tscn")
-			if pistol_scene:
-				new_projectile = pistol_scene.instantiate()
-		
-		# 备用方案：通过复制创建
-		if not new_projectile:
-			new_projectile = original.duplicate()
+		# 直接复制原始投射物创建分裂投射物
+		var new_projectile: Node2D = original.duplicate()
 		
 		if not new_projectile:
+			print("  创建分裂投射物失败")
 			continue
 		
 		main_scene.add_child(new_projectile)

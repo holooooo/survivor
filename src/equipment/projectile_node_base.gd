@@ -32,6 +32,10 @@ func _ready() -> void:
 	_setup_collision_system()
 	_setup_lifecycle()
 	add_to_group("projectiles")
+	
+	# 初始时禁用碰撞检测，等待资源设置完成后再启用
+	set_deferred("monitoring", false)
+	set_deferred("monitorable", false)
 
 ## 查找可选节点[br]
 func _find_optional_nodes() -> void:
@@ -84,6 +88,10 @@ func setup_from_resource(resource: EmitterProjectileResource, direction: Vector2
 	
 	# 执行特定初始化
 	_initialize_specific(direction)
+	
+	# 初始化完成后启用碰撞检测
+	set_deferred("monitoring", true)
+	set_deferred("monitorable", true)
 
 ## 设置碰撞系统
 func _setup_collision_system() -> void:
@@ -180,12 +188,16 @@ func _deal_damage_to_target(target: Node, damage_amount: int) -> void:
 	
 	# 发射命中信号
 	projectile_hit.emit(target)
+	
+	# 处理mod效果（只有在资源已初始化时）
+	if projectile_resource:
+		_handle_mod_effects_on_hit(target)
 
 ## 检查是否应该销毁[br]
 ## [returns] 是否应该销毁
 func _should_destroy() -> bool:
 	if not projectile_resource:
-		return lifetime_timer >= 5.0 # 默认5秒
+		return lifetime_timer >= 5.0 # 默认5秒，资源未初始化时的回退
 	
 	return lifetime_timer >= projectile_resource.lifetime
 
@@ -216,7 +228,11 @@ func _destroy_projectile() -> void:
 ## [param effects] 模组效果数组
 func add_mod_effects(effects: Array[Dictionary]) -> void:
 	mod_effects = effects
-	ProjectileModifier.apply_mod_effects_to_projectile(self, mod_effects)
+	
+	for effect_data in mod_effects:
+		var mod_resource = effect_data.get("mod_resource", null)
+		if mod_resource and mod_resource is ModResource:
+			mod_resource.apply_to_projectile(self)
 
 ## 获取投射物信息[br]
 ## [returns] 投射物信息字典
@@ -279,4 +295,17 @@ func _update_custom(delta: float) -> void:
 ## 销毁前处理[br]
 func _before_destroy() -> void:
 	# 子类可重写此方法来处理销毁前的清理逻辑
-	pass 
+	pass
+
+## 处理命中时的mod效果[br]
+## [param target] 命中的目标
+func _handle_mod_effects_on_hit(target: Node) -> void:
+	# 使用新的mod系统，让每个mod自己处理命中事件
+	for effect_data in mod_effects:
+		var mod_resource = effect_data.get("mod_resource", null)
+		if mod_resource and mod_resource is ModResource:
+			var should_continue = mod_resource.on_projectile_hit(self, target)
+			if not should_continue:
+				break  # 某些mod可能要求停止处理后续mod
+
+# 旧的硬编码mod处理方法已移除，现在使用ModResource系统 

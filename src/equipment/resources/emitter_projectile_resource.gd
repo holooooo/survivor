@@ -29,6 +29,7 @@ class_name EmitterProjectileResource
 ## [returns] 投射物配置字典
 func get_projectile_config() -> Dictionary:
 	return {
+		# EmitterProjectileResource 特有的属性
 		"projectile_speed": projectile_speed,
 		"base_damage": base_damage,
 		"pierce_count": pierce_count,
@@ -38,7 +39,18 @@ func get_projectile_config() -> Dictionary:
 		"affected_groups": affected_groups,
 		"trail_length": trail_length,
 		"trail_color": trail_color,
-		"fade_out": fade_out
+		"fade_out": fade_out,
+		# 从 ProjectileBase 继承的属性
+		"projectile_name": projectile_name,
+		"damage_per_tick": damage_per_tick,
+		"tick_damage": damage_per_tick,  # 为向后兼容提供别名
+		"damage_interval": damage_interval,
+		"lifetime": lifetime,
+		"detection_range": detection_range,
+		"damage_ticks": damage_ticks,
+		"projectile_texture": projectile_texture,
+		"projectile_color": projectile_color,
+		"projectile_scale": projectile_scale
 	}
 
 ## 计算当前穿透后的伤害[br]

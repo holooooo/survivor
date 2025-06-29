@@ -7,6 +7,7 @@ class_name EquipmentBase
 @export var equipment_name: String = "基础装备"
 @export var equipment_id: String = ""
 @export var equipment_position: EquipmentResource.EquipmentPosition = EquipmentResource.EquipmentPosition.OUTPUT ## 装备位置类型
+@export var equipment_quality: EquipmentResource.EquipmentQuality = EquipmentResource.EquipmentQuality.COMMERCIAL ## 装备品质
 @export var icon_texture: Texture2D
 @export var cooldown_time: float = 1.0 ## 冷却时间（秒）
 @export var projectile_scene: PackedScene ## 发射的投射物场景
@@ -62,20 +63,14 @@ func _setup_base_stats() -> void:
 ## 安装预设模组
 func _install_preset_mods() -> void:
 	if not mod_manager:
-		print("警告: 模组管理器未初始化")
 		return
 
 	for i in range(mods.size()):
 		var mod_resource = mods[i]
 		if mod_resource:
-			print("  安装模组 ", i + 1, ": ", mod_resource.mod_name)
 			var slot = mod_manager.install_mod(mod_resource)
 			if slot != -1:
-				print("    ✓ 安装成功，槽位: ", slot)
-			else:
-				print("    ✗ 安装失败")
-		else:
-			print("  模组 ", i + 1, " 为空")
+				print("已安装模组: ", mod_resource.mod_name)
 
 ## 属性更新回调
 func _on_stats_updated(new_stats: Dictionary) -> void:
@@ -218,10 +213,8 @@ func _apply_mods_to_projectile(projectile: Node2D) -> void:
 	if not mod_manager:
 		return
 	
-	
 	# 获取投射物模组效果
 	var projectile_effects = mod_manager.get_projectile_effects()
-	
 	
 	# 为投射物添加效果处理器
 	if projectile.has_method("add_mod_effects"):

@@ -4,7 +4,7 @@ class_name PistolProjectile
 ## 手枪子弹投射物 - 直线飞行的子弹[br]
 ## 以直线方式飞向目标，具备穿透和伤害衰减能力
 
-const TRAIL_LENGTH: int = 20 ## 拖尾长度
+const TRAIL_LENGTH: int = 0 ## 拖尾长度
 const TRAIL_INTERVAL: float = 0.02 ## 拖尾更新间隔
 
 var direction: Vector2 = Vector2.RIGHT ## 飞行方向
@@ -47,6 +47,11 @@ func _get_projectile_type() -> String:
 ## 重写目标进入处理 - 手枪子弹的穿透逻辑[br]
 ## [param target] 进入的目标
 func _on_target_entered(target: Node) -> void:
+	# 检查资源是否已初始化
+	if not projectile_resource:
+		print("警告：投射物资源未初始化，跳过伤害处理")
+		return
+	
 	var current_pierce = projectile_resource.pierce_count - pierce_left
 	var damage = _calculate_pierce_damage(current_damage, current_pierce)
 	
@@ -105,3 +110,15 @@ func _calculate_pierce_damage(base_damage: int, current_pierce: int) -> int:
 	damage_multiplier = max(damage_multiplier, 0.1) # 最少保留10%伤害
 	
 	return int(base_damage * damage_multiplier)
+
+## 设置飞行方向[br]
+## [param new_direction] 新的飞行方向
+func _set_direction(new_direction: Vector2) -> void:
+	direction = new_direction.normalized()
+	if direction != Vector2.ZERO:
+		rotation = direction.angle()
+
+## 获取当前飞行方向[br]
+## [returns] 当前飞行方向
+func _get_direction() -> Vector2:
+	return direction

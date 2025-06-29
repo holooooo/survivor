@@ -96,4 +96,44 @@ func get_mod_info() -> Dictionary:
 		"compatible_tags": compatible_tags,
 		"priority": priority,
 		"effect_config": effect_config
-	} 
+	}
+
+## === 模组效果执行接口 ===
+
+## 应用模组效果到投射物[br]
+## [param projectile] 目标投射物[br]
+## 子类可重写此方法来实现模组的初始化逻辑
+func apply_to_projectile(projectile: Node) -> void:
+	# 默认实现：将effect_config设置到projectile的meta中
+	if effect_type == ModEffectType.PROJECTILE_EFFECT:
+		var effect_name = effect_config.get("effect_name", "")
+		if not effect_name.is_empty():
+			projectile.set_meta(effect_name + "_mod", self)
+			projectile.set_meta(effect_name + "_data", _get_initial_mod_data())
+
+## 处理投射物命中事件[br]
+## [param projectile] 投射物[br]
+## [param target] 命中的目标[br]
+## [returns] 是否应该继续处理后续逻辑
+func on_projectile_hit(projectile: Node, target: Node) -> bool:
+	# 子类重写此方法来实现命中时的效果
+	return true
+
+## 获取初始模组数据[br]
+## [returns] 初始数据字典[br]
+## 子类可重写此方法来提供自定义的初始数据
+func _get_initial_mod_data() -> Dictionary:
+	return effect_config.duplicate()
+
+## 修改其他模组的数据[br]
+## [param projectile] 投射物[br]
+## [param other_mod_id] 其他模组的ID[br]
+## [param modifications] 要应用的修改[br]
+## 用于实现模组间的相互影响
+func modify_other_mod(projectile: Node, other_mod_id: String, modifications: Dictionary) -> void:
+	var other_mod_data_key = other_mod_id + "_data"
+	if projectile.has_meta(other_mod_data_key):
+		var other_data = projectile.get_meta(other_mod_data_key, {})
+		for key in modifications:
+			other_data[key] = modifications[key]
+		projectile.set_meta(other_mod_data_key, other_data) 
