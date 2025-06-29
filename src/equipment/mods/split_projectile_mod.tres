@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="SplitProjectileMod" load_steps=2 format=3 uid="uid://dxsank3fm5wh2"]
 
-[ext_resource type="Script" path="res://src/equipment/mods/split_projectile_mod.gd" id="1_split_mod"]
+[ext_resource type="Script" uid="uid://dpf3nxt4y554y" path="res://src/equipment/mods/split_projectile_mod.gd" id="1_split_mod"]
 
 [resource]
 script = ExtResource("1_split_mod")

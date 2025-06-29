@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://bqlr0mdryjoek"]
 
-[ext_resource type="Script" uid="uid://etsay58j6v62" path="res://src/scenes/main/main.gd" id="1_main_script"]
+[ext_resource type="Script" uid="uid://etsay58j6v62" path="res://src/scenes/fight/fight.gd" id="1_main_script"]
 [ext_resource type="PackedScene" uid="uid://dkeamf7f6v0g1" path="res://src/entities/enemies/enemy.tscn" id="2_enemy_scene"]
 [ext_resource type="PackedScene" uid="uid://bexl2b5q5oopf" path="res://src/ui/performance_monitor.tscn" id="3_fub2y"]
 [ext_resource type="Script" uid="uid://cutwsom3s04lv" path="res://src/equipment/equipment_manager.gd" id="3_fup5m"]

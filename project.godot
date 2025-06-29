@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="geometry-survivor"
-run/main_scene="res://src/scenes/main/main.tscn"
+run/main_scene="uid://bqlr0mdryjoek"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
 

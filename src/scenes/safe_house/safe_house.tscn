@@ -1,7 +1,7 @@
-[gd_scene load_steps=9 format=3 uid="uid://b5h6i7j8lal0m"]
+[gd_scene load_steps=10 format=3 uid="uid://b5h6i7j8lal0m"]
 
-[ext_resource type="Script" path="res://src/scenes/safe_house/safe_house.gd" id="1_9bq6t"]
-[ext_resource type="Script" path="res://src/scenes/safe_house/safe_house_manager.gd" id="2_0cr7u"]
+[ext_resource type="Script" uid="uid://dstkak5cdavsc" path="res://src/scenes/safe_house/safe_house.gd" id="1_9bq6t"]
+[ext_resource type="Script" uid="uid://dagsdv8bsymqf" path="res://src/scenes/safe_house/safe_house_manager.gd" id="2_0cr7u"]
 [ext_resource type="PackedScene" uid="uid://bj8k6x3yv2n2k" path="res://src/scenes/safe_house/components/navigation_bar.tscn" id="3_1ds8v"]
 [ext_resource type="PackedScene" uid="uid://cve8k4q6nnwrd" path="res://src/scenes/safe_house/rooms/main_room.tscn" id="4_2et9w"]
 [ext_resource type="PackedScene" uid="uid://bfb5f7ng7yj0m" path="res://src/scenes/safe_house/rooms/battle_room.tscn" id="5_3fu0x"]
@@ -10,67 +10,69 @@
 [ext_resource type="PackedScene" uid="uid://xppmb3v12ta2" path="res://src/scenes/safe_house/rooms/research_room.tscn" id="8_6ix30"]
 [ext_resource type="PackedScene" uid="uid://byoqnc2w2sub3" path="res://src/scenes/safe_house/rooms/brand_room.tscn" id="9_7jy41"]
 
-[node name="SafeHouse" type="Control"]
+[node name="Node3D" type="Node2D"]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="SafeHouse" type="Control" parent="CanvasLayer"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_9bq6t")
 
-[node name="SafeHouseManager" type="Node" parent="."]
+[node name="SafeHouseManager" type="Node" parent="CanvasLayer/SafeHouse"]
 script = ExtResource("2_0cr7u")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/SafeHouse"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="NavigationBar" parent="VBoxContainer" instance=ExtResource("3_1ds8v")]
+[node name="NavigationBar" parent="CanvasLayer/SafeHouse/VBoxContainer" instance=ExtResource("3_1ds8v")]
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="RoomContainer" type="Control" parent="VBoxContainer"]
+[node name="RoomContainer" type="Control" parent="CanvasLayer/SafeHouse/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="MainRoom" parent="VBoxContainer/RoomContainer" instance=ExtResource("4_2et9w")]
+[node name="MainRoom" parent="CanvasLayer/SafeHouse/VBoxContainer/RoomContainer" instance=ExtResource("4_2et9w")]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="BattleRoom" parent="VBoxContainer/RoomContainer" instance=ExtResource("5_3fu0x")]
+[node name="BattleRoom" parent="CanvasLayer/SafeHouse/VBoxContainer/RoomContainer" instance=ExtResource("5_3fu0x")]
 visible = false
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="RecruitRoom" parent="VBoxContainer/RoomContainer" instance=ExtResource("6_4gv1y")]
+[node name="RecruitRoom" parent="CanvasLayer/SafeHouse/VBoxContainer/RoomContainer" instance=ExtResource("6_4gv1y")]
 visible = false
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="UpgradeRoom" parent="VBoxContainer/RoomContainer" instance=ExtResource("7_5hw2z")]
+[node name="UpgradeRoom" parent="CanvasLayer/SafeHouse/VBoxContainer/RoomContainer" instance=ExtResource("7_5hw2z")]
 visible = false
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="ResearchRoom" parent="VBoxContainer/RoomContainer" instance=ExtResource("8_6ix30")]
+[node name="ResearchRoom" parent="CanvasLayer/SafeHouse/VBoxContainer/RoomContainer" instance=ExtResource("8_6ix30")]
 visible = false
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="BrandRoom" parent="VBoxContainer/RoomContainer" instance=ExtResource("9_7jy41")]
+[node name="BrandRoom" parent="CanvasLayer/SafeHouse/VBoxContainer/RoomContainer" instance=ExtResource("9_7jy41")]
 visible = false
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0 
+grow_horizontal = 2
+grow_vertical = 2

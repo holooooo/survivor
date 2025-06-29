@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="BounceProjectileMod" load_steps=2 format=3 uid="uid://chk8pm4nq7fw1"]
 
-[ext_resource type="Script" path="res://src/equipment/mods/bounce_projectile_mod.gd" id="1_bounce_mod"]
+[ext_resource type="Script" uid="uid://e47aqef3k73s" path="res://src/equipment/mods/bounce_projectile_mod.gd" id="1_bounce_mod"]
 
 [resource]
 script = ExtResource("1_bounce_mod")
