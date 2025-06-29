@@ -22,6 +22,7 @@ signal game_paused
 signal game_resumed
 signal game_over
 signal wave_completed(wave_number: int)
+signal battle_completed ## 战斗完成信号
 
 # UI事件
 signal ui_health_update_requested(current_health: int, max_health: int)

@@ -1,0 +1,59 @@
+[gd_scene load_steps=2 format=3 uid="uid://bj8k6x3yv2n2k"]
+
+[ext_resource type="Script" path="res://src/scenes/safe_house/components/navigation_bar.gd" id="1_1x5k8"]
+
+[node name="NavigationBar" type="Control"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 80)
+script = ExtResource("1_1x5k8")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="InfoContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="CurrentRoomLabel" type="Label" parent="VBoxContainer/InfoContainer"]
+layout_mode = 2
+text = "当前位置: 主界面"
+horizontal_alignment = 1
+
+[node name="VSeparator" type="VSeparator" parent="VBoxContainer/InfoContainer"]
+layout_mode = 2
+
+[node name="GameWeekLabel" type="Label" parent="VBoxContainer/InfoContainer"]
+layout_mode = 2
+text = "第 1 周"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="BattleButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "作战室"
+
+[node name="RecruitButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "招募室"
+
+[node name="UpgradeButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "改造室"
+
+[node name="ResearchButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "研究室"
+
+[node name="BrandButton" type="Button" parent="VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "品牌室"
+
+ 

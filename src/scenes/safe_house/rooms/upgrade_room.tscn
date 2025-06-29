@@ -1,0 +1,39 @@
+[gd_scene load_steps=2 format=3 uid="uid://dsah5cy4k6m8s"]
+
+[ext_resource type="Script" path="res://src/scenes/safe_house/rooms/upgrade_room.gd" id="1_6yn3q"]
+
+[node name="UpgradeRoom" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_6yn3q")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "改造室"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="ContentContainer" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PlaceholderLabel" type="Label" parent="VBoxContainer/ContentContainer"]
+layout_mode = 2
+text = "升级你的角色能力和装备！"
+horizontal_alignment = 1
+vertical_alignment = 1 

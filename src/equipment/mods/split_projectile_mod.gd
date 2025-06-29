@@ -8,7 +8,6 @@ class_name SplitProjectileMod
 ## [param projectile] 目标投射物
 func apply_to_projectile(projectile: Node) -> void:
 	super.apply_to_projectile(projectile)
-	print("分裂效果已应用到投射物")
 
 ## 重写命中处理方法[br]
 ## [param projectile] 投射物[br]
@@ -21,14 +20,13 @@ func on_projectile_hit(projectile: Node, target: Node) -> bool:
 	
 	var split_data = projectile.get_meta(data_key, {})
 	if split_data.get("has_split", false):
-		print("  已经分裂过，跳过")
 		return true
 	
-	print("分裂效果触发")
 	split_data["has_split"] = true
 	projectile.set_meta(data_key, split_data)
 	
-	_create_split_projectiles(projectile, target, split_data)
+	# 延迟创建分裂投射物以避免物理查询冲突
+	_create_split_projectiles.call_deferred(projectile, target, split_data)
 	return true
 
 ## 重写获取初始模组数据[br]

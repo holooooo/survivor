@@ -8,7 +8,6 @@ class_name BounceProjectileMod
 ## [param projectile] 目标投射物
 func apply_to_projectile(projectile: Node) -> void:
 	super.apply_to_projectile(projectile)
-	print("弹射效果已应用到投射物")
 
 ## 重写命中处理方法[br]
 ## [param projectile] 投射物[br]
@@ -23,17 +22,14 @@ func on_projectile_hit(projectile: Node, target: Node) -> bool:
 	var remaining_bounces = bounce_data.get("remaining_bounces", 0)
 	
 	if remaining_bounces <= 0:
-		print("  弹跳次数已用完，销毁投射物")
 		if projectile.has_method("_destroy_projectile"):
 			projectile.call("_destroy_projectile")
 		return false
 	
 	var bounced_enemies = bounce_data.get("bounced_enemies", [])
 	if target in bounced_enemies:
-		print("  目标已被弹跳过，跳过")
 		return true
 	
-	print("弹跳触发，剩余次数: ", remaining_bounces)
 	
 	# 记录已弹跳的敌人
 	bounced_enemies.append(target)
@@ -44,7 +40,6 @@ func on_projectile_hit(projectile: Node, target: Node) -> bool:
 	# 寻找下一个弹跳目标
 	var next_target = _find_bounce_target(projectile, target, bounce_data)
 	if next_target:
-		print("弹跳到: ", next_target.name)
 		# 重新定向到新目标
 		var direction = (next_target.global_position - projectile.global_position).normalized()
 		if projectile.has_method("_set_direction"):
@@ -56,7 +51,6 @@ func on_projectile_hit(projectile: Node, target: Node) -> bool:
 		
 		return false  # 阻止销毁投射物
 	else:
-		print("弹跳结束，未找到目标")
 		if projectile.has_method("_destroy_projectile"):
 			projectile.call("_destroy_projectile")
 		return false

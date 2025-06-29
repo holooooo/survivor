@@ -73,7 +73,6 @@ static func _setup_split_effect(projectile: Node2D, config: Dictionary) -> void:
 	var inherit_mods = config.get("inherit_mods", false)
 	var damage_multiplier = config.get("damage_multiplier", 0.8)
 	
-	print("    设置分裂效果: 分裂数量=", split_count, " 角度=", split_angle, " 继承模组=", inherit_mods, " 伤害倍数=", damage_multiplier)
 	
 	# 添加分裂状态
 	projectile.set_meta("split_effect", {
@@ -89,14 +88,9 @@ static func _setup_split_effect(projectile: Node2D, config: Dictionary) -> void:
 		if not projectile.projectile_hit.is_connected(_on_projectile_split_hit):
 			# 使用call_deferred确保在投射物完全准备好后连接信号
 			projectile.call_deferred("connect", "projectile_hit", _on_projectile_split_hit.bind(projectile))
-			print("    ✓ 分裂效果信号连接已安排（延迟）")
-		else:
-			print("    ⚠ 分裂效果信号已连接")
 	elif projectile.has_method("_on_area_entered"):
 		projectile.call_deferred("call", "_setup_split_collision_monitor", projectile)
-		print("    ✓ 分裂效果碰撞监听设置已安排（延迟）")
-	else:
-		print("    ✗ 分裂效果设置失败：没有可用的信号或方法")
+
 
 ## 设置穿透增强效果[br]
 ## [param projectile] 投射物[br]
@@ -162,16 +156,15 @@ static func _on_projectile_bounce_hit(projectile: Node2D, hit_target: Node2D) ->
 	var next_target = _find_bounce_target(projectile, hit_target, bounce_data)
 	if next_target:
 		print("  找到弹射目标: ", next_target.name)
-		_create_bounce_projectile(projectile, hit_target, next_target, bounce_data)
+		# 延迟创建弹射投射物以避免物理查询冲突
+		_create_bounce_projectile.call_deferred(projectile, hit_target, next_target, bounce_data)
 	else:
 		print("  未找到弹射目标")
 
 ## 分裂命中处理[br]
 ## [param projectile] 投射物[br]
 ## [param hit_target] 命中目标
-static func _on_projectile_split_hit(projectile: Node2D, hit_target: Node2D) -> void:
-	print("分裂效果触发: 投射物=", projectile.name, " 命中=", hit_target.name)
-	
+static func _on_projectile_split_hit(projectile: Node2D, hit_target: Node2D) -> void:	
 	var split_data = projectile.get_meta("split_effect", {})
 	if split_data.is_empty():
 		print("  分裂数据为空，跳过")
@@ -185,7 +178,8 @@ static func _on_projectile_split_hit(projectile: Node2D, hit_target: Node2D) -> 
 	split_data["has_split"] = true
 	projectile.set_meta("split_effect", split_data)
 	
-	_create_split_projectiles(projectile, hit_target, split_data)
+	# 延迟创建分裂投射物以避免物理查询冲突
+	_create_split_projectiles.call_deferred(projectile, hit_target, split_data)
 
 ## 寻找弹射目标[br]
 ## [param projectile] 当前投射物[br]
