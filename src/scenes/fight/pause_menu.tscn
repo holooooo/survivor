@@ -1,0 +1,94 @@
+[gd_scene load_steps=2 format=3 uid="uid://hjusjc3ewh33"]
+
+[ext_resource type="Script" uid="uid://2nmggdes6yv8" path="res://src/ui/pause_menu.gd" id="1_3bo73"]
+
+[node name="PauseMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_3bo73")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "游戏暂停"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="InfoContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="SurvivalTimeLabel" type="Label" parent="CenterContainer/VBoxContainer/InfoContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "存活时长: 00:00"
+horizontal_alignment = 1
+
+[node name="CurrentWaveLabel" type="Label" parent="CenterContainer/VBoxContainer/InfoContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "当前波次: 1"
+horizontal_alignment = 1
+
+[node name="ScoreLabel" type="Label" parent="CenterContainer/VBoxContainer/InfoContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "分数: 0"
+horizontal_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="EquipmentContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="HSeparator3" type="HSeparator" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ButtonContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ResumeButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "继续游戏"
+
+[node name="HSeparator4" type="HSeparator" parent="CenterContainer/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+
+[node name="HintLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "按 ESC 键或点击继续游戏按钮恢复游戏"
+horizontal_alignment = 1

@@ -10,7 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://xppmb3v12ta2" path="res://src/scenes/safe_house/rooms/research_room.tscn" id="8_6ix30"]
 [ext_resource type="PackedScene" uid="uid://byoqnc2w2sub3" path="res://src/scenes/safe_house/rooms/brand_room.tscn" id="9_7jy41"]
 
-[node name="Node3D" type="Node2D"]
+[node name="Node2d" type="Node2D"]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -35,7 +35,6 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="NavigationBar" parent="CanvasLayer/SafeHouse/VBoxContainer" instance=ExtResource("3_1ds8v")]
-layout_mode = 2
 size_flags_vertical = 0
 
 [node name="RoomContainer" type="Control" parent="CanvasLayer/SafeHouse/VBoxContainer"]

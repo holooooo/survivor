@@ -60,6 +60,9 @@ func _setup_emitter_system() -> void:
 		emit_interval = emitter_config.emit_interval
 	if emitter_config.has("attack_range"):
 		attack_range = emitter_config.attack_range
+	
+	# 应用玩家的装弹速度加成
+	_apply_player_reload_speed_bonus()
 
 ## 更新弹药系统[br]
 ## [param delta] 时间增量
@@ -169,16 +172,11 @@ func _fire_single_projectile() -> void:
 		# 配置投射物
 		if projectile.has_method("setup_from_resource") and projectile_resource:
 			var target_direction: Vector2 = _get_target_direction()
-			var equipment_stats = {}
-			if mod_manager:
-				equipment_stats = mod_manager.get_modified_stats()
-			projectile.setup_from_resource(projectile_resource, target_direction, equipment_stats)
+			var equipment_stats = _get_current_stats()
+			projectile.setup_from_resource(self, projectile_resource, target_direction, equipment_stats)
 		
 		# 应用特定配置
 		_configure_projectile_specific(projectile)
-		
-		# 应用模组效果
-		_apply_mods_to_projectile(projectile)
 
 ## 开始装弹[br]
 func _start_reload() -> void:
@@ -238,7 +236,7 @@ func _finish_regenerative_reload() -> void:
 ## 检查是否有无限弹药效果[br]
 ## [returns] 是否有无限弹药
 func _has_infinite_ammo() -> bool:
-	return has_special_effect("infinite_ammo")
+	return false  # Infinite ammo now handled by global mod system
 
 ## 获取状态信息[br]
 ## [returns] 状态信息字典
@@ -274,6 +272,19 @@ func _configure_projectile_specific(projectile: Node2D) -> void:
 func _custom_update(delta: float) -> void:
 	# 子类可重写此方法来实现特定的更新逻辑（如位置跟踪、旋转等）
 	pass
+
+## 应用玩家装弹速度加成[br]
+func _apply_player_reload_speed_bonus() -> void:
+	if owner_player and owner_player.stats_manager:
+		var equipment_damage_type = get_damage_type()
+		var reload_multiplier = owner_player.stats_manager.get_reload_speed_multiplier(equipment_damage_type)
+		reload_time /= reload_multiplier
+
+## 重新计算装备属性（重写基类方法）[br]
+func recalculate_stats() -> void:
+	super.recalculate_stats()
+	# 重新应用装弹速度加成
+	_apply_player_reload_speed_bonus()
 
 ## === 可重写方法 ===
 

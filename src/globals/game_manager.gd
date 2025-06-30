@@ -48,11 +48,15 @@ func pause_game() -> void:
 
 ## 恢复游戏  
 func resume_game() -> void:
+	print("GameManager.resume_game() 被调用，当前状态: ", current_state)
 	if current_state == GameConstants.GameState.PAUSED:
 		current_state = GameConstants.GameState.PLAYING
 		get_tree().paused = false
 		state_changed.emit(current_state)
 		EventBus.game_resumed.emit()
+		print("游戏已恢复，状态切换为: ", current_state)
+	else:
+		print("游戏未处于暂停状态，无法恢复")
 
 ## 结束游戏
 func end_game() -> void:

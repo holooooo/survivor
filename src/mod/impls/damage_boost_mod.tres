@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="ModResource" load_steps=2 format=3 uid="uid://cxm6wn4bq8jf7"]
+
+[ext_resource type="Script" path="res://src/mod/mod_resource.gd" id="1_mod_resource"]
+
+[resource]
+script = ExtResource("1_mod_resource")
+mod_name = "伤害增强"
+mod_id = "damage_boost"
+description = "使装备的基础伤害增加25%"
+compatible_tags = Array[int]([14])
+priority = 15
+effect_type = 0
+effect_config = {
+"modifier_type": "percentage",
+"stat_name": "base_damage",
+"value": 0.25
+}

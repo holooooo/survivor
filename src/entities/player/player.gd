@@ -3,7 +3,8 @@ class_name Player
 
 ## 玩家控制器 - 处理玩家移动、血量管理和战斗逻辑[br]
 ## 使用事件系统与其他模块通信，避免直接依赖
-@onready var equipment_manager: PlayerEquipmentManager = $PlayerEquipmentManager
+@onready var equipment_manager: EquipmentManager = %EquipmentManager
+@onready var stats_manager: PlayerStatsManager = %PlayerStatsManager
 
 func _ready() -> void:
 	super ()
@@ -11,6 +12,12 @@ func _ready() -> void:
 	
 	# 将玩家添加到player组，便于其他系统获取玩家引用
 	add_to_group("player")
+	
+	# 初始化属性管理器
+	add_child(stats_manager)
+	stats_manager.initialize(self)
+	stats_manager.stats_changed.connect(_on_damage_type_stats_changed)
+	stats_manager.base_stats_changed.connect(_on_base_stats_changed)
 	
 	# 添加装备管理器
 	equipment_manager.initialize(self as Player)
@@ -66,3 +73,43 @@ func _on_died(actor: Actor) -> void:
 func heal(amount: int) -> void:
 	current_health = min(max_health, current_health + amount)
 	EventBus.emit_player_health_changed(current_health, max_health)
+
+## 伤害类型属性变化处理[br]
+## [param damage_type] 伤害类型[br]
+## [param stat_name] 属性名称[br]
+## [param old_value] 旧值[br]
+## [param new_value] 新值
+func _on_damage_type_stats_changed(damage_type: Constants.DamageType, stat_name: String, old_value: float, new_value: float) -> void:
+	# 通知装备管理器重新计算属性
+	if equipment_manager:
+		equipment_manager.recalculate_equipment_stats()
+
+## 基础属性变化处理[br]
+## [param stat_name] 属性名称[br]
+## [param old_value] 旧值[br]
+## [param new_value] 新值
+func _on_base_stats_changed(stat_name: String, old_value, new_value) -> void:
+	# 处理基础属性变化
+	match stat_name:
+		"max_health_bonus":
+			_update_max_health()
+		"move_speed_multiplier":
+			_update_movement_speed()
+
+## 更新最大生命值[br]
+func _update_max_health() -> void:
+	if stats_manager:
+		var health_bonus = stats_manager.get_base_stat("max_health_bonus")
+		var new_max_health = int(max_health * (1.0 + health_bonus))
+		if new_max_health != max_health:
+			var health_ratio = float(current_health) / float(max_health)
+			max_health = new_max_health
+			current_health = int(max_health * health_ratio)
+			EventBus.emit_player_health_changed(current_health, max_health)
+
+## 更新移动速度[br]
+func _update_movement_speed() -> void:
+	if stats_manager:
+		var speed_multiplier = stats_manager.get_base_stat("move_speed_multiplier")
+		# 这里可以应用速度修改，需要根据Actor基类的实现来决定具体方式
+		pass

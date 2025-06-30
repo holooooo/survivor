@@ -6,47 +6,39 @@ class_name EquipmentBase
 
 @export var equipment_name: String = "基础装备"
 @export var equipment_id: String = ""
-@export var equipment_position: EquipmentResource.EquipmentPosition = EquipmentResource.EquipmentPosition.OUTPUT ## 装备位置类型
 @export var equipment_quality: EquipmentResource.EquipmentQuality = EquipmentResource.EquipmentQuality.COMMERCIAL ## 装备品质
 @export var icon_texture: Texture2D
 @export var cooldown_time: float = 1.0 ## 冷却时间（秒）
 @export var projectile_scene: PackedScene ## 发射的投射物场景
-@export var projectile_resource: ProjectileBase ## 投射物配置资源
+@export var projectile_resource: EmitterProjectileResource ## 投射物配置资源
+@export var damage_type: Constants.DamageType = Constants.DamageType.枪械 ## 装备伤害类型
 
-@export_group("模组系统")
-@export var equipment_tags: Array[EquipmentTags.Tag] = [] ## 装备标签数组，用于模组兼容性检查
-@export var mods: Array[ModResource] = [] ## 预设模组数组
 
-# 装备配置存储
-var aoe_config: Dictionary = {}
-var firearm_config: Dictionary = {}
-var bomb_config: Dictionary = {}
 var emitter_config: Dictionary = {}
 
-# 模组系统
-var mod_manager: ModManager ## 模组管理器
+# 属性系统
 var base_stats: Dictionary = {} ## 基础属性
-var modified_stats: Dictionary = {} ## 模组修改后的属性
+var external_mod_effects: Dictionary = {} ## 外部mod效果
+
 
 var owner_player: Player
 var last_use_time: float = 0.0
 
-signal equipment_used(equipment_instance)
-
 func _ready() -> void:
-	_initialize_mod_system()
+	_setup_base_stats()
+	_setup_damage_type()
 
 ## 初始化装备[br]
 ## [param player] 装备拥有者
 func initialize(player: Player) -> void:
 	owner_player = player
 	name = equipment_name + "_Instance"
+	_setup_base_stats()
+	_setup_damage_type()
+	
+	# 装备管理器会稍后设置mod管理器
+	FightEventBus.on_equip.emit(player, self)
 
-## 初始化模组系统
-func _initialize_mod_system() -> void:
-	if not mod_manager:
-		mod_manager = ModManager.new(self)
-		mod_manager.stats_updated.connect(_on_stats_updated)
 
 ## 设置基础属性
 func _setup_base_stats() -> void:
@@ -54,52 +46,54 @@ func _setup_base_stats() -> void:
 		"cooldown_time": cooldown_time,
 		"attack_range": emitter_config.get("attack_range", 300.0),
 		"base_damage": emitter_config.get("base_damage", 10),
-		"magazine_capacity": emitter_config.get("magazine_capacity", 0)
+		"magazine_capacity": emitter_config.get("magazine_capacity", 0),
+		"damage_type": damage_type
 	}
+
+## 设置装备伤害类型[br]
+## 根据装备标签自动设置合适的伤害类型
+func _setup_damage_type() -> void:
+	# 更新基础属性中的伤害类型
+	base_stats["damage_type"] = damage_type
+
+## 应用外部mod效果[br]
+## [param mod_effects] 从装备管理器传来的mod效果
+func apply_external_mod_effects(mod_effects: Dictionary) -> void:
+	external_mod_effects = mod_effects
+	_apply_all_effects()
+
+## 应用所有效果到装备属性
+func _apply_all_effects() -> void:
+	# 从基础属性开始
+	var final_stats = base_stats.duplicate()
 	
-	if mod_manager:
-		mod_manager.set_base_stats(base_stats)
-
-## 安装预设模组
-func _install_preset_mods() -> void:
-	if not mod_manager:
-		return
-
-	for i in range(mods.size()):
-		var mod_resource = mods[i]
-		if mod_resource:
-			var slot = mod_manager.install_mod(mod_resource)
-			if slot != -1:
-				print("已安装模组: ", mod_resource.mod_name)
-
-## 属性更新回调
-func _on_stats_updated(new_stats: Dictionary) -> void:
-	modified_stats = new_stats
-	_apply_modified_stats()
-
-## 应用修改后的属性到装备
-func _apply_modified_stats() -> void:
-	# 应用冷却时间修改
-	if modified_stats.has("cooldown_time"):
-		cooldown_time = modified_stats.cooldown_time
+	# 应用外部mod效果
+	for stat_name in external_mod_effects:
+		if base_stats.has(stat_name):
+			final_stats[stat_name] = external_mod_effects[stat_name]
 	
-	# 更新emitter_config中的属性
-	if modified_stats.has("attack_range"):
-		emitter_config["attack_range"] = modified_stats.attack_range
-	if modified_stats.has("base_damage"):
-		emitter_config["base_damage"] = modified_stats.base_damage
-	if modified_stats.has("magazine_capacity"):
-		emitter_config["magazine_capacity"] = modified_stats.magazine_capacity
+	# 更新装备属性
+	if final_stats.has("cooldown_time"):
+		cooldown_time = final_stats.cooldown_time
+	
+	# 更新配置中的属性
+	if final_stats.has("attack_range"):
+		emitter_config["attack_range"] = final_stats.attack_range
+	if final_stats.has("base_damage"):
+		emitter_config["base_damage"] = final_stats.base_damage
+	if final_stats.has("magazine_capacity"):
+		emitter_config["magazine_capacity"] = final_stats.magazine_capacity
 
 ## 使用装备[br]
 ## [returns] 是否成功使用
 func use_equipment() -> bool:
 	if not can_use():
 		return false
-	
+
 	last_use_time = Time.get_ticks_msec() / 1000.0
+	FightEventBus.on_equipment_cooldown_start.emit(owner_player, self, last_use_time, cooldown_time)
+	FightEventBus.on_equipment_used.emit(owner_player, self)
 	_execute_equipment_effect()
-	equipment_used.emit(self)
 	return true
 
 ## 检查是否可以使用装备[br]
@@ -119,26 +113,47 @@ func _execute_equipment_effect() -> void:
 	
 	# 创建投射物
 	var projectile: Node2D = projectile_scene.instantiate()
+	add_child(projectile)
+	projectile.global_position = _get_projectile_spawn_position()
+
+	# 如果投射物有设置方法，配置参数
+	if projectile.has_method("setup_from_resource") and projectile_resource:
+		var target_direction: Vector2 = _get_target_direction()
+		# 传递装备当前的属性到投射物
+		var equipment_stats = _get_current_stats()
+		projectile.setup_from_resource(self, projectile_resource, target_direction, equipment_stats)
+
+## 获取当前有效的属性[br]
+## [returns] 当前属性字典
+func _get_current_stats() -> Dictionary:
+	var current_stats = base_stats.duplicate()
 	
-	# 获取主场景
-	var main_scene: Node2D = owner_player.get_parent()
-	if main_scene:
-		main_scene.add_child(projectile)
+	# 应用玩家属性加成
+	if owner_player and owner_player.stats_manager:
+		var player_stats = owner_player.stats_manager
+		var equipment_damage_type = get_damage_type()
 		
-		# 设置投射物位置 - 基础实现在玩家位置
-		projectile.global_position = _get_projectile_spawn_position()
+		# 应用冷却时间缩减
+		if current_stats.has("cooldown_time"):
+			var reduction = player_stats.get_cooldown_reduction(equipment_damage_type)
+			current_stats.cooldown_time *= (1.0 - reduction)
 		
-		# 如果投射物有设置方法，配置参数
-		if projectile.has_method("setup_from_resource") and projectile_resource:
-			var target_direction: Vector2 = _get_target_direction()
-			# 传递装备修改后的属性到投射物
-			var equipment_stats = {}
-			if mod_manager:
-				equipment_stats = mod_manager.get_modified_stats()
-			projectile.setup_from_resource(projectile_resource, target_direction, equipment_stats)
+		# 应用伤害倍率
+		if current_stats.has("base_damage"):
+			var multiplier = player_stats.get_damage_multiplier(equipment_damage_type)
+			current_stats.base_damage = int(current_stats.base_damage * multiplier)
 		
-		# 应用模组效果到投射物
-		_apply_mods_to_projectile(projectile)
+		# 应用攻击范围加成
+		if current_stats.has("attack_range"):
+			var bonus = player_stats.get_attack_range_bonus(equipment_damage_type)
+			current_stats.attack_range *= (1.0 + bonus)
+	
+	# 应用外部mod效果
+	for stat_name in external_mod_effects:
+		if current_stats.has(stat_name):
+			current_stats[stat_name] = external_mod_effects[stat_name]
+	
+	return current_stats
 
 ## 获取目标方向 - 优先选择攻击距离内最近的敌人[br]
 ## [returns] 目标方向向量
@@ -176,85 +191,15 @@ func get_remaining_cooldown() -> float:
 	var remaining: float = cooldown_time - (current_time - last_use_time)
 	return max(0.0, remaining)
 
-
-## 设置炸弹配置[br]
-## [param config] 炸弹配置字典
-func set_bomb_config(config: Dictionary) -> void:
-	bomb_config = config
-
 ## 设置发射器配置[br]
 ## [param config] 发射器配置字典
 func set_emitter_config(config: Dictionary) -> void:
 	emitter_config = config
 
-## 获取AOE配置[br]
-## [returns] AOE配置字典
-func get_aoe_config() -> Dictionary:
-	return aoe_config
-
-## 获取枪械配置[br]
-## [returns] 枪械配置字典
-func get_firearm_config() -> Dictionary:
-	return firearm_config
-
-## 获取炸弹配置[br]
-## [returns] 炸弹配置字典
-func get_bomb_config() -> Dictionary:
-	return bomb_config
-
 ## 获取发射器配置[br]
 ## [returns] 发射器配置字典
 func get_emitter_config() -> Dictionary:
 	return emitter_config
-
-## 应用模组效果到投射物[br]
-## [param projectile] 投射物实例
-func _apply_mods_to_projectile(projectile: Node2D) -> void:
-	if not mod_manager:
-		return
-	
-	# 获取投射物模组效果
-	var projectile_effects = mod_manager.get_projectile_effects()
-	
-	# 为投射物添加效果处理器
-	if projectile.has_method("add_mod_effects"):
-		projectile.add_mod_effects(projectile_effects)
-
-## 获取模组管理器[br]
-## [returns] 模组管理器实例
-func get_mod_manager() -> ModManager:
-	return mod_manager
-
-## 安装模组[br]
-## [param mod_resource] 模组资源[br]
-## [param slot_index] 槽位索引，-1表示自动寻找[br]
-## [returns] 安装成功的槽位索引
-func install_mod(mod_resource: ModResource, slot_index: int = -1) -> int:
-	if not mod_manager:
-		return -1
-	return mod_manager.install_mod(mod_resource, slot_index)
-
-## 卸载模组[br]
-## [param slot_index] 槽位索引[br]
-## [returns] 是否成功卸载
-func uninstall_mod(slot_index: int) -> bool:
-	if not mod_manager:
-		return false
-	return mod_manager.uninstall_mod(slot_index)
-
-## 检查是否有特殊效果[br]
-## [param effect_name] 效果名称[br]
-## [returns] 是否有此效果
-func has_special_effect(effect_name: String) -> bool:
-	if not mod_manager:
-		return false
-	
-	var special_effects = mod_manager.get_special_effects()
-	for effect in special_effects:
-		if effect.effect_config.get("effect_name", "") == effect_name:
-			return true
-	
-	return false
 
 ## 检查攻击距离内是否有敌人[br]
 ## 使用敌人缓存的距离信息提高性能[br]
@@ -352,6 +297,17 @@ func _get_nearest_enemy() -> Node2D:
 	
 	return nearest_enemy
 
+## 获取装备伤害类型[br]
+## [returns] 伤害类型
+func get_damage_type() -> Constants.DamageType:
+	return damage_type
+
+## 设置装备伤害类型[br]
+## [param new_damage_type] 新的伤害类型
+func set_damage_type(new_damage_type: Constants.DamageType) -> void:
+	damage_type = new_damage_type
+	base_stats["damage_type"] = damage_type
+
 ## 创建装备实例 - 复制当前装备用于游戏中[br]
 ## [param player] 装备的拥有者[br]
 ## [returns] 装备实例节点
@@ -359,3 +315,8 @@ func create_instance(player: Player) -> EquipmentBase:
 	var instance: EquipmentBase = duplicate()
 	instance.initialize(player)
 	return instance
+
+## 重新计算装备属性（由装备管理器调用）[br]
+func recalculate_stats() -> void:
+	# 重新应用玩家属性到装备
+	_apply_all_effects()

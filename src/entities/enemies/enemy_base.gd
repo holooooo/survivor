@@ -91,8 +91,7 @@ func take_damage(damage_amount: int) -> void:
 	# 发送伤害事件
 	EventBus.enemy_damaged.emit(self, damage_amount)
 
-	# 通过 EventBus 显示伤害数字
-	EventBus.show_damage_number(damage_amount, global_position, Color.RED)
+	# 伤害数字显示现在由投射物根据伤害类型处理，这里不再显示固定颜色的伤害数字
 
 ## 重写Actor的死亡回调
 func _on_death() -> void:

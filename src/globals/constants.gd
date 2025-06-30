@@ -1,4 +1,5 @@
 extends Node
+class_name Constants
 
 ## 游戏常量定义
 ## 包含所有游戏中使用的常量值，便于统一管理和调整
@@ -57,20 +58,74 @@ enum GameState {
 	GAME_OVER ## 游戏结束状态
 }
 
-## 装备位置枚举
-enum EquipmentPosition {
-	OUTPUT = 0,    ## 输出位置 - 攻击型装备
-	MOBILITY = 1,  ## 移动位置 - 移动增强装备  
-	TRANSFORM = 2, ## 转化位置 - 效果转化装备
-	DEFENSE = 3,   ## 防御位置 - 防护型装备
-	UNIVERSAL = 4  ## 通用位置 - 可装备任意类型
+# 装备系统
+const EQUIPMENT_SLOTS: int = 8 ## 装备槽位数量
+const MOD_SLOTS: int = 10 ## mod槽位数量
+
+# 物理层定义
+const LAYER_PLAYER: int = 1
+const LAYER_ENEMY: int = 2
+const LAYER_PROJECTILE: int = 4
+const LAYER_PICKUP: int = 8
+
+# 组名定义
+const GROUP_PLAYER: String = "player"
+const GROUP_ENEMIES: String = "enemies"
+const GROUP_PROJECTILES: String = "projectiles"
+const GROUP_PICKUPS: String = "pickups"
+
+# 伤害类型枚举
+enum DamageType {
+	枪械,   ## 枪械伤害（手枪、步枪等）
+	近战,       ## 近战伤害（拳击、刀具等）  
+	能量,      ## 能量伤害（电弧、激光等）
+	爆炸,   ## 爆炸伤害（炸弹、手榴弹等）
+	火焰,        ## 火焰伤害
+	毒素,      ## 毒素伤害
+	冰冻,         ## 冰冻伤害
+	电击     ## 电击伤害
 }
 
-## 装备槽位配置
-const EQUIPMENT_SLOT_CONFIG = {
-	EquipmentPosition.OUTPUT: 3,    ## 输出槽位数量
-	EquipmentPosition.MOBILITY: 3,  ## 移动槽位数量
-	EquipmentPosition.TRANSFORM: 3, ## 转化槽位数量
-	EquipmentPosition.DEFENSE: 3,   ## 防御槽位数量
-	EquipmentPosition.UNIVERSAL: 2  ## 通用槽位数量
-}
+# 获取伤害类型名称
+static func get_damage_type_name(damage_type: DamageType) -> String:
+	match damage_type:
+		DamageType.枪械:
+			return "枪械伤害"
+		DamageType.近战:
+			return "钝击伤害"
+		DamageType.能量:
+			return "能量伤害"
+		DamageType.爆炸:
+			return "炸药伤害"
+		DamageType.火焰:
+			return "火焰伤害"
+		DamageType.毒素:
+			return "毒素伤害"
+		DamageType.冰冻:
+			return "冰冻伤害"
+		DamageType.电击:
+			return "电击伤害"
+		_:
+			return "未知伤害"
+
+# 获取伤害类型颜色
+static func get_damage_type_color(damage_type: DamageType) -> Color:
+	match damage_type:
+		DamageType.枪械:
+			return Color.WHITE
+		DamageType.近战:
+			return Color.BROWN
+		DamageType.能量:
+			return Color.CYAN
+		DamageType.爆炸:
+			return Color.RED
+		DamageType.火焰:
+			return Color.ORANGE_RED
+		DamageType.毒素:
+			return Color.GREEN
+		DamageType.冰冻:
+			return Color.LIGHT_BLUE
+		DamageType.电击:
+			return Color.YELLOW
+		_:
+			return Color.WHITE

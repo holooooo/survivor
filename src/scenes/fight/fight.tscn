@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bqlr0mdryjoek"]
+[gd_scene load_steps=31 format=3 uid="uid://bqlr0mdryjoek"]
 
 [ext_resource type="Script" uid="uid://etsay58j6v62" path="res://src/scenes/fight/fight.gd" id="1_main_script"]
 [ext_resource type="PackedScene" uid="uid://dkeamf7f6v0g1" path="res://src/entities/enemies/enemy.tscn" id="2_enemy_scene"]
@@ -6,13 +6,46 @@
 [ext_resource type="Script" uid="uid://cutwsom3s04lv" path="res://src/equipment/equipment_manager.gd" id="3_fup5m"]
 [ext_resource type="PackedScene" uid="uid://c6g8qj0v1w7vj" path="res://src/entities/player/player.tscn" id="3_player_scene"]
 [ext_resource type="PackedScene" uid="uid://cyn32jhnmyvlc" path="res://src/ui/equipment_ui.tscn" id="4_equipment_ui"]
-[ext_resource type="Script" uid="uid://fw5xx4bowcqs" path="res://src/equipment/equipment_resource.gd" id="4_f4xxn"]
+[ext_resource type="Script" uid="uid://fw5xx4bowcqs" path="res://src/equipment/resources/equipment_resource.gd" id="4_f4xxn"]
 [ext_resource type="Script" uid="uid://dpfjfe2ivnncr" path="res://src/entities/enemies/enemy_spawner.gd" id="4_vw57g"]
 [ext_resource type="Script" uid="uid://dpxqtnxm6umfg" path="res://src/globals/damage_number_pool.gd" id="6_3q0a4"]
-[ext_resource type="Resource" uid="uid://dxknm8f2vboac" path="res://src/equipment/output/pistol/pistol_emitter_equipment_resource.tres" id="6_cic45"]
-[ext_resource type="Resource" uid="uid://canx5q7r8t4kw" path="res://src/equipment/output/arc_tower/arc_tower_equipment_resource.tres" id="6_ek26i"]
-[ext_resource type="Resource" uid="uid://bxmn7rak4pqw8" path="res://src/equipment/output/fist/fist_emitter_equipment_resource.tres" id="7_ek26i"]
+[ext_resource type="Resource" uid="uid://dxknm8f2vboac" path="res://src/equipment/impls/pistol/pistol_emitter_equipment_resource.tres" id="6_cic45"]
+[ext_resource type="Resource" uid="uid://canx5q7r8t4kw" path="res://src/equipment/impls/arc_tower/arc_tower_equipment_resource.tres" id="6_ek26i"]
+[ext_resource type="Resource" uid="uid://bxmn7rak4pqw8" path="res://src/equipment/impls/fist/fist_emitter_equipment_resource.tres" id="7_ek26i"]
+[ext_resource type="Script" path="res://src/mod/mod_resource.gd" id="8_1s48r"]
 [ext_resource type="PackedScene" uid="uid://bhdq3r65eieyf" path="res://src/ui/credits_display.tscn" id="8_credits"]
+[ext_resource type="Resource" uid="uid://cvddfh6pcaffm" path="res://src/equipment/impls/bomb/bomb_equipment_resource.tres" id="8_hv7fi"]
+[ext_resource type="Resource" uid="uid://chk8pm4nq7fw1" path="res://src/mod/impls/bounce_projectile_mod.tres" id="9_eyn13"]
+[ext_resource type="Resource" uid="uid://bh5k3tw7fn8m4" path="res://src/mod/impls/life_steal_on_kill_mod.tres" id="10_n86bo"]
+[ext_resource type="Script" path="res://src/mod/mod_manager.gd" id="11_eyn13"]
+[ext_resource type="Resource" uid="uid://dxsank3fm5wh2" path="res://src/mod/impls/split_projectile_mod.tres" id="11_n86bo"]
+[ext_resource type="PackedScene" uid="uid://hjusjc3ewh33" path="res://src/scenes/fight/pause_menu.tscn" id="14_1s48r"]
+[ext_resource type="Script" uid="uid://bc3m45ixxioyb" path="res://src/entities/player/player_stats_manager.gd" id="14_iumex"]
+[ext_resource type="Script" uid="uid://bl0upi7hb4mj2" path="res://src/entities/player/damage_type_stats.gd" id="15_e1285"]
+
+[sub_resource type="Resource" id="Resource_4u850"]
+script = ExtResource("15_e1285")
+
+[sub_resource type="Resource" id="Resource_y16n8"]
+script = ExtResource("15_e1285")
+
+[sub_resource type="Resource" id="Resource_lf3bo"]
+script = ExtResource("15_e1285")
+
+[sub_resource type="Resource" id="Resource_2ckkw"]
+script = ExtResource("15_e1285")
+
+[sub_resource type="Resource" id="Resource_0lrsq"]
+script = ExtResource("15_e1285")
+
+[sub_resource type="Resource" id="Resource_xxjrd"]
+script = ExtResource("15_e1285")
+
+[sub_resource type="Resource" id="Resource_6yet0"]
+script = ExtResource("15_e1285")
+
+[sub_resource type="Resource" id="Resource_37cy8"]
+script = ExtResource("15_e1285")
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_main_script")
@@ -22,10 +55,31 @@ position = Vector2(576, 324)
 max_health = 1000
 speed = 600.0
 
-[node name="PlayerEquipmentManager" type="Node" parent="Player"]
+[node name="EquipmentManager" type="Node" parent="Player"]
+unique_name_in_owner = true
 script = ExtResource("3_fup5m")
-default_equipments = Array[ExtResource("4_f4xxn")]([ExtResource("6_ek26i"), ExtResource("7_ek26i"), ExtResource("6_cic45"), null])
+default_equipments = Array[ExtResource("4_f4xxn")]([ExtResource("6_ek26i"), ExtResource("7_ek26i"), ExtResource("6_cic45"), ExtResource("8_hv7fi")])
+default_mods = Array[ExtResource("8_1s48r")]([ExtResource("9_eyn13"), ExtResource("10_n86bo"), ExtResource("11_n86bo")])
 metadata/_custom_type_script = "uid://cutwsom3s04lv"
+
+[node name="ModManager" type="Node" parent="Player"]
+unique_name_in_owner = true
+script = ExtResource("11_eyn13")
+
+[node name="PlayerStatsManager" type="Node" parent="Player"]
+unique_name_in_owner = true
+script = ExtResource("14_iumex")
+damage_type_stats = Dictionary[int, ExtResource("15_e1285")]({
+0: SubResource("Resource_4u850"),
+1: SubResource("Resource_y16n8"),
+2: SubResource("Resource_2ckkw"),
+3: SubResource("Resource_lf3bo"),
+4: SubResource("Resource_0lrsq"),
+5: SubResource("Resource_6yet0"),
+6: SubResource("Resource_xxjrd"),
+7: SubResource("Resource_37cy8")
+})
+metadata/_custom_type_script = "uid://bc3m45ixxioyb"
 
 [node name="UI" type="CanvasLayer" parent="."]
 
@@ -36,6 +90,8 @@ offset_right = -1280.0
 [node name="EquipmentUI" parent="UI" instance=ExtResource("4_equipment_ui")]
 
 [node name="CreditsDisplay" parent="UI" instance=ExtResource("8_credits")]
+
+[node name="PauseMenu" parent="UI" instance=ExtResource("14_1s48r")]
 
 [node name="EnemySpawner" type="Node2D" parent="."]
 script = ExtResource("4_vw57g")

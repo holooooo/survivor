@@ -79,7 +79,7 @@ func _on_preview_button_pressed(room_type: int) -> void:
 func _on_battle_requested() -> void:
 	print("切换到战斗场景")
 	# 这里将来会实现场景切换到战斗场景
-	# 例如: get_tree().change_scene_to_file("res://src/scenes/main/main.tscn")
+	get_tree().change_scene_to_file("res://src/scenes/fight/fight.tscn")
 
 ## 返回主界面响应
 func _on_return_to_main_requested() -> void:

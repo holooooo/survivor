@@ -36,7 +36,7 @@ func _on_restart_pressed() -> void:
 	# 重置游戏管理器状态
 	GameManager.reset_game()
 	# 安全地跳转到主游戏场景
-	EventBus.change_scene_safely("res://src/scenes/main/main.tscn")
+	EventBus.change_scene_safely("res://src/scenes/fight/fight.tscn")
 
 ## 退出游戏
 func _on_quit_pressed() -> void:
