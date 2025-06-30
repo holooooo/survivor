@@ -14,7 +14,6 @@ func _ready() -> void:
 	add_to_group("player")
 	
 	# 初始化属性管理器
-	add_child(stats_manager)
 	stats_manager.initialize(self)
 	stats_manager.stats_changed.connect(_on_damage_type_stats_changed)
 	stats_manager.base_stats_changed.connect(_on_base_stats_changed)
