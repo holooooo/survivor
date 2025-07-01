@@ -15,6 +15,7 @@ var last_damage_time: float = 0.0 ## 上次造成伤害的时间
 var damage_cooldown: float = 1.0 ## 伤害冷却时间（秒）
 var frame_skip_counter: int = 0 ## 帧跳过计数器
 var use_physics_movement: bool = false ## 是否使用物理移动（默认使用简单移动）
+var movement_disabled: bool = false ## 是否禁用移动（用于击退等效果）
 
 # 距离缓存系统
 var cached_distance_to_player: float = 0.0 ## 缓存的与玩家的距离
@@ -33,7 +34,7 @@ func _ready() -> void:
 	# 连接Actor的信号
 	died.connect(_on_died)
 
-	player = get_tree().get_root().find_child("Player", true, false)
+	player = get_tree().get_first_node_in_group(Constants.GROUP_PLAYER)
 	
 	# 初始化距离缓存
 	if player:
@@ -59,7 +60,11 @@ func _physics_process(delta):
 		distance_cache_counter = 0
 
 	update_screen_status()
-	enemy_ai(adjusted_delta)
+	
+	# 只有在移动未被禁用时才执行AI
+	if not movement_disabled:
+		enemy_ai(adjusted_delta)
+	
 	check_distance_damage()
 	check_distance_and_respawn()
 
@@ -205,7 +210,43 @@ func get_effective_speed() -> float:
 ## [param direction] 移动方向[br]
 ## [param delta] 时间增量
 func move_optimized(direction: Vector2, delta: float) -> void:
-	if direction != Vector2.ZERO:
+	if direction != Vector2.ZERO and not movement_disabled:
 		# 使用Actor基类的移动方法，考虑当前速度倍数
 		var target_position = global_position + direction * get_effective_speed() * delta
 		global_position = target_position
+
+## 应用击退效果[br]
+## [param direction] 击退方向[br]
+## [param strength] 击退强度
+func apply_knockback(direction: Vector2, strength: float) -> void:
+	# 禁用移动
+	movement_disabled = true
+	
+	# 创建击退动画
+	var tween = create_tween()
+	if not tween:
+		# 如果无法创建Tween，立即恢复移动
+		movement_disabled = false
+		return
+	
+	var start_position = global_position
+	var target_position = start_position + direction * strength
+	
+	# 击退动画
+	tween.tween_property(self, "global_position", target_position, 0.3)
+	
+	# 击退结束后恢复移动
+	tween.tween_callback(func(): movement_disabled = false)
+
+## 设置移动禁用状态[br]
+## [param disabled] 是否禁用移动
+func set_movement_disabled(disabled: bool) -> void:
+	movement_disabled = disabled
+
+## 禁用移动
+func disable_movement() -> void:
+	movement_disabled = true
+
+## 启用移动
+func enable_movement() -> void:
+	movement_disabled = false

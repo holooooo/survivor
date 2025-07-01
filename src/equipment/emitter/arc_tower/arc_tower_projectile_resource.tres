@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EmitterProjectileResource" load_steps=2 format=3 uid="uid://c7x8lam3n5pqw"]
+
+[ext_resource type="Script" path="res://src/equipment/emitter_projectile_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+projectile_name = "电弧塔电弧"
+projectile_color = Color(0.5, 0.8, 1, 1)
+projectile_scale = Vector2(1, 1)
+projectile_speed = 0.0
+lifetime = 0.3
+base_damage = 18
+damage_ticks = 1
+damage_type = 2
+pierce_damage_reduction = 0.0
+pierce_speed_reduction = 0.0
+detection_radius = 200.0
+trail_length = 0.0
+trail_color = Color(0.5, 0.8, 1, 0)
+fade_out = true

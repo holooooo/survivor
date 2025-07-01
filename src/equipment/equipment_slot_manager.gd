@@ -1,4 +1,4 @@
-extends RefCounted
+extends Node
 class_name EquipmentSlotManager
 
 ## 装备槽位管理器 - 管理装备和mod的槽位分配[br]
@@ -8,14 +8,14 @@ class_name EquipmentSlotManager
 class SlotData:
 	var equipment_instance: EquipmentBase
 	var mod_resource: ModResource
-	var slot_type: String  # "equipment" 或 "mod"
+	var slot_type: String # "equipment" 或 "mod"
 	
 	func _init(type: String):
 		slot_type = type
 
 ## 装备和mod槽位配置
-const EQUIPMENT_SLOTS: int = 8   ## 装备槽位数量
-const MOD_SLOTS: int = 10        ## mod槽位数量
+const EQUIPMENT_SLOTS: int = 8 ## 装备槽位数量
+const MOD_SLOTS: int = 10 ## mod槽位数量
 
 var equipment_slots: Array[SlotData] = []
 var mod_slots: Array[SlotData] = []
@@ -31,12 +31,12 @@ func _init():
 func _initialize_slots() -> void:
 	equipment_slots.clear()
 	mod_slots.clear()
-	
+
 	# 创建装备槽位
 	for i in range(EQUIPMENT_SLOTS):
 		var slot_data = SlotData.new("equipment")
 		equipment_slots.append(slot_data)
-	
+
 	# 创建mod槽位
 	for i in range(MOD_SLOTS):
 		var slot_data = SlotData.new("mod")
@@ -48,11 +48,13 @@ func _initialize_slots() -> void:
 ## [returns] 装备成功的槽位索引，失败返回-1
 func try_equip_equipment(equipment_resource: EquipmentResource, equipment_instance: EquipmentBase) -> int:
 	if not equipment_resource or not equipment_instance:
+		push_error("无效的装备资源或装备实例")
 		return -1
 	
 	# 寻找空的装备槽位
 	var slot_index = _find_empty_equipment_slot()
 	if slot_index == -1:
+		push_error("没有空的装备槽位")
 		return -1
 	
 	# 装备到槽位
@@ -125,6 +127,8 @@ func unequip_mod_slot(slot_index: int) -> bool:
 func get_equipment_at_slot(slot_index: int) -> EquipmentBase:
 	if slot_index < 0 or slot_index >= equipment_slots.size():
 		return null
+	if not equipment_slots[slot_index]:
+		return null
 	return equipment_slots[slot_index].equipment_instance
 
 ## 获取指定mod槽位的mod[br]
@@ -132,6 +136,8 @@ func get_equipment_at_slot(slot_index: int) -> EquipmentBase:
 ## [returns] mod资源
 func get_mod_at_slot(slot_index: int) -> ModResource:
 	if slot_index < 0 or slot_index >= mod_slots.size():
+		return null
+	if not mod_slots[slot_index]:
 		return null
 	return mod_slots[slot_index].mod_resource
 
@@ -195,4 +201,4 @@ func _find_empty_mod_slot() -> int:
 	for i in range(mod_slots.size()):
 		if not mod_slots[i].mod_resource:
 			return i
-	return -1 
+	return -1

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EmitterProjectileResource" load_steps=2 format=3 uid="uid://flad4n03wsag"]
+
+[ext_resource type="Script" path="res://src/equipment/emitter_projectile_resource.gd" id="1_projectile_base"]
+
+[resource]
+script = ExtResource("1_projectile_base")
+projectile_name = "激光枪投射物"
+projectile_color = Color(0, 1, 1, 0.8)
+projectile_scale = Vector2(1, 1)
+projectile_speed = 0.0
+base_damage = 5
+damage_ticks = 6
+damage_interval = 0.08
+damage_type = 2
+pierce_damage_reduction = 0.0
+pierce_speed_reduction = 0.0
+detection_radius = 30.0
+trail_length = 0.0
+trail_color = Color(1, 1, 1, 0)
+fade_out = true

@@ -4,6 +4,7 @@ class_name Player
 ## 玩家控制器 - 处理玩家移动、血量管理和战斗逻辑[br]
 ## 使用事件系统与其他模块通信，避免直接依赖
 @onready var equipment_manager: EquipmentManager = %EquipmentManager
+@onready var mod_manager: ModManager = %ModManager
 @onready var stats_manager: PlayerStatsManager = %PlayerStatsManager
 
 func _ready() -> void:
@@ -11,15 +12,12 @@ func _ready() -> void:
 	current_health = max_health
 	
 	# 将玩家添加到player组，便于其他系统获取玩家引用
-	add_to_group("player")
+	add_to_group(Constants.GROUP_PLAYER)
 	
 	# 初始化属性管理器
 	stats_manager.initialize(self)
 	stats_manager.stats_changed.connect(_on_damage_type_stats_changed)
 	stats_manager.base_stats_changed.connect(_on_base_stats_changed)
-	
-	# 添加装备管理器
-	equipment_manager.initialize(self as Player)
 	
 	# 连接Actor的信号到事件总线
 	health_changed.connect(_on_health_changed)

@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bqm5hxr7yb1ch"]
+
+[ext_resource type="Script" path="res://src/equipment/emitter/laser_gun/emitter/laser_gun_equipment.gd" id="1_laser_gun_equipment"]
+
+[node name="LaserGunEquipment" type="Node2D"]
+script = ExtResource("1_laser_gun_equipment")
+
+[node name="ProjectilePool" type="Node2D" parent="."] 

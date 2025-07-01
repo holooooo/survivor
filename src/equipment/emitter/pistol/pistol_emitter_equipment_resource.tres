@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="EmitterEquipmentResource" load_steps=8 format=3 uid="uid://dxknm8f2vboac"]
+
+[ext_resource type="Script" uid="uid://cnwq8e5vm7df2" path="res://src/equipment/emitter_equipment_resource.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://c7nak4j2f8p1x" path="res://src/equipment/emitter/pistol/emitter/pistol_equipment.tscn" id="1_it6w0"]
+[ext_resource type="Texture2D" uid="uid://d0ebkhbqp4fhd" path="res://icon.svg" id="2_0u8n4"]
+[ext_resource type="Script" uid="uid://c3ih2fukl5lb6" path="res://src/equipment/hit_effect_resource.gd" id="2_ku84u"]
+[ext_resource type="Resource" uid="uid://c5n8m3k4p7qxw" path="res://src/equipment/emitter/pistol/pistol_emitter_projectile_resource.tres" id="3_6d8bt"]
+[ext_resource type="Resource" uid="uid://hx4a52ubgmci" path="res://src/equipment/hit_effect/resources/split.tres" id="3_krhis"]
+[ext_resource type="PackedScene" uid="uid://dqh8b3k5r7x2m" path="res://src/equipment/emitter/pistol/projectile/pistol_projectile.tscn" id="6_3w17x"]
+
+[resource]
+script = ExtResource("1")
+emit_interval = 5.0
+base_damage = 12
+attack_range = 1000.0
+magazine_capacity = 9
+hit_effects = Array[ExtResource("2_ku84u")]([ExtResource("3_krhis")])
+equipment_name = "手枪"
+equipment_id = "pistol"
+equipment_type = 1
+icon_texture = ExtResource("2_0u8n4")
+cooldown_time = 0.5
+equipment_scene = ExtResource("1_it6w0")
+projectile_scene = ExtResource("6_3w17x")
+projectile_resource = ExtResource("3_6d8bt")
+description = "自动瞄准手枪，在1000米攻击距离内有敌人时进行射击，单次发射3发子弹"

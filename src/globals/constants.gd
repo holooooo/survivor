@@ -4,11 +4,6 @@ class_name Constants
 ## 游戏常量定义
 ## 包含所有游戏中使用的常量值，便于统一管理和调整
 
-# 武器属性
-const BULLET_DEFAULT_SPEED: float = 400.0
-const BULLET_DEFAULT_DAMAGE: int = 15
-const BULLET_LIFETIME: float = 5.0
-
 # 游戏平衡
 const SPAWN_DISTANCE_FROM_SCREEN: float = 300.0 ## 增加生成距离，避免玩家看到敌人凭空出现
 const DAMAGE_NUMBER_OFFSET_RANGE: float = 20.0
@@ -31,12 +26,6 @@ const ENEMY_UPDATE_SKIP_FRAMES: int = 2 ## 敌人更新跳过的帧数（降低�
 const MAX_ENEMIES_PER_FRAME: int = 50 ## 每帧最大处理的敌人数量
 const DISTANCE_CHECK_OPTIMIZATION: bool = true ## 启用距离检查优化
 
-# 物理性能优化
-const MAX_BULLETS_ON_SCREEN: int = 100 ## 屏幕上同时存在的最大子弹数
-const BULLET_POOL_SIZE: int = 50 ## 子弹对象池大小
-const USE_BULLET_POOLING: bool = true ## 启用子弹对象池
-const PHYSICS_CULLING_DISTANCE: float = 1500.0 ## 物理剔除距离
-const AREA2D_OPTIMIZATION: bool = true ## 启用Area2D优化
 
 # 敌人类型枚举
 enum EnemyType {
@@ -58,10 +47,6 @@ enum GameState {
 	GAME_OVER ## 游戏结束状态
 }
 
-# 装备系统
-const EQUIPMENT_SLOTS: int = 8 ## 装备槽位数量
-const MOD_SLOTS: int = 10 ## mod槽位数量
-
 # 物理层定义
 const LAYER_PLAYER: int = 1
 const LAYER_ENEMY: int = 2
@@ -76,14 +61,49 @@ const GROUP_PICKUPS: String = "pickups"
 
 # 伤害类型枚举
 enum DamageType {
-	枪械,   ## 枪械伤害（手枪、步枪等）
-	近战,       ## 近战伤害（拳击、刀具等）  
-	能量,      ## 能量伤害（电弧、激光等）
-	爆炸,   ## 爆炸伤害（炸弹、手榴弹等）
-	火焰,        ## 火焰伤害
-	毒素,      ## 毒素伤害
-	冰冻,         ## 冰冻伤害
-	电击     ## 电击伤害
+	枪械, ## 枪械伤害（手枪、步枪等）
+	近战, ## 近战伤害（拳击、刀具等）
+	能量, ## 能量伤害（电弧、激光等）
+	爆炸, ## 爆炸伤害（炸弹、手榴弹等）
+	火焰, ## 火焰伤害
+	毒素, ## 毒素伤害
+	冰冻, ## 冰冻伤害
+	电击 ## 电击伤害
+}
+
+## 装备品质
+## 装备品质影响装备的属性、效果
+## 分为民用级企业级专业级军用级和传说级
+enum EquipmentQuality {
+	民用,
+	专业,
+	企业,
+	军用,
+	传说
+}
+
+enum EquipmentType {
+	近战武器,
+	枪械,
+	能量武器,
+	投掷物,
+	装甲,
+	护盾,
+	植入物,
+}
+
+enum EquipmentProducer {
+	无名作坊,
+	公司1,
+	公司2,
+}
+
+## 装备目标类型枚举
+enum TargetType {
+	最近敌人,      ## 攻击范围内最近的敌人
+	最低生命值敌人, ## 攻击范围内生命值最低的敌人  
+	随机敌人,      ## 攻击范围内的随机敌人
+	随机位置       ## 攻击范围内的随机位置
 }
 
 # 获取伤害类型名称

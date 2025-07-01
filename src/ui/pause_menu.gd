@@ -69,7 +69,7 @@ func _update_equipment_display() -> void:
 		child.queue_free()
 	
 	# 获取玩家装备管理器
-	var player = get_tree().get_first_node_in_group("player")
+	var player = get_tree().get_first_node_in_group(Constants.GROUP_PLAYER)
 	if not player:
 		return
 		

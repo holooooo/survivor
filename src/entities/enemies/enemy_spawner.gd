@@ -56,7 +56,7 @@ func spawn_enemy() -> void:
 	var enemies_to_spawn: int = min(enemies_per_spawn, max_enemies - current_enemy_count)
 	
 	# 获取玩家位置用于动态生成计算
-	var player: Node = get_tree().get_first_node_in_group("player")
+	var player: Node = get_tree().get_first_node_in_group(Constants.GROUP_PLAYER)
 	
 	for i in range(enemies_to_spawn):
 		# 随机选择敌人类型

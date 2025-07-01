@@ -7,6 +7,7 @@ class_name EmitterEquipmentBase
 
 @export_group("发射器配置")
 @export var attack_range: float = 300.0 ## 攻击范围
+@onready var projectile_pool: Node = $ProjectilePool
 
 # 弹药系统（可选）
 var magazine_capacity: int = 0 ## 弹夹容量（0=无限弹药）
@@ -165,18 +166,17 @@ func _fire_single_projectile() -> void:
 	var projectile: Node2D = projectile_scene.instantiate()
 	var main_scene: Node2D = owner_player.get_parent()
 	
-	if main_scene:
-		main_scene.add_child(projectile)
-		projectile.global_position = _get_projectile_spawn_position()
-		
-		# 配置投射物
-		if projectile.has_method("setup_from_resource") and projectile_resource:
-			var target_direction: Vector2 = _get_target_direction()
-			var equipment_stats = _get_current_stats()
-			projectile.setup_from_resource(self, projectile_resource, target_direction, equipment_stats)
-		
-		# 应用特定配置
-		_configure_projectile_specific(projectile)
+	projectile_pool.add_child(projectile)
+	projectile.global_position = _get_projectile_spawn_position()
+	
+	# 配置投射物
+	if projectile.has_method("setup_from_resource") and projectile_resource:
+		var target_direction: Vector2 = _get_target_direction()
+		var equipment_stats = _get_current_stats()
+		projectile.setup_from_resource(self, projectile_resource, target_direction, equipment_stats)
+	
+	# 应用特定配置
+	_configure_projectile_specific(projectile)
 
 ## 开始装弹[br]
 func _start_reload() -> void:
@@ -258,8 +258,25 @@ func get_emitter_status() -> Dictionary:
 ## 检查特定使用条件[br]
 ## [returns] 是否满足特定条件
 func _can_use_specific() -> bool:
-	# 默认实现：检查攻击范围内是否有敌人
-	return has_enemies_in_attack_range()
+	var target_type: Constants.TargetType = emitter_config.get("target_type", Constants.TargetType.最近敌人)
+	var continuous_attack: bool = emitter_config.get("continuous_attack", false)
+	
+	# 如果启用了持续攻击，总是可以使用
+	if continuous_attack:
+		return true
+	
+	# 否则检查是否有有效目标
+	match target_type:
+		Constants.TargetType.最近敌人:
+			return has_enemies_in_attack_range()
+		Constants.TargetType.最低生命值敌人:
+			return _get_lowest_health_enemy_in_range() != null
+		Constants.TargetType.随机敌人:
+			return _get_random_enemy_in_range() != null
+		Constants.TargetType.随机位置:
+			return true # 随机位置总是可用
+	
+	return false
 
 ## 配置投射物特定属性[br]
 ## [param projectile] 投射物实例

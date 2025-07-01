@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="SplitHitEffect" load_steps=2 format=3 uid="uid://hx4a52ubgmci"]
+
+[ext_resource type="Script" uid="uid://s2tgj0byv263" path="res://src/equipment/hit_effect/split_hit_effect.gd" id="1_1lt4b"]
+
+[resource]
+script = ExtResource("1_1lt4b")
+metadata/_custom_type_script = "uid://s2tgj0byv263"

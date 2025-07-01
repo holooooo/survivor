@@ -14,43 +14,44 @@ var mod_effects: Array[Dictionary] = [] ## 应用的模组效果
 var lifetime_timer: float = 0.0 ## 存活时间计时器
 var is_destroyed: bool = false ## 是否已被销毁
 
+# 射程追踪系统
+var start_position: Vector2 ## 投射物起始位置
+var traveled_distance: float = 0.0 ## 已飞行距离
+var max_range: float = 0.0 ## 最大射程
+var range_check_enabled: bool = true ## 是否启用射程检查
+
+# 穿透系统
+var pierce_remaining: int = 0 ## 剩余穿透次数
+var has_hit_target: bool = false ## 是否已命中目标
+
 # 伤害系统
 var base_damage: int = 10 ## 基础伤害
 var current_damage: int = 10 ## 当前伤害（可能被模组修改）
 var damage_type: Constants.DamageType = Constants.DamageType.枪械 ## 伤害类型
+var is_critical_hit_flag: bool = false ## 是否为暴击
+
+# 投射物标记系统
+var flags: Dictionary = {} ## 投射物标记，用于控制各种效果行为
 
 # 碰撞系统
 var colliding_targets: Array[Node] = [] ## 当前碰撞中的目标
 
 # 视觉组件（可选）
-var sprite: Sprite2D
-var collision_shape: CollisionShape2D
+@onready var sprite: Sprite2D = $Sprite2D
+@onready var collision_shape: CollisionShape2D = $CollisionShape2D
 
 func _ready() -> void:
-	_find_optional_nodes()
 	_setup_collision_system()
 	_setup_lifecycle()
-	add_to_group("projectiles")
-	
-	# 初始时禁用碰撞检测，等待资源设置完成后再启用
-	set_deferred("monitoring", false)
-	set_deferred("monitorable", false)
+	add_to_group(Constants.GROUP_PROJECTILES)
 
-## 查找可选节点[br]
-func _find_optional_nodes() -> void:
-	# 安全查找Sprite2D节点
-	sprite = get_node_or_null("Sprite2D")
-	if not sprite:
-		sprite = get_node_or_null("Sprite")
-	
-	# 安全查找CollisionShape2D节点
-	collision_shape = get_node_or_null("CollisionShape2D")
-	if not collision_shape:
-		collision_shape = get_node_or_null("CollisionShape")
 
 func _physics_process(delta: float) -> void:
 	if is_destroyed:
 		return
+	
+	# 更新飞行距离追踪
+	_update_traveled_distance()
 	
 	lifetime_timer += delta
 	
@@ -78,6 +79,17 @@ func setup_from_resource(_equipment: EquipmentBase, resource: EmitterProjectileR
 		push_error("Projectile resource not set.")
 		queue_free()
 		return
+	
+	# 记录起始位置
+	start_position = global_position
+	
+	# 设置射程系统
+	var equipment_attack_range: float = equipment_stats.get("attack_range", 300.0)
+	max_range = projectile_resource.get_effective_max_range(equipment_attack_range)
+	range_check_enabled = projectile_resource.range_check_enabled
+	
+	# 设置穿透系统
+	pierce_remaining = equipment_stats.get("pierce_count", projectile_resource.pierce_count)
 	
 	# 设置基础属性
 	base_damage = equipment_stats.get("base_damage", projectile_resource.base_damage)
@@ -202,10 +214,40 @@ func _deal_damage_to_target(target: Node, damage_amount: int) -> void:
 ## 检查是否应该销毁[br]
 ## [returns] 是否应该销毁
 func _should_destroy() -> bool:
+	# 基础生命周期检查
+	if _should_destroy_by_lifetime():
+		return true
+	
+	# 枪械类型的特殊检查
+	if equipment.resource.equipment_type == Constants.EquipmentType.枪械:
+		if _should_destroy_by_range():
+			return true
+		if _should_destroy_by_pierce():
+			return true
+	
+	return false
+
+## 检查是否因生命周期到期而销毁[br]
+## [returns] 是否应该销毁
+func _should_destroy_by_lifetime() -> bool:
 	if not projectile_resource:
 		return lifetime_timer >= 5.0 # 默认5秒，资源未初始化时的回退
 	
 	return lifetime_timer >= projectile_resource.lifetime
+
+## 检查是否因射程超限而销毁[br]
+## [returns] 是否应该销毁
+func _should_destroy_by_range() -> bool:
+	if not range_check_enabled or max_range <= 0.0:
+		return false
+	
+	return traveled_distance >= max_range
+
+## 检查是否因穿透次数耗尽而销毁[br]
+## [returns] 是否应该销毁
+func _should_destroy_by_pierce() -> bool:
+	# 只有在已命中目标且穿透次数耗尽时才销毁
+	return has_hit_target and pierce_remaining <= 0
 
 ## 销毁投射物[br]
 func _destroy_projectile() -> void:
@@ -283,8 +325,15 @@ func _get_projectile_type() -> String:
 ## 目标进入处理[br]
 ## [param target] 进入的目标
 func _on_target_entered(target: Node) -> void:
+	# 标记已命中目标
+	has_hit_target = true
+	
 	# 默认立即造成伤害
 	_deal_damage_to_target(target, current_damage)
+	
+	# 处理穿透逻辑（枪械类型）
+	if damage_type == Constants.DamageType.枪械:
+		_handle_pierce_logic(target)
 
 ## 目标离开处理[br]
 ## [param target] 离开的目标
@@ -345,6 +394,77 @@ func _apply_player_stats_bonuses() -> void:
 
 ## 标记为暴击（子类可重写）[br]
 func _mark_as_critical_hit() -> void:
+	is_critical_hit_flag = true
 	# 子类可以重写此方法来添加暴击视觉效果
 	# 例如：改变颜色、添加特效等
 	pass
+
+## 检查是否为暴击[br]
+## [returns] 是否为暴击
+func is_critical_hit() -> bool:
+	return is_critical_hit_flag
+
+## 获取基础伤害[br]
+## [returns] 基础伤害值
+func get_base_damage() -> int:
+	return base_damage
+
+## 获取装备统计[br]
+## [returns] 装备统计字典
+func get_equipment_stats() -> Dictionary:
+	return equipment_stats
+
+## 获取剩余穿透次数[br]
+## [returns] 剩余穿透次数
+func get_pierce_remaining() -> int:
+	return pierce_remaining
+
+## 设置投射物标记[br]
+## [param flag_name] 标记名称[br]
+## [param value] 标记值
+func set_flag(flag_name: String, value) -> void:
+	flags[flag_name] = value
+
+## 获取投射物标记[br]
+## [param flag_name] 标记名称[br]
+## [param default_value] 默认值[br]
+## [returns] 标记值
+func get_flag(flag_name: String, default_value = null):
+	return flags.get(flag_name, default_value)
+
+## 检查是否有指定标记[br]
+## [param flag_name] 标记名称[br]
+## [returns] 是否存在该标记
+func has_flag(flag_name: String) -> bool:
+	return flags.has(flag_name)
+
+## 移除投射物标记[br]
+## [param flag_name] 标记名称
+func remove_flag(flag_name: String) -> void:
+	flags.erase(flag_name)
+
+## 获取所有标记[br]
+## [returns] 标记字典
+func get_all_flags() -> Dictionary:
+	return flags.duplicate()
+
+## 处理穿透逻辑[br]
+## [param target] 命中的目标
+func _handle_pierce_logic(target: Node) -> void:
+	# 减少穿透次数
+	pierce_remaining -= 1
+	
+	# 如果有穿透资源配置，应用穿透伤害和速度衰减
+	if projectile_resource and pierce_remaining >= 0:
+		var current_pierce = projectile_resource.pierce_count - pierce_remaining
+		
+		# 更新伤害（基于穿透次数的衰减）
+		if current_pierce > 0:
+			var pierce_damage = projectile_resource.get_pierce_damage(current_pierce)
+			# 重新应用玩家属性加成
+			current_damage = pierce_damage
+			_apply_player_stats_bonuses()
+
+## 更新飞行距离追踪
+func _update_traveled_distance() -> void:
+	traveled_distance = (global_position - start_position).length()

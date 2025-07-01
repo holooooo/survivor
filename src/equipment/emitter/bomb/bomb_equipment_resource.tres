@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EmitterEquipmentResource" load_steps=6 format=3 uid="uid://cvddfh6pcaffm"]
+
+[ext_resource type="Resource" uid="uid://bh7fk7xj04fqd" path="res://src/equipment/emitter/bomb/bomb_projectile_resource.tres" id="1"]
+[ext_resource type="Texture2D" uid="uid://d0ebkhbqp4fhd" path="res://icon.svg" id="1_7kwjk"]
+[ext_resource type="Script" uid="uid://cnwq8e5vm7df2" path="res://src/equipment/emitter_equipment_resource.gd" id="1_pt8cf"]
+[ext_resource type="PackedScene" uid="uid://dixd1w5g84q6x" path="res://src/equipment/emitter/bomb/emitter/bomb_equipment.tscn" id="2_bomb_equipment_scene"]
+[ext_resource type="PackedScene" uid="uid://cwb6jojnxgxmx" path="res://src/equipment/emitter/bomb/projectile/bomb_projectile.tscn" id="4_plx1a"]
+
+[resource]
+script = ExtResource("1_pt8cf")
+target_type = 3
+equipment_name = "炸弹"
+equipment_id = "bomb"
+equipment_type = 3
+icon_texture = ExtResource("1_7kwjk")
+equipment_scene = ExtResource("2_bomb_equipment_scene")
+projectile_scene = ExtResource("4_plx1a")
+projectile_resource = ExtResource("1")
+metadata/_custom_type_script = "uid://cnwq8e5vm7df2"

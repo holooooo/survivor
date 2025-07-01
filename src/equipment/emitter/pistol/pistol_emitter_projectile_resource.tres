@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EmitterProjectileResource" load_steps=3 format=3 uid="uid://c5n8m3k4p7qxw"]
+
+[ext_resource type="Texture2D" uid="uid://d0ebkhbqp4fhd" path="res://icon.svg" id="1_2j106"]
+[ext_resource type="Script" path="res://src/equipment/emitter_projectile_resource.gd" id="1_projectile_base"]
+
+[resource]
+script = ExtResource("1_projectile_base")
+projectile_name = "发射器手枪子弹"
+projectile_texture = ExtResource("1_2j106")
+projectile_scale = Vector2(0.2, 0.2)
+max_range = 1200.0
+projectile_speed = 1500.0
+lifetime = 0.6
+base_damage = 12
+damage_ticks = 1
+pierce_count = 3
+pierce_damage_reduction = 0.15
+trail_length = 10.0
+trail_color = Color(1, 1, 0, 0.50980395)
+fade_out = true

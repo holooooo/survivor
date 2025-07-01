@@ -49,7 +49,7 @@ func get_character_count() -> int:
 	var count: int = 0
 	
 	# 计算玩家数量
-	count += get_tree().get_nodes_in_group("player").size()
+	count += get_tree().get_nodes_in_group(Constants.GROUP_PLAYER).size()
 	
 	# 尝试从敌人生成器获取敌人数量
 	var spawner: Node = get_tree().current_scene.find_child("EnemySpawner")
@@ -68,24 +68,7 @@ func get_character_count() -> int:
 func get_projectile_count() -> int:
 	var count: int = 0
 	
-	# 查找所有子弹和投射物节点
-	for node in get_tree().current_scene.find_children("*"):
-		# 通过类型识别（最准确）
-		if node is Bullet:
-			count += 1
-		# 通过节点名称识别
-		elif (node.name.begins_with("Bullet") or 
-			node.name.begins_with("Projectile") or
-			node.name.to_lower().contains("bullet") or
-			node.name.to_lower().contains("projectile")):
-			count += 1
-		# 通过脚本特征识别（有setup或set_direction方法的通常是子弹）
-		elif (node.has_method("setup") or node.has_method("set_direction")) and node is Area2D:
-			count += 1
-		# 通过类名识别
-		elif node.get_script() and str(node.get_script()).contains("bullet"):
-			count += 1
-	
+	count += get_tree().get_nodes_in_group(Constants.GROUP_PROJECTILES).size()
 	return count
 
 ## 设置可见性[br]

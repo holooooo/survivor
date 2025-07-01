@@ -10,7 +10,8 @@ class_name EquipmentUI
 var equipment_slots: Array[EquipmentSlot] = []
 var mod_slots: Array[EquipmentSlot] = []
 
-var equipment_manager
+@onready var equipment_manager: EquipmentManager = %EquipmentManager
+@onready var mod_manager: ModManager = %ModManager
 
 # 预加载装备槽场景
 const EQUIPMENT_SLOT_SCENE = preload("res://src/ui/equipment_slot.tscn")
@@ -27,16 +28,15 @@ func _find_equipment_manager() -> void:
 	# 延迟查找，确保玩家已经初始化
 	await get_tree().process_frame
 	
-	var player: Node = get_tree().get_first_node_in_group("player")
+	var player: Node = get_tree().get_first_node_in_group(Constants.GROUP_PLAYER)
 	print("查找玩家: ", player)
 	if player and player.has_node("EquipmentManager"):
-		equipment_manager = player.get_node("EquipmentManager")
 		print("找到装备管理器: ", equipment_manager)
 		if not equipment_manager.equipment_changed.is_connected(_on_equipment_changed):
 			equipment_manager.equipment_changed.connect(_on_equipment_changed)
-			equipment_manager.mod_changed.connect(_on_mod_changed)
 			equipment_manager.equipment_slot_info_changed.connect(_on_equipment_slot_info_changed)
-			equipment_manager.mod_slot_info_changed.connect(_on_mod_slot_info_changed)
+			mod_manager.mod_changed.connect(_on_mod_changed)
+			mod_manager.mod_slot_info_changed.connect(_on_mod_slot_info_changed)
 			print("已连接装备变化信号")
 		
 		# 初始化完成后立即更新一次UI

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EmitterEquipmentResource" load_steps=6 format=3 uid="uid://dqk8ng5efct1e"]
+
+[ext_resource type="Script" uid="uid://cnwq8e5vm7df2" path="res://src/equipment/emitter_equipment_resource.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://bqm5hxr7yb1ch" path="res://src/equipment/emitter/laser_gun/emitter/laser_gun_equipment.tscn" id="2"]
+[ext_resource type="Script" uid="uid://c3ih2fukl5lb6" path="res://src/equipment/hit_effect_resource.gd" id="2_qb30c"]
+[ext_resource type="PackedScene" uid="uid://cjx5hgm8r7n2d" path="res://src/equipment/emitter/laser_gun/projectile/laser_gun_projectile.tscn" id="3"]
+[ext_resource type="Resource" uid="uid://flad4n03wsag" path="res://src/equipment/emitter/laser_gun/laser_gun_projectile_resource.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+base_damage = 5
+target_type = 1
+reload_time = 0.0
+equipment_name = "激光枪"
+equipment_id = "laser_gun"
+equipment_type = 2
+cooldown_time = 3.0
+equipment_scene = ExtResource("2")
+projectile_scene = ExtResource("3")
+projectile_resource = ExtResource("4")

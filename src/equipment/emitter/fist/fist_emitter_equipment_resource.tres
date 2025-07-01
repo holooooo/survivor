@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="EmitterEquipmentResource" load_steps=6 format=3 uid="uid://dtkgng4efct0d"]
+
+[ext_resource type="Script" uid="uid://cnwq8e5vm7df2" path="res://src/equipment/emitter_equipment_resource.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://chdq3vvnuiwui" path="res://src/equipment/emitter/fist/emitter/fist_equipment.tscn" id="2"]
+[ext_resource type="Script" uid="uid://c3ih2fukl5lb6" path="res://src/equipment/hit_effect_resource.gd" id="2_i8eip"]
+[ext_resource type="PackedScene" uid="uid://bru7130l7n5va" path="res://src/equipment/emitter/fist/projectile/fist_projectile.tscn" id="3"]
+[ext_resource type="Resource" uid="uid://ec7d3n02wsag" path="res://src/equipment/emitter/fist/fist_emitter_projectile_resource.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+emit_interval = 0.15
+base_damage = 5
+attack_range = 80.0
+target_type = 1
+magazine_capacity = 2
+reload_time = 10.0
+reload_mode = 1
+equipment_name = "拳击"
+equipment_id = "fist_emitter"
+cooldown_time = 2.0
+equipment_scene = ExtResource("2")
+projectile_scene = ExtResource("3")
+projectile_resource = ExtResource("4")
