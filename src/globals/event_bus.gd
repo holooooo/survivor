@@ -6,6 +6,7 @@ extends Node
 
 # 玩家相关事件
 signal player_health_changed(current_health: int, max_health: int)
+signal player_armor_changed(current_armor: int, max_armor: int)
 signal player_died
 signal player_level_up(new_level: int)
 signal player_credits_changed(credits: int)
@@ -26,6 +27,7 @@ signal battle_completed ## 战斗完成信号
 
 # UI事件
 signal ui_health_update_requested(current_health: int, max_health: int)
+signal ui_armor_update_requested(current_armor: int, max_armor: int)
 signal ui_score_update_requested(new_score: int)
 signal ui_credits_update_requested(credits: int)
 signal performance_update_requested(fps: int, characters: int, projectiles: int)
@@ -54,6 +56,13 @@ func emit_damage_dealt(target: Node2D, damage: int, world_position: Vector2) -> 
 func emit_player_health_changed(current: int, maximum: int) -> void:
 	player_health_changed.emit(current, maximum)
 	ui_health_update_requested.emit(current, maximum)
+
+## 发射玩家护甲变化事件[br]
+## [param current] 当前护甲[br]
+## [param maximum] 最大护甲
+func emit_player_armor_changed(current: int, maximum: int) -> void:
+	player_armor_changed.emit(current, maximum)
+	ui_armor_update_requested.emit(current, maximum)
 
 ## 显示伤害数字 - 统一的伤害数字显示逻辑[br]
 ## [param damage] 伤害数值[br]

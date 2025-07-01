@@ -8,7 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://cyn32jhnmyvlc" path="res://src/ui/equipment_ui.tscn" id="4_equipment_ui"]
 [ext_resource type="Script" uid="uid://fw5xx4bowcqs" path="res://src/equipment/equipment_resource.gd" id="4_f4xxn"]
 [ext_resource type="Script" uid="uid://dpfjfe2ivnncr" path="res://src/entities/enemies/enemy_spawner.gd" id="4_vw57g"]
-[ext_resource type="Resource" uid="uid://dqk8ng5efct1e" path="res://src/equipment/emitter/laser_gun/laser_gun_equipment_resource.tres" id="5_1s48r"]
+[ext_resource type="Resource" uid="uid://dxknm8f2vboac" path="res://src/equipment/emitter/pistol/pistol_emitter_equipment_resource.tres" id="5_1s48r"]
 [ext_resource type="Script" uid="uid://dpxqtnxm6umfg" path="res://src/globals/damage_number_pool.gd" id="6_3q0a4"]
 [ext_resource type="PackedScene" uid="uid://bhdq3r65eieyf" path="res://src/ui/credits_display.tscn" id="8_credits"]
 [ext_resource type="Script" path="res://src/mod/mod_manager.gd" id="11_eyn13"]
@@ -16,7 +16,7 @@
 [ext_resource type="PackedScene" uid="uid://hjusjc3ewh33" path="res://src/scenes/fight/pause_menu.tscn" id="14_1s48r"]
 [ext_resource type="Script" uid="uid://bc3m45ixxioyb" path="res://src/entities/player/player_stats_manager.gd" id="14_iumex"]
 [ext_resource type="Script" uid="uid://bl0upi7hb4mj2" path="res://src/entities/player/damage_type_stats.gd" id="15_e1285"]
-[ext_resource type="Script" uid="uid://lpvq04imgbf3" path="res://src/equipment/hit_effect_manager.gd" id="hit_effect_manager"]
+[ext_resource type="Script" uid="uid://lpvq04imgbf3" path="res://src/equipment/hit_effect/hit_effect_manager.gd" id="hit_effect_manager"]
 
 [sub_resource type="Resource" id="Resource_4u850"]
 script = ExtResource("15_e1285")

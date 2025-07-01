@@ -183,6 +183,9 @@ func _create_fallback_fist_resource() -> EquipmentResource:
 func _on_equipment_slot_changed(slot_index: int, equipment_instance: EquipmentBase) -> void:
 	equipment_changed.emit(slot_index, equipment_instance)
 	equipment_slot_info_changed.emit(slot_manager.get_equipment_slot_info())
+	
+	# 重新计算总护甲值
+	recalculate_total_armor()
 
 
 ## 重新计算所有装备属性（当玩家属性变化时调用）[br]
@@ -192,6 +195,27 @@ func recalculate_equipment_stats() -> void:
 		if equipment_instance and equipment_instance.has_method("recalculate_stats"):
 			equipment_instance.recalculate_stats()
 
+## 计算总护甲值[br]
+## [returns] 来自所有装备的总护甲值
+func calculate_total_armor() -> int:
+	var total_armor = 0
+	var equipped_instances = slot_manager.get_all_equipped_instances()
+	
+	for equipment_instance in equipped_instances:
+		if equipment_instance and equipment_instance.has_method("get_armor_value"):
+			total_armor += equipment_instance.get_armor_value()
+	
+	return total_armor
+
+## 重新计算总护甲值并应用到玩家[br]
+func recalculate_total_armor() -> void:
+	if not player:
+		return
+	
+	var total_armor = calculate_total_armor()
+	player.update_equipment_armor(total_armor)
+
 ## 玩家属性变化回调[br]
 func on_player_stats_changed() -> void:
 	recalculate_equipment_stats()
+	recalculate_total_armor()

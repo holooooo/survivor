@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ArmorEquipmentResource" load_steps=3 format=3 uid="uid://dqoang6efct2f"]
+
+[ext_resource type="Script" path="res://src/equipment/armor/armor_equipment_resource.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://bqn6hxr8yb2ch" path="res://src/equipment/armor/energy_armor/energy_armor_equipment.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+equipment_name = "电能护甲"
+equipment_id = "energy_armor"
+equipment_quality = 1
+equipment_type = 4
+cooldown_time = 0.0
+equipment_scene = ExtResource("2")

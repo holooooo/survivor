@@ -1,5 +1,6 @@
 extends Node
 
+signal on_player_damage(player: Player, damage: int)
 
 signal on_equip(player: Player, equipment: EquipmentBase)
 signal on_equipment_used(player: Player, equipment: EquipmentBase)
@@ -16,4 +17,13 @@ signal on_knockback_applied(target: Node, direction: Vector2, strength: float)
 signal on_explosion_triggered(position: Vector2, radius: float, damage: int)
 signal on_projectile_split(original_projectile: ProjectileBase, split_projectiles: Array)
 signal on_projectile_ricochet(projectile: ProjectileBase, old_target: Node, new_target: Node)
+signal on_vampire_heal(player: Player, heal_amount: int)
+signal on_enemies_gathered(center: Vector2, enemies: Array, radius: float)
+
+# 护甲相关信号
+signal on_armor_damaged(player: Player, armor_equipment: Node, current_armor: int, max_armor: int, damage: int)
+signal on_armor_broken(player: Player, armor_equipment: Node, max_armor: int)
+signal on_armor_regeneration_started(player: Player, armor_equipment: Node)
+signal on_armor_regeneration_finished(player: Player, armor_equipment: Node, regenerated_amount: int)
+signal on_armor_fully_restored(player: Player, armor_equipment: Node, restored_amount: int)
 

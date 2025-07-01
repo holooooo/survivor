@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bqo7hxr9yb3ch"]
+
+[ext_resource type="Script" path="res://src/equipment/emitter/polymer_wire/emitter/polymer_wire_equipment.gd" id="1_polymer_wire_equipment"]
+
+[node name="PolymerWireEquipment" type="Node2D"]
+script = ExtResource("1_polymer_wire_equipment")
+
+[node name="ProjectilePool" type="Node2D" parent="."] 

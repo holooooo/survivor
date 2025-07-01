@@ -1,0 +1,13 @@
+[gd_resource type="VampireHitEffect" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/equipment/hit_effect/vampire_hit_effect.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+effect_name = "基础吸血"
+effect_id = "vampire_basic"
+enabled = true
+trigger_probability = 1.0
+cooldown_time = 0.0
+heal_ratio = 0.05
+apply_to_all_damage_types = true 

@@ -37,7 +37,7 @@ var flags: Dictionary = {} ## 投射物标记，用于控制各种效果行为
 var colliding_targets: Array[Node] = [] ## 当前碰撞中的目标
 
 # 视觉组件（可选）
-@onready var sprite: Sprite2D = $Sprite2D
+@onready var sprite: Sprite2D = get_node_or_null("Sprite2D")
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 
 func _ready() -> void:

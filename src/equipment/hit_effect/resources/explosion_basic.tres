@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ExplosionHitEffect" load_steps=2 format=3 uid="uid://f7h0h0hj2fhy"]
+
+[ext_resource type="Script" uid="uid://cub2anbhkjxdd" path="res://src/equipment/hit_effect/explosion_hit_effect.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+metadata/_custom_type_script = "uid://cub2anbhkjxdd"

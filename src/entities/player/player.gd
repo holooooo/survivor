@@ -21,10 +21,12 @@ func _ready() -> void:
 	
 	# 连接Actor的信号到事件总线
 	health_changed.connect(_on_health_changed)
+	armor_changed.connect(_on_armor_changed)
 	died.connect(_on_died)
 	
-	# 使用事件总线发送血量变化
+	# 使用事件总线发送血量和护甲变化
 	EventBus.emit_player_health_changed(current_health, max_health)
+	_emit_armor_changed()
 
 func _physics_process(delta):
 	var direction = Vector2.ZERO
@@ -47,6 +49,7 @@ func _physics_process(delta):
 ## 重写Actor的受伤方法，添加伤害数字显示
 func take_damage(damage: int) -> void:
 	super (damage)
+	FightEventBus.on_player_damage.emit(self, damage)
 	# 通过 EventBus 显示伤害数字，玩家伤害使用橙色显示
 	EventBus.show_damage_number(damage, global_position, Color.ORANGE)
 
@@ -64,6 +67,14 @@ func _on_health_changed(new_health: int, max_hp: int) -> void:
 ## 玩家死亡处理
 func _on_died(actor: Actor) -> void:
 	EventBus.player_died.emit()
+
+## 护甲变化处理
+func _on_armor_changed(new_armor: int, max_armor_value: int) -> void:
+	_emit_armor_changed()
+
+## 发送护甲变化事件
+func _emit_armor_changed() -> void:
+	EventBus.emit_player_armor_changed(current_armor, max_armor)
 
 ## 治疗[br]
 ## [param amount] 治疗数值
@@ -110,3 +121,11 @@ func _update_movement_speed() -> void:
 		var speed_multiplier = stats_manager.get_base_stat("move_speed_multiplier")
 		# 这里可以应用速度修改，需要根据Actor基类的实现来决定具体方式
 		pass
+
+## 更新装备护甲值[br]
+## [param total_armor] 来自装备的总护甲值
+func update_equipment_armor(total_armor: int) -> void:
+	set_max_armor(total_armor)
+	# 如果当前护甲值小于最大值，恢复到最大值
+	if current_armor < max_armor:
+		set_armor(max_armor)

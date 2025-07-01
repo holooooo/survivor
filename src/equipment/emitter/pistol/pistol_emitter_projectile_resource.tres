@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="EmitterProjectileResource" load_steps=3 format=3 uid="uid://c5n8m3k4p7qxw"]
 
 [ext_resource type="Texture2D" uid="uid://d0ebkhbqp4fhd" path="res://icon.svg" id="1_2j106"]
-[ext_resource type="Script" path="res://src/equipment/emitter_projectile_resource.gd" id="1_projectile_base"]
+[ext_resource type="Script" path="res://src/equipment/emitter/emitter_projectile_resource.gd" id="1_projectile_base"]
 
 [resource]
 script = ExtResource("1_projectile_base")

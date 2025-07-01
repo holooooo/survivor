@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EmitterEquipmentResource" load_steps=4 format=3 uid="uid://dqp0ng7efct3g"]
+
+[ext_resource type="Script" uid="uid://cnwq8e5vm7df2" path="res://src/equipment/emitter/emitter_equipment_resource.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://bqo7hxsayb3ch" path="res://src/equipment/emitter/polymer_wire/emitter/polymer_wire_equipment.tscn" id="2"]
+[ext_resource type="Script" uid="uid://c3ih2fukl5lb6" path="res://src/equipment/hit_effect/hit_effect_resource.gd" id="2_fub5k"]
+
+[resource]
+script = ExtResource("1")
+emit_interval = 1.5
+base_damage = 75
+target_type = 3
+equipment_name = "高分子线"
+equipment_id = "polymer_wire"
+equipment_scene = ExtResource("2")

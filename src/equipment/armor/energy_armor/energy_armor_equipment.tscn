@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bqn6hxr8yb2ch"]
+
+[ext_resource type="Script" path="res://src/equipment/armor/energy_armor/energy_armor_equipment.gd" id="1_energy_armor_equipment"]
+
+[node name="EnergyArmorEquipment" type="Node2D"]
+script = ExtResource("1_energy_armor_equipment") 

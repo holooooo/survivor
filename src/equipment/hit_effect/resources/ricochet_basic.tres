@@ -1,0 +1,16 @@
+[gd_resource type="RicochetHitEffect" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/equipment/hit_effect/ricochet_hit_effect.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+effect_name = "基础弹射"
+effect_id = "ricochet_basic"
+enabled = true
+trigger_probability = 0.25
+cooldown_time = 1.5
+ricochet_count = 2
+damage_decay = 0.1
+reset_flight_distance = true
+use_equipment_range = true
+fallback_search_radius = 300.0 

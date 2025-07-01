@@ -1,8 +1,8 @@
 [gd_resource type="Resource" script_class="EmitterEquipmentResource" load_steps=6 format=3 uid="uid://dtkgng4efct0d"]
 
-[ext_resource type="Script" uid="uid://cnwq8e5vm7df2" path="res://src/equipment/emitter_equipment_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://cnwq8e5vm7df2" path="res://src/equipment/emitter/emitter_equipment_resource.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://chdq3vvnuiwui" path="res://src/equipment/emitter/fist/emitter/fist_equipment.tscn" id="2"]
-[ext_resource type="Script" uid="uid://c3ih2fukl5lb6" path="res://src/equipment/hit_effect_resource.gd" id="2_i8eip"]
+[ext_resource type="Script" uid="uid://c3ih2fukl5lb6" path="res://src/equipment/hit_effect/hit_effect_resource.gd" id="2_i8eip"]
 [ext_resource type="PackedScene" uid="uid://bru7130l7n5va" path="res://src/equipment/emitter/fist/projectile/fist_projectile.tscn" id="3"]
 [ext_resource type="Resource" uid="uid://ec7d3n02wsag" path="res://src/equipment/emitter/fist/fist_emitter_projectile_resource.tres" id="4"]
 
