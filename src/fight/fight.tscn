@@ -1,6 +1,6 @@
-[gd_scene load_steps=26 format=3 uid="uid://bqlr0mdryjoek"]
+[gd_scene load_steps=26 format=3 uid="uid://dog00wdohu7m1"]
 
-[ext_resource type="Script" uid="uid://etsay58j6v62" path="res://src/scenes/fight/fight.gd" id="1_main_script"]
+[ext_resource type="Script" uid="uid://etsay58j6v62" path="res://src/fight/fight.gd" id="1_main_script"]
 [ext_resource type="PackedScene" uid="uid://dkeamf7f6v0g1" path="res://src/entities/enemies/enemy.tscn" id="2_enemy_scene"]
 [ext_resource type="PackedScene" uid="uid://bexl2b5q5oopf" path="res://src/ui/performance_monitor.tscn" id="3_fub2y"]
 [ext_resource type="Script" uid="uid://cutwsom3s04lv" path="res://src/equipment/equipment_manager.gd" id="3_fup5m"]
@@ -9,11 +9,11 @@
 [ext_resource type="Script" uid="uid://fw5xx4bowcqs" path="res://src/equipment/equipment_resource.gd" id="4_f4xxn"]
 [ext_resource type="Script" uid="uid://dpfjfe2ivnncr" path="res://src/entities/enemies/enemy_spawner.gd" id="4_vw57g"]
 [ext_resource type="Resource" uid="uid://dxknm8f2vboac" path="res://src/equipment/emitter/pistol/pistol_emitter_equipment_resource.tres" id="5_1s48r"]
-[ext_resource type="Script" uid="uid://dpxqtnxm6umfg" path="res://src/globals/damage_number_pool.gd" id="6_3q0a4"]
+[ext_resource type="Script" uid="uid://dpxqtnxm6umfg" path="res://src/fight/global/damage_number_pool.gd" id="6_3q0a4"]
 [ext_resource type="PackedScene" uid="uid://bhdq3r65eieyf" path="res://src/ui/credits_display.tscn" id="8_credits"]
-[ext_resource type="Script" path="res://src/mod/mod_manager.gd" id="11_eyn13"]
+[ext_resource type="Script" path="res://src/equipment/mod/mod_manager.gd" id="11_eyn13"]
 [ext_resource type="Script" path="res://src/equipment/equipment_slot_manager.gd" id="12_n86bo"]
-[ext_resource type="PackedScene" uid="uid://hjusjc3ewh33" path="res://src/scenes/fight/pause_menu.tscn" id="14_1s48r"]
+[ext_resource type="PackedScene" uid="uid://hjusjc3ewh33" path="res://src/scenes/common/pause_menu.tscn" id="14_1s48r"]
 [ext_resource type="Script" uid="uid://bc3m45ixxioyb" path="res://src/entities/player/player_stats_manager.gd" id="14_iumex"]
 [ext_resource type="Script" uid="uid://bl0upi7hb4mj2" path="res://src/entities/player/damage_type_stats.gd" id="15_e1285"]
 [ext_resource type="Script" uid="uid://lpvq04imgbf3" path="res://src/equipment/hit_effect/hit_effect_manager.gd" id="hit_effect_manager"]
@@ -90,6 +90,7 @@ offset_right = -1280.0
 [node name="CreditsDisplay" parent="UI" instance=ExtResource("8_credits")]
 
 [node name="PauseMenu" parent="UI" instance=ExtResource("14_1s48r")]
+visible = false
 
 [node name="EnemySpawner" type="Node2D" parent="."]
 script = ExtResource("4_vw57g")

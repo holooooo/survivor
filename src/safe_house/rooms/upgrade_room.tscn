@@ -1,13 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://byoqnc2w2sub3"]
+[gd_scene load_steps=2 format=3 uid="uid://dsah5cy4k6m8s"]
 
-[ext_resource type="Script" path="res://src/scenes/safe_house/rooms/brand_room.gd" id="1_8ap5s"]
+[ext_resource type="Script" uid="uid://begh12dn77fpg" path="res://src/safe_house/rooms/upgrade_room.gd" id="1_6yn3q"]
 
-[node name="BrandRoom" type="Control"]
+[node name="UpgradeRoom" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource("1_8ap5s")
+script = ExtResource("1_6yn3q")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -22,7 +22,7 @@ alignment = 1
 
 [node name="TitleLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-text = "品牌室"
+text = "改造室"
 horizontal_alignment = 1
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
@@ -34,6 +34,6 @@ size_flags_vertical = 3
 
 [node name="PlaceholderLabel" type="Label" parent="VBoxContainer/ContentContainer"]
 layout_mode = 2
-text = "与各大品牌建立合作关系，获取独特资源！"
+text = "升级你的角色能力和装备！"
 horizontal_alignment = 1
 vertical_alignment = 1 

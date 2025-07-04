@@ -1,13 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://dsah5cy4k6m8s"]
+[gd_scene load_steps=2 format=3 uid="uid://cq7f8bx3p4n5r"]
 
-[ext_resource type="Script" path="res://src/scenes/safe_house/rooms/upgrade_room.gd" id="1_6yn3q"]
+[ext_resource type="Script" uid="uid://dwg7m2t588h74" path="res://src/safe_house/rooms/recruit_room.gd" id="1_5xm2p"]
 
-[node name="UpgradeRoom" type="Control"]
+[node name="RecruitRoom" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource("1_6yn3q")
+script = ExtResource("1_5xm2p")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -22,7 +22,7 @@ alignment = 1
 
 [node name="TitleLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-text = "改造室"
+text = "招募室"
 horizontal_alignment = 1
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
@@ -34,6 +34,6 @@ size_flags_vertical = 3
 
 [node name="PlaceholderLabel" type="Label" parent="VBoxContainer/ContentContainer"]
 layout_mode = 2
-text = "升级你的角色能力和装备！"
+text = "在这里招募新的角色，组建你的团队！"
 horizontal_alignment = 1
 vertical_alignment = 1 

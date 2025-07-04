@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bj8k6x3yv2n2k"]
 
-[ext_resource type="Script" path="res://src/scenes/safe_house/components/navigation_bar.gd" id="1_1x5k8"]
+[ext_resource type="Script" uid="uid://b21726mak6jxp" path="res://src/safe_house/components/navigation_bar.gd" id="1_1x5k8"]
 
 [node name="NavigationBar" type="Control"]
 layout_mode = 2

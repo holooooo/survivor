@@ -1,13 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://xppmb3v12ta2"]
+[gd_scene load_steps=2 format=3 uid="uid://bfb5f7ng7yj0m"]
 
-[ext_resource type="Script" path="res://src/scenes/safe_house/rooms/research_room.gd" id="1_7zo4r"]
+[ext_resource type="Script" uid="uid://d1pjwxj5i0sic" path="res://src/safe_house/rooms/battle_room.gd" id="1_4xk9n"]
 
-[node name="ResearchRoom" type="Control"]
+[node name="BattleRoom" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource("1_7zo4r")
+script = ExtResource("1_4xk9n")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -22,7 +22,7 @@ alignment = 1
 
 [node name="TitleLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-text = "研究室"
+text = "作战室"
 horizontal_alignment = 1
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
@@ -34,6 +34,11 @@ size_flags_vertical = 3
 
 [node name="PlaceholderLabel" type="Label" parent="VBoxContainer/ContentContainer"]
 layout_mode = 2
-text = "研究新技术，解锁强大的能力！"
+text = "选择你的角色和目标，准备进入战斗！"
 horizontal_alignment = 1
-vertical_alignment = 1 
+vertical_alignment = 1
+
+[node name="EnterBattleButton" type="Button" parent="VBoxContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "进入战斗" 

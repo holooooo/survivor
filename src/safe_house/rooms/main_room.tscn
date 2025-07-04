@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cve8k4q6nnwrd"]
 
-[ext_resource type="Script" path="res://src/scenes/safe_house/rooms/main_room.gd" id="1_3rk8l"]
+[ext_resource type="Script" uid="uid://bcjjl3ok862eu" path="res://src/safe_house/rooms/main_room.gd" id="1_3rk8l"]
 
 [node name="MainRoom" type="Control"]
 layout_mode = 3

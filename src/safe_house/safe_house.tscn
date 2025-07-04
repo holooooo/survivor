@@ -1,14 +1,14 @@
 [gd_scene load_steps=10 format=3 uid="uid://b5h6i7j8lal0m"]
 
-[ext_resource type="Script" uid="uid://dstkak5cdavsc" path="res://src/scenes/safe_house/safe_house.gd" id="1_9bq6t"]
-[ext_resource type="Script" uid="uid://dagsdv8bsymqf" path="res://src/scenes/safe_house/safe_house_manager.gd" id="2_0cr7u"]
-[ext_resource type="PackedScene" uid="uid://bj8k6x3yv2n2k" path="res://src/scenes/safe_house/components/navigation_bar.tscn" id="3_1ds8v"]
-[ext_resource type="PackedScene" uid="uid://cve8k4q6nnwrd" path="res://src/scenes/safe_house/rooms/main_room.tscn" id="4_2et9w"]
-[ext_resource type="PackedScene" uid="uid://bfb5f7ng7yj0m" path="res://src/scenes/safe_house/rooms/battle_room.tscn" id="5_3fu0x"]
-[ext_resource type="PackedScene" uid="uid://cq7f8bx3p4n5r" path="res://src/scenes/safe_house/rooms/recruit_room.tscn" id="6_4gv1y"]
-[ext_resource type="PackedScene" uid="uid://dsah5cy4k6m8s" path="res://src/scenes/safe_house/rooms/upgrade_room.tscn" id="7_5hw2z"]
-[ext_resource type="PackedScene" uid="uid://xppmb3v12ta2" path="res://src/scenes/safe_house/rooms/research_room.tscn" id="8_6ix30"]
-[ext_resource type="PackedScene" uid="uid://byoqnc2w2sub3" path="res://src/scenes/safe_house/rooms/brand_room.tscn" id="9_7jy41"]
+[ext_resource type="Script" uid="uid://dstkak5cdavsc" path="res://src/safe_house/safe_house.gd" id="1_9bq6t"]
+[ext_resource type="Script" uid="uid://dagsdv8bsymqf" path="res://src/safe_house/safe_house_manager.gd" id="2_0cr7u"]
+[ext_resource type="PackedScene" uid="uid://bj8k6x3yv2n2k" path="res://src/safe_house/components/navigation_bar.tscn" id="3_1ds8v"]
+[ext_resource type="PackedScene" uid="uid://cve8k4q6nnwrd" path="res://src/safe_house/rooms/main_room.tscn" id="4_2et9w"]
+[ext_resource type="PackedScene" uid="uid://bfb5f7ng7yj0m" path="res://src/safe_house/rooms/battle_room.tscn" id="5_3fu0x"]
+[ext_resource type="PackedScene" uid="uid://cq7f8bx3p4n5r" path="res://src/safe_house/rooms/recruit_room.tscn" id="6_4gv1y"]
+[ext_resource type="PackedScene" uid="uid://dsah5cy4k6m8s" path="res://src/safe_house/rooms/upgrade_room.tscn" id="7_5hw2z"]
+[ext_resource type="PackedScene" uid="uid://xppmb3v12ta2" path="res://src/safe_house/rooms/research_room.tscn" id="8_6ix30"]
+[ext_resource type="PackedScene" uid="uid://byoqnc2w2sub3" path="res://src/safe_house/rooms/brand_room.tscn" id="9_7jy41"]
 
 [node name="Node2d" type="Node2D"]
 

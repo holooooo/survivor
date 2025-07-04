@@ -11,18 +11,18 @@ config_version=5
 [application]
 
 config/name="geometry-survivor"
-run/main_scene="uid://bqlr0mdryjoek"
+run/main_scene="uid://dog00wdohu7m1"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [autoload]
 
-EventBus="*res://src/globals/event_bus.gd"
-GameManager="*res://src/globals/game_manager.gd"
+EventBus="*res://src/fight/global/event_bus.gd"
+GameManager="*res://src/fight/global/game_manager.gd"
 GameConstants="*res://src/globals/constants.gd"
 MathUtils="*res://src/globals/math_utils.gd"
 CreditManager="*res://src/globals/credit_manager.gd"
-FightEventBus="*res://src/globals/fight_event_bus.gd"
+FightEventBus="*res://src/fight/global/fight_event_bus.gd"
 
 [debug]
 

@@ -1,13 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://bfb5f7ng7yj0m"]
+[gd_scene load_steps=2 format=3 uid="uid://byoqnc2w2sub3"]
 
-[ext_resource type="Script" path="res://src/scenes/safe_house/rooms/battle_room.gd" id="1_4xk9n"]
+[ext_resource type="Script" uid="uid://bpcwgtkf5xg04" path="res://src/safe_house/rooms/brand_room.gd" id="1_8ap5s"]
 
-[node name="BattleRoom" type="Control"]
+[node name="BrandRoom" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-script = ExtResource("1_4xk9n")
+script = ExtResource("1_8ap5s")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -22,7 +22,7 @@ alignment = 1
 
 [node name="TitleLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-text = "作战室"
+text = "品牌室"
 horizontal_alignment = 1
 
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
@@ -34,11 +34,6 @@ size_flags_vertical = 3
 
 [node name="PlaceholderLabel" type="Label" parent="VBoxContainer/ContentContainer"]
 layout_mode = 2
-text = "选择你的角色和目标，准备进入战斗！"
+text = "与各大品牌建立合作关系，获取独特资源！"
 horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="EnterBattleButton" type="Button" parent="VBoxContainer/ContentContainer"]
-layout_mode = 2
-size_flags_horizontal = 4
-text = "进入战斗" 
+vertical_alignment = 1 
