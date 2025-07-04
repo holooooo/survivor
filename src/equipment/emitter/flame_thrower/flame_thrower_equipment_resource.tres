@@ -1,0 +1,17 @@
+[gd_resource type="EmitterEquipmentResource" format=3]
+
+[ext_resource type="Resource" uid="uid://dpxqtnxm6umfg" path="res://src/equipment/hit_effect/resources/burn_hit_effect.tres" id="1_burn_hit_effect"]
+
+[resource]
+equipment_name = "火焰喷射器"
+equipment_id = "flame_thrower"
+equipment_description = "发射火焰弹，命中敌人时施加灼烧效果"
+equipment_type = 1
+base_damage = 15
+base_attack_speed = 2.0
+base_attack_range = 250.0
+base_pierce_count = 0
+damage_type = 4
+hit_effects = Array[HitEffectResource]([ExtResource("1_burn_hit_effect")])
+cooldown_time = 0.5
+energy_cost = 0

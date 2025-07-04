@@ -1,0 +1,18 @@
+[gd_resource type="BuffResource" format=3]
+
+[resource]
+buff_name = "伤害增强"
+buff_id = "damage_enhance"
+buff_description = "增加10%伤害输出"
+buff_type = 0
+effect_type = 0
+duration = 5.0
+is_permanent = false
+stackable = true
+max_stacks = 5
+stack_refresh_duration = true
+trigger_probability = 1.0
+apply_to_all_damage_types = true
+effect_values = {
+"damage_multiplier": 0.1
+} 

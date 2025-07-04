@@ -31,8 +31,6 @@ func _ready() -> void:
 	# 将敌人添加到enemies组，便于其他系统获取敌人引用
 	add_to_group("enemies")
 
-	# 连接Actor的信号
-	died.connect(_on_died)
 
 	player = get_tree().get_first_node_in_group(Constants.GROUP_PLAYER)
 	
@@ -89,18 +87,16 @@ func is_within_distance_of_player(max_distance: float) -> bool:
 func enemy_ai(delta: float):
 	pass
 
-## 重写Actor的受伤方法，添加伤害数字显示和事件发送
-func take_damage(damage_amount: int) -> void:
-	super.take_damage(damage_amount)
+## 受到伤害
+## [param damage_amount] 伤害值[br]
+## [param damage_type] 伤害类型
+func take_damage(damage_amount: int, damage_type: int = 0) -> void:
+	super.take_damage(damage_amount, damage_type)
 
 	# 发送伤害事件
 	EventBus.enemy_damaged.emit(self, damage_amount)
 
 	# 伤害数字显示现在由投射物根据伤害类型处理，这里不再显示固定颜色的伤害数字
-
-## 重写Actor的死亡回调
-func _on_death() -> void:
-	pass
 
 ## 敌人死亡处理
 func _on_died(actor: Actor) -> void:

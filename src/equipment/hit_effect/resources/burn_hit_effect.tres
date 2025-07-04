@@ -1,0 +1,15 @@
+[gd_resource type="BurnHitEffect" format=3]
+
+[resource]
+effect_name = "灼烧效果"
+effect_id = "burn"
+enabled = true
+trigger_probability = 1.0
+cooldown_time = 0.0
+require_critical_hit = false
+require_kill = false
+min_damage_threshold = 0
+valid_damage_types = []
+burn_damage_per_tick = 5
+burn_duration = 5.0
+max_stacks = 5

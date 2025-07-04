@@ -7,9 +7,16 @@ class_name Player
 @onready var mod_manager: ModManager = %ModManager
 @onready var stats_manager: PlayerStatsManager = %PlayerStatsManager
 
+# 存储原始基础速度，用于速度buff计算
+var base_movement_speed: float
+
 func _ready() -> void:
 	super ()
 	current_health = max_health
+	
+	# 存储原始基础速度
+	base_movement_speed = speed
+	print("Player初始化 - 基础移动速度: %.1f" % base_movement_speed)
 	
 	# 将玩家添加到player组，便于其他系统获取玩家引用
 	add_to_group(Constants.GROUP_PLAYER)
@@ -18,11 +25,6 @@ func _ready() -> void:
 	stats_manager.initialize(self)
 	stats_manager.stats_changed.connect(_on_damage_type_stats_changed)
 	stats_manager.base_stats_changed.connect(_on_base_stats_changed)
-	
-	# 连接Actor的信号到事件总线
-	health_changed.connect(_on_health_changed)
-	armor_changed.connect(_on_armor_changed)
-	died.connect(_on_died)
 	
 	# 使用事件总线发送血量和护甲变化
 	EventBus.emit_player_health_changed(current_health, max_health)
@@ -46,19 +48,14 @@ func _physics_process(delta):
 		move_by_direction(direction, delta)
 
 
-## 重写Actor的受伤方法，添加伤害数字显示
-func take_damage(damage: int) -> void:
-	super (damage)
+## 造成伤害
+## [param damage] 伤害值[br]
+## [param damage_type] 伤害类型
+func take_damage(damage: int, damage_type: int = 0) -> void:
+	super(damage, damage_type)
 	FightEventBus.on_player_damage.emit(self, damage)
 	# 通过 EventBus 显示伤害数字，玩家伤害使用橙色显示
 	EventBus.show_damage_number(damage, global_position, Color.ORANGE)
-
-## 重写Actor的死亡回调
-func _on_death() -> void:
-	print("玩家死亡!")
-	# 当生命值为0时跳转到游戏结束场景
-	if current_health <= 0:
-		EventBus.change_scene_safely("res://src/ui/game_over.tscn")
 
 ## 血量变化处理
 func _on_health_changed(new_health: int, max_hp: int) -> void:
@@ -67,6 +64,10 @@ func _on_health_changed(new_health: int, max_hp: int) -> void:
 ## 玩家死亡处理
 func _on_died(actor: Actor) -> void:
 	EventBus.player_died.emit()
+	# 当生命值为0时跳转到游戏结束场景
+	if current_health <= 0:
+		print("玩家死亡!")
+		EventBus.change_scene_safely("res://src/ui/game_over.tscn")
 
 ## 护甲变化处理
 func _on_armor_changed(new_armor: int, max_armor_value: int) -> void:
@@ -119,8 +120,12 @@ func _update_max_health() -> void:
 func _update_movement_speed() -> void:
 	if stats_manager:
 		var speed_multiplier = stats_manager.get_base_stat("move_speed_multiplier")
-		# 这里可以应用速度修改，需要根据Actor基类的实现来决定具体方式
-		pass
+		# 应用速度修改到Actor基类的speed属性
+		# 原始基础速度 * (1 + 速度修改倍率)
+		speed = base_movement_speed * (1.0 + speed_multiplier)
+		print("移动速度更新: %.1f (基础: %.1f, 倍率: %.2f)" % [speed, base_movement_speed, 1.0 + speed_multiplier])
+
+
 
 ## 更新装备护甲值[br]
 ## [param total_armor] 来自装备的总护甲值

@@ -14,9 +14,9 @@ signal base_stats_changed(stat_name: String, old_value, new_value)
 		"max_health_bonus": 0.0,
 		"health_regen_rate": 0.0,
 		"armor": 0,
-		"move_speed_multiplier": 1.0,
+		"move_speed_multiplier": 0.0,
 		"magazine_capacity_bonus": 0,
-		"projectile_speed_multiplier": 1.0,
+		"projectile_speed_multiplier": 0.0,
 		"multishot_count": 0,
 		"pierce_count": 0,
 		"bounce_count": 0
@@ -35,6 +35,7 @@ signal base_stats_changed(stat_name: String, old_value, new_value)
 	}
 
 var owner_player: Player
+var buff_modifiers: Dictionary = {} ## buff修改器缓存
 
 ## 初始化玩家引用[br]
 ## [param player] 玩家实例
@@ -168,7 +169,7 @@ func _initialize_base_stats() -> void:
 		"max_health_bonus": 0.0,
 		"health_regen_rate": 0.0,
 		"armor": 0,
-		"move_speed_multiplier": 1.0,
+		"move_speed_multiplier": 0.0,
 		"magazine_capacity_bonus": 0,
 		"projectile_speed_multiplier": 1.0,
 		"multishot_count": 0,
@@ -205,3 +206,39 @@ func apply_stat_package(stat_package: Dictionary) -> void:
 			var type_stats = damage_modifications[damage_type]
 			for stat_name in type_stats:
 				modify_damage_type_stat(damage_type, stat_name, type_stats[stat_name])
+
+## 更新buff修改器缓存[br]
+func update_buff_modifiers() -> void:
+	buff_modifiers.clear()
+	
+	if not owner_player or not owner_player.has_method("get_buff_manager"):
+		return
+	
+	var buff_manager = owner_player.get_buff_manager()
+	if not buff_manager:
+		return
+	
+	buff_modifiers = buff_manager.get_buff_modifiers()
+
+## 获取考虑buff修改器的基础属性值[br]
+## [param stat_name] 属性名称[br]
+## [returns] 修改后的属性值
+func get_base_stat_with_buffs(stat_name: String):
+	var base_value = get_base_stat(stat_name)
+	var buff_modifier = buff_modifiers.get(stat_name, 0.0)
+	
+	match stat_name:
+		"move_speed_multiplier":
+			return base_value + buff_modifier
+		"damage_multiplier":
+			return base_value + buff_modifier
+		_:
+			return base_value + buff_modifier
+
+## 获取考虑buff修改器的伤害倍率[br]
+## [param damage_type] 伤害类型[br]
+## [returns] 修改后的伤害倍率
+func get_damage_multiplier_with_buffs(damage_type: Constants.DamageType) -> float:
+	var base_multiplier = get_damage_multiplier(damage_type)
+	var buff_modifier = buff_modifiers.get("damage_multiplier", 0.0)
+	return base_multiplier + buff_modifier

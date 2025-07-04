@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ArmorEquipmentResource" load_steps=4 format=3 uid="uid://cleyid5defdfo"]
+
+[ext_resource type="Script" path="res://src/equipment/armor/armor_equipment_resource.gd" id="1"]
+[ext_resource type="Script" uid="uid://c35f544qy6b84" path="res://src/entities/buff/buff_resource.gd" id="1_ipgpk"]
+[ext_resource type="PackedScene" uid="uid://dd2ssvfmg778k" path="res://src/equipment/armor/power_armor/power_armor_equipment.tscn" id="2"]
+
+[resource]
+script = ExtResource("1")
+armor_value = 20
+armor_regeneration_rate = 3.0
+armor_effects = Array[String](["speed_boost_on_damage"])
+equipment_name = "动力护甲"
+equipment_id = "power_armor"
+equipment_scene = ExtResource("2")

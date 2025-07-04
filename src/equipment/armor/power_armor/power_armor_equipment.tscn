@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://dd2ssvfmg778k"]
+
+[ext_resource type="Script" uid="uid://beo0w6rr56ie4" path="res://src/equipment/armor/power_armor/power_armor_equipment.gd" id="1"]
+
+[node name="PowerArmorEquipment" type="Node2D"]
+script = ExtResource("1")
+metadata/_custom_type_script = "uid://beo0w6rr56ie4"

@@ -1,0 +1,19 @@
+[gd_resource type="BuffResource" format=3]
+
+[resource]
+buff_name = "中毒"
+buff_id = "poison_dot"
+buff_description = "每秒受到15点毒素伤害"
+buff_type = 1
+effect_type = 1
+duration = 8.0
+is_permanent = false
+stackable = true
+max_stacks = 3
+stack_refresh_duration = false
+trigger_probability = 1.0
+apply_to_all_damage_types = true
+effect_values = {
+"damage_per_tick": 15,
+"damage_type": 6
+}

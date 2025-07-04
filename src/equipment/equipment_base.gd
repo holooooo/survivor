@@ -12,6 +12,7 @@ class_name EquipmentBase
 @export var projectile_scene: PackedScene ## 发射的投射物场景
 @export var projectile_resource: EmitterProjectileResource ## 投射物配置资源
 @export var damage_type: Constants.DamageType = Constants.DamageType.枪械 ## 装备伤害类型
+@export var attached_buffs: Array[BuffResource] = [] ## 装备附带的buff效果
 
 
 var resource: EquipmentResource
@@ -39,6 +40,9 @@ func initialize(player: Player) -> void:
 	
 	# 装备管理器会稍后设置mod管理器
 	FightEventBus.on_equip.emit(player, self)
+	
+	# 装备时施加附带的buff
+	_apply_attached_buffs()
 
 
 ## 设置基础属性
@@ -455,3 +459,30 @@ func create_instance(player: Player) -> EquipmentBase:
 func recalculate_stats() -> void:
 	# 重新应用玩家属性到装备
 	_apply_all_effects()
+
+## 施加装备附带的buff[br]
+func _apply_attached_buffs() -> void:
+	if not owner_player or attached_buffs.is_empty():
+		return
+	
+	for buff_resource in attached_buffs:
+		if buff_resource:
+			owner_player.add_buff(buff_resource, owner_player)
+			print("装备 %s 施加buff: %s" % [equipment_name, buff_resource.buff_name])
+
+## 移除装备附带的buff[br]
+func _remove_attached_buffs() -> void:
+	if not owner_player or attached_buffs.is_empty():
+		return
+	
+	for buff_resource in attached_buffs:
+		if buff_resource:
+			owner_player.remove_buff(buff_resource.buff_id)
+			print("装备 %s 移除buff: %s" % [equipment_name, buff_resource.buff_name])
+
+## 装备卸载时的清理[br]
+func _exit_tree() -> void:
+	# 注意：根据需求，装备卸载时不移除buff，让buff自行到期
+	# 如果需要立即移除，可以取消注释下面的行
+	# _remove_attached_buffs()
+	pass

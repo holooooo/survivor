@@ -33,6 +33,9 @@ var is_critical_hit_flag: bool = false ## 是否为暴击
 # 投射物标记系统
 var flags: Dictionary = {} ## 投射物标记，用于控制各种效果行为
 
+# Buff系统
+var attached_buffs: Array[BuffResource] = [] ## 投射物附带的buff效果
+
 # 碰撞系统
 var colliding_targets: Array[Node] = [] ## 当前碰撞中的目标
 
@@ -47,14 +50,15 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	pass
+
+func _process(delta: float) -> void:
 	if is_destroyed:
 		return
+	lifetime_timer += delta
 	
 	# 更新飞行距离追踪
 	_update_traveled_distance()
-	
-	lifetime_timer += delta
-	
 	# 检查生命周期
 	if _should_destroy():
 		_destroy_projectile()
@@ -210,6 +214,9 @@ func _deal_damage_to_target(target: Node, damage_amount: int) -> void:
 	var damage_color: Color = get_damage_type_color()
 	EventBus.show_damage_number(damage_amount, target.global_position, damage_color)
 	FightEventBus.on_projectile_hit.emit(equipment.owner_player, equipment, self, target, damage_amount, damage_type)
+	
+	# 施加附带的buff
+	_apply_attached_buffs_to_target(target)
 
 ## 检查是否应该销毁[br]
 ## [returns] 是否应该销毁
@@ -468,3 +475,38 @@ func _handle_pierce_logic(target: Node) -> void:
 ## 更新飞行距离追踪
 func _update_traveled_distance() -> void:
 	traveled_distance = (global_position - start_position).length()
+
+## 施加附带的buff到目标[br]
+## [param target] 目标节点
+func _apply_attached_buffs_to_target(target: Node) -> void:
+	if not target or attached_buffs.is_empty():
+		return
+	
+	# 检查目标是否支持buff
+	if not target.has_method("add_buff"):
+		return
+	
+	# 获取施法者（投射物的发射者）
+	var caster = equipment.owner_player if equipment else null
+	
+	for buff_resource in attached_buffs:
+		if buff_resource:
+			var success = target.add_buff(buff_resource, caster)
+			if success:
+				print("投射物 %s 对目标施加buff: %s" % [_get_projectile_type(), buff_resource.buff_name])
+
+## 添加附带的buff[br]
+## [param buff_resource] buff资源
+func add_attached_buff(buff_resource: BuffResource) -> void:
+	if buff_resource and buff_resource not in attached_buffs:
+		attached_buffs.append(buff_resource)
+
+## 设置附带的buff列表[br]
+## [param buffs] buff资源数组
+func set_attached_buffs(buffs: Array[BuffResource]) -> void:
+	attached_buffs = buffs
+
+## 获取附带的buff列表[br]
+## [returns] buff资源数组
+func get_attached_buffs() -> Array[BuffResource]:
+	return attached_buffs

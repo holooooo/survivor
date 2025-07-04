@@ -63,6 +63,17 @@ script = ExtResource("11_eyn13")
 [node name="PlayerStatsManager" type="Node" parent="Player"]
 unique_name_in_owner = true
 script = ExtResource("14_iumex")
+base_stats = Dictionary[String, float]({
+"armor": 0.0,
+"bounce_count": 0.0,
+"health_regen_rate": 0.0,
+"magazine_capacity_bonus": 0.0,
+"max_health_bonus": 0.0,
+"move_speed_multiplier": 1.0,
+"multishot_count": 0.0,
+"pierce_count": 0.0,
+"projectile_speed_multiplier": 1.0
+})
 damage_type_stats = Dictionary[int, ExtResource("15_e1285")]({
 0: SubResource("Resource_4u850"),
 1: SubResource("Resource_y16n8"),

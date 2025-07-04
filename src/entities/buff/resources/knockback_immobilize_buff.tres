@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="BuffResource" load_steps=2 format=3 uid="uid://bxm8vkgm8nqcw"]
+
+[ext_resource type="Script" uid="uid://c35f544qy6b84" path="res://src/entities/buff/buff_resource.gd" id="1_buff"]
+
+[resource]
+script = ExtResource("1_buff")
+buff_name = "击退禁锢"
+buff_id = "knockback_immobilize"
+buff_description = "被击退并禁锢移动"
+buff_type = 1
+effect_type = 2
+duration = 0.3
+is_permanent = false
+stackable = false
+max_stacks = 1
+stack_refresh_duration = true
+trigger_probability = 1.0
+apply_to_all_damage_types = true
+effect_values = {
+"control_type": "knockback",
+"knockback_strength": 200.0,
+"knockback_duration": 0.3
+} 

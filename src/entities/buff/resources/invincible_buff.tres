@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="BuffResource" load_steps=2 format=3 uid="uid://bm110vi0hxgct"]
+
+[ext_resource type="Script" uid="uid://c35f544qy6b84" path="res://src/entities/buff/buff_resource.gd" id="1_ms005"]
+
+[resource]
+script = ExtResource("1_ms005")

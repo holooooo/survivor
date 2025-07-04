@@ -128,6 +128,22 @@ static func get_damage_type_name(damage_type: DamageType) -> String:
 		_:
 			return "未知伤害"
 
+# Buff类型枚举
+enum BuffType {
+	增益,   ## 正面效果
+	减益,   ## 负面效果
+	中性    ## 中性效果
+}
+
+# Buff效果类型枚举
+enum BuffEffectType {
+	属性修改,   ## 修改角色属性
+	持续伤害,   ## 持续造成伤害
+	控制效果,   ## 控制角色行为
+	特殊效果,   ## 特殊机制效果
+	复合效果    ## 组合多种效果
+}
+
 # 获取伤害类型颜色
 static func get_damage_type_color(damage_type: DamageType) -> Color:
 	match damage_type:

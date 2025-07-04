@@ -17,6 +17,7 @@ class_name EquipmentResource
 @export var projectile_scene: PackedScene ## 发射的投射物场景
 @export var projectile_resource: EmitterProjectileResource ## 投射物配置资源
 @export var description: String = "" ## 装备描述
+@export var attached_buffs: Array[BuffResource] = [] ## 装备附带的buff效果
 
 ## 创建装备实例[br]
 ## [param player] 装备的拥有者[br]
@@ -59,6 +60,10 @@ func _apply_config_to_instance(instance: EquipmentBase) -> void:
 		instance.projectile_scene = projectile_scene
 	if projectile_resource:
 		instance.projectile_resource = projectile_resource
+	
+	# 设置附带buff
+	if attached_buffs.size() > 0:
+		instance.attached_buffs = attached_buffs
 
 ## 验证装备资源的完整性[br]
 ## [returns] 是否有效

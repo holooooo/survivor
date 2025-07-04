@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BuffResource" load_steps=2 format=3 uid="uid://p4bflht76b7p"]
+
+[ext_resource type="Script" uid="uid://c35f544qy6b84" path="res://src/entities/buff/buff_resource.gd" id="1_eh7f7"]
+
+[resource]
+script = ExtResource("1_eh7f7")
+buff_name = "灼烧"
+buff_id = "burn_dot"
+buff_description = "每秒受到%d点火焰伤害，最多叠加%d层"
+buff_type = 1
+effect_type = 1
+stackable = true
+max_stacks = 5
+effect_values = {
+"damage_per_tick": 5.0,
+"damage_type": 4
+}
+metadata/_custom_type_script = "uid://c35f544qy6b84"

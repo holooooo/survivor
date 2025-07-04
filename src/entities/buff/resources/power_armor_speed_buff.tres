@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="BuffResource" load_steps=2 format=3 uid="uid://bwx8vkgm8nqcq"]
+
+[ext_resource type="Script" uid="uid://c35f544qy6b84" path="res://src/entities/buff/buff_resource.gd" id="1_buff"]
+
+[resource]
+script = ExtResource("1_buff")
+buff_name = "动力加速"
+buff_id = "power_armor_speed"
+buff_description = "动力护甲激活，移动速度提高20%"
+buff_type = 0
+effect_type = 0
+duration = 3.0
+is_permanent = false
+stackable = false
+max_stacks = 1
+stack_refresh_duration = true
+trigger_probability = 1.0
+apply_to_all_damage_types = true
+effect_values = {
+"speed_multiplier": 0.2
+} 

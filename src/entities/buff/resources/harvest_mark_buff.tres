@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BuffResource" load_steps=2 format=3 uid="uid://ckvwqcugckc88"]
+
+[ext_resource type="Script" uid="uid://c35f544qy6b84" path="res://src/entities/buff/buff_resource.gd" id="1_i0sye"]
+
+[resource]
+script = ExtResource("1_i0sye")
+buff_name = "收割标记"
+buff_id = "harvest_mark"
+buff_description = "标记敌人，当标记数量超过阈值或敌人生命值过低时触发收割"
+buff_type = 1
+effect_type = 3
+duration = 0.0
+is_permanent = true
+stack_refresh_duration = false
+effect_values = {
+"effect_type": "harvest_mark",
+"harvest_damage": 75
+}

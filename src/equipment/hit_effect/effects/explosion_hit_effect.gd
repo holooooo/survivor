@@ -1,8 +1,8 @@
 extends HitEffectResource
 class_name ExplosionHitEffect
 
-## 爆炸命中效果 - 命中敌人时在原地生成快速引爆的爆炸投射物[br]
-## 参考bomb投射物系统，支持可配置的爆炸参数
+## 爆炸命中效果 - 命中敌人时在原地生成快速引爆的炸弹投射物[br]
+## 使用炸弹投射物系统，支持可配置的爆炸参数
 
 @export_group("爆炸配置")
 @export var explosion_radius: float = 100.0 ## 爆炸半径
@@ -13,9 +13,16 @@ class_name ExplosionHitEffect
 @export var detonation_delay: float = 0.1 ## 引爆延迟时间
 @export var explosion_spread_speed: float = 500.0 ## 爆炸扩散速度
 
+@export_group("炸弹投射物配置")
+@export var bomb_projectile_scene: PackedScene ## 炸弹投射物场景
+
 func _init():
 	effect_name = "爆炸效果"
 	effect_id = "explosion"
+	
+	# 如果没有设置炸弹投射物场景，尝试加载默认场景
+	if not bomb_projectile_scene:
+		bomb_projectile_scene = load("res://src/equipment/emitter/bomb/projectile/bomb_projectile.tscn")
 
 ## 重写执行效果方法[br]
 ## [param player] 玩家实例[br]
@@ -45,153 +52,126 @@ func execute_effect(player: Player, equipment: EquipmentBase, projectile: Projec
 	else:
 		explosion_damage_type = Constants.DamageType.爆炸
 	
-	# 延迟创建爆炸，避免在物理查询期间修改状态
-	call_deferred("_create_explosion_deferred", explosion_position, explosion_damage, explosion_damage_type, player, equipment)
+	# 创建炸弹投射物
+	_create_bomb_projectile(explosion_position, explosion_damage, explosion_damage_type, player, equipment)
 
-## 延迟创建爆炸效果[br]
-## [param position] 爆炸位置[br]
+## 创建炸弹投射物[br]
+## [param position] 炸弹位置[br]
 ## [param damage] 爆炸伤害[br]
 ## [param damage_type] 爆炸伤害类型[br]
 ## [param player] 玩家实例[br]
 ## [param equipment] 装备实例
-func _create_explosion_deferred(position: Vector2, damage: int, damage_type: Constants.DamageType, player: Player, equipment: EquipmentBase) -> void:
-	# 创建爆炸节点
-	var explosion: Area2D = _create_explosion_area(position, damage, damage_type, player, equipment)
+func _create_bomb_projectile(position: Vector2, damage: int, damage_type: Constants.DamageType, player: Player, equipment: EquipmentBase) -> void:
+	if not bomb_projectile_scene:
+		push_error("爆炸效果：未设置炸弹投射物场景")
+		return
 	
-	if explosion:
-		# 添加到场景树中
-		if equipment.get_parent():
-			equipment.get_parent().add_child(explosion)
-		else:
-			# 备用方案：添加到玩家的父节点
-			if player.get_parent():
-				player.get_parent().add_child(explosion)
-			else:
-				explosion.queue_free()
-				return
-		
-		# 设置爆炸位置
-		explosion.global_position = position
-		
-		# 发送爆炸信号
-		FightEventBus.on_explosion_triggered.emit(position, explosion_radius, damage)
+	# 实例化炸弹投射物
+	var bomb_projectile: Node2D = bomb_projectile_scene.instantiate()
+	if not bomb_projectile:
+		push_error("爆炸效果：无法实例化炸弹投射物")
+		return
+	
+	# 添加到场景树
+	var parent_node: Node = _get_projectile_parent(player, equipment)
+	if not parent_node:
+		bomb_projectile.queue_free()
+		return
+	call_deferred("_add_bomb", parent_node, bomb_projectile, position, damage, damage_type, equipment)
 
-## 创建爆炸区域[br]
-## [param position] 爆炸位置[br]
-## [param damage] 爆炸伤害[br]
-## [param damage_type] 爆炸伤害类型[br]
+
+func _add_bomb(parent_node: Node, bomb_projectile: Node2D, position: Vector2, damage: int, damage_type: Constants.DamageType, equipment: EquipmentBase) -> void:
+	parent_node.add_child(bomb_projectile)
+	bomb_projectile.global_position = position
+	
+	# 配置炸弹投射物属性
+	if bomb_projectile.has_method("setup_from_resource"):
+		var bomb_stats = _create_bomb_stats(damage, damage_type)
+		var dummy_resource = _create_dummy_projectile_resource(damage, damage_type)
+		bomb_projectile.setup_from_resource(equipment, dummy_resource, Vector2.ZERO, bomb_stats)
+	else:
+		# 直接设置属性作为备用方案
+		_configure_bomb_directly(bomb_projectile, damage, damage_type)
+
+
+## 获取投射物父节点[br]
 ## [param player] 玩家实例[br]
 ## [param equipment] 装备实例[br]
-## [returns] 爆炸Area2D节点
-func _create_explosion_area(position: Vector2, damage: int, damage_type: Constants.DamageType, player: Player, equipment: EquipmentBase) -> Area2D:
-	var explosion = Area2D.new()
-	explosion.name = "ExplosionEffect"
+## [returns] 父节点
+func _get_projectile_parent(player: Player, equipment: EquipmentBase) -> Node:
+	# 优先使用装备的父节点
+	if equipment.get_parent():
+		return equipment.get_parent()
 	
-	# 设置碰撞层级
-	explosion.collision_layer = 0
-	explosion.collision_mask = 2  # 敌人层
+	# 备用方案：使用玩家的父节点
+	if player.get_parent():
+		return player.get_parent()
 	
-	# 创建碰撞形状
-	var collision_shape = CollisionShape2D.new()
-	var circle_shape = CircleShape2D.new()
-	circle_shape.radius = 0.0  # 初始半径为0，通过动画扩大
-	collision_shape.shape = circle_shape
-	explosion.add_child(collision_shape)
+	# 最后备用方案：使用场景树根节点
+	if player.get_tree():
+		return player.get_tree().current_scene
 	
-	# 创建视觉效果（简单的圆形）
-	var visual = ColorRect.new()
-	visual.size = Vector2.ZERO
-	visual.color = Color.ORANGE
-	visual.position = Vector2.ZERO
-	explosion.add_child(visual)
-	
-	# 存储爆炸参数
-	explosion.set_meta("explosion_damage", damage)
-	explosion.set_meta("damage_type", damage_type)
-	explosion.set_meta("player", player)
-	explosion.set_meta("equipment", equipment)
-	explosion.set_meta("affected_targets", [])
-	
-	# 连接碰撞信号
-	explosion.area_entered.connect(_on_explosion_area_entered.bind(explosion))
-	
-	# 启动爆炸动画
-	_start_explosion_animation(explosion, circle_shape, visual)
-	
-	return explosion
+	return null
 
-## 启动爆炸动画[br]
-## [param explosion] 爆炸节点[br]
-## [param shape] 碰撞形状[br]
-## [param visual] 视觉节点
-func _start_explosion_animation(explosion: Area2D, shape: CircleShape2D, visual: ColorRect) -> void:
-	# 等待引爆延迟
-	await explosion.get_tree().create_timer(detonation_delay).timeout
-	
-	if not is_instance_valid(explosion):
-		return
-	
-	# 启用碰撞检测
-	explosion.monitoring = true
-	explosion.monitorable = true
-	
-	# 计算动画持续时间
-	var duration: float = explosion_radius / explosion_spread_speed if explosion_spread_speed > 0 else 0.2
-	
-	# 创建扩散动画
-	var tween: Tween = explosion.create_tween()
-	tween.set_parallel(true)
-	
-	# 动画1: 扩大碰撞区域
-	tween.tween_property(shape, "radius", explosion_radius, duration).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
-	
-	# 动画2: 扩大视觉效果
-	var final_size = Vector2.ONE * explosion_radius * 2
-	var final_position = -final_size / 2
-	tween.tween_property(visual, "size", final_size, duration)
-	tween.tween_property(visual, "position", final_position, duration)
-	
-	# 动画3: 渐隐效果
-	tween.set_parallel(false)
-	tween.tween_property(visual, "modulate:a", 0.0, 0.2)
-	tween.tween_callback(explosion.queue_free)
+## 创建炸弹统计数据[br]
+## [param damage] 爆炸伤害[br]
+## [param damage_type] 爆炸伤害类型[br]
+## [returns] 统计数据字典
+func _create_bomb_stats(damage: int, damage_type: Constants.DamageType) -> Dictionary:
+	return {
+		"base_damage": damage,
+		"damage_type": damage_type,
+		"pierce_count": 999, # 爆炸可以穿透所有目标
+		"attack_range": explosion_radius,
+		"detonation_time": detonation_delay,
+		"explosion_radius": explosion_radius,
+		"explosion_spread_speed": explosion_spread_speed
+	}
 
-## 爆炸区域碰撞处理[br]
-## [param explosion] 爆炸节点[br]
-## [param area] 进入的区域
-func _on_explosion_area_entered(explosion: Area2D, area: Area2D) -> void:
-	if not is_instance_valid(explosion) or not is_instance_valid(area):
-		return
+## 创建临时投射物资源[br]
+## [param damage] 爆炸伤害[br]
+## [param damage_type] 爆炸伤害类型[br]
+## [returns] 临时投射物资源
+func _create_dummy_projectile_resource(damage: int, damage_type: Constants.DamageType) -> EmitterProjectileResource:
+	# 创建一个发射器投射物资源用于配置炸弹
+	var dummy_resource = EmitterProjectileResource.new()
+	dummy_resource.projectile_name = "爆炸炸弹"
+	dummy_resource.base_damage = damage
+	dummy_resource.damage_type = damage_type
+	dummy_resource.projectile_speed = 0.0 # 炸弹不移动
+	dummy_resource.lifetime = detonation_delay + 2.0 # 确保有足够时间完成爆炸
+	dummy_resource.pierce_count = 999 # 爆炸可以穿透所有目标
+	dummy_resource.detection_radius = explosion_radius
+	dummy_resource.affected_groups = ["enemies"] as Array[String]
+	dummy_resource.projectile_color = Color.ORANGE
+	dummy_resource.projectile_scale = Vector2(0.5, 0.5)
 	
-	var target = area.get_parent()
-	if not target or not target.is_in_group("enemies"):
-		return
+	# 通过元数据传递炸弹特有的配置
+	dummy_resource.set_meta("detonation_time", detonation_delay)
+	dummy_resource.set_meta("explosion_radius", explosion_radius)
+	dummy_resource.set_meta("explosion_spread_speed", explosion_spread_speed)
+	return dummy_resource
+
+## 直接配置炸弹属性（备用方案）[br]
+## [param bomb_projectile] 炸弹投射物实例[br]
+## [param damage] 爆炸伤害[br]
+## [param damage_type] 爆炸伤害类型
+func _configure_bomb_directly(bomb_projectile: Node2D, damage: int, damage_type: Constants.DamageType) -> void:
+	# 直接设置炸弹属性
+	if bomb_projectile.has_method("set") and bomb_projectile.has_property("current_damage"):
+		bomb_projectile.current_damage = damage
 	
-	# 检查是否已经影响过这个目标
-	var affected_targets: Array = explosion.get_meta("affected_targets", [])
-	if target in affected_targets:
-		return
+	if bomb_projectile.has_method("set") and bomb_projectile.has_property("damage_type"):
+		bomb_projectile.damage_type = damage_type
 	
-	# 添加到已影响列表
-	affected_targets.append(target)
-	explosion.set_meta("affected_targets", affected_targets)
+	if bomb_projectile.has_method("set") and bomb_projectile.has_property("detonation_time"):
+		bomb_projectile.detonation_time = detonation_delay
 	
-	# 造成爆炸伤害
-	var explosion_damage: int = explosion.get_meta("explosion_damage", 0)
-	var damage_type: Constants.DamageType = explosion.get_meta("damage_type", Constants.DamageType.爆炸)
-	var player: Player = explosion.get_meta("player")
-	var equipment: EquipmentBase = explosion.get_meta("equipment")
+	if bomb_projectile.has_method("set") and bomb_projectile.has_property("explosion_radius"):
+		bomb_projectile.explosion_radius = explosion_radius
 	
-	if target.has_method("take_damage"):
-		target.take_damage(explosion_damage)
-		
-		# 显示伤害数字
-		var damage_color: Color = Constants.get_damage_type_color(damage_type)
-		EventBus.show_damage_number(explosion_damage, target.global_position, damage_color)
-		
-		# 发送命中事件
-		if player and equipment:
-			FightEventBus.on_projectile_hit.emit(player, equipment, null, target, explosion_damage, damage_type)
+	if bomb_projectile.has_method("set") and bomb_projectile.has_property("explosion_spread_speed"):
+		bomb_projectile.explosion_spread_speed = explosion_spread_speed
 
 ## 重写触发条件检查[br]
 ## [param player] 玩家实例[br]
@@ -212,6 +192,10 @@ func can_trigger(player: Player, equipment: EquipmentBase, projectile: Projectil
 	if explosion_radius <= 0:
 		return false
 	
+	# 检查是否有炸弹投射物场景
+	if not bomb_projectile_scene:
+		return false
+	
 	return true
 
 ## 获取效果描述[br]
@@ -219,9 +203,9 @@ func can_trigger(player: Player, equipment: EquipmentBase, projectile: Projectil
 func get_description() -> String:
 	var desc: String
 	if use_damage_ratio:
-		desc = "在命中点引爆，造成 %.0f%% 伤害，半径 %.0f" % [damage_ratio * 100, explosion_radius]
+		desc = "在命中点投放炸弹，造成 %.0f%% 伤害，半径 %.0f" % [damage_ratio * 100, explosion_radius]
 	else:
-		desc = "在命中点引爆，造成 %d 固定伤害，半径 %.0f" % [fixed_damage, explosion_radius]
+		desc = "在命中点投放炸弹，造成 %d 固定伤害，半径 %.0f" % [fixed_damage, explosion_radius]
 	
 	if detonation_delay > 0:
 		desc += "（延迟 %.1f秒）" % detonation_delay
@@ -230,4 +214,4 @@ func get_description() -> String:
 		desc += "（%.0f%% 概率）" % (trigger_probability * 100)
 	if cooldown_time > 0:
 		desc += "（冷却 %.1f秒）" % cooldown_time
-	return desc 
+	return desc
