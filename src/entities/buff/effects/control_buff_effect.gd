@@ -72,13 +72,13 @@ func _apply_immobilize() -> void:
 		target.set_movement_disabled(true)
 	elif target.has_method("disable_movement"):
 		target.disable_movement()
-	elif target.has_property("can_move"):
+	elif target.get("can_move"):
 		original_values["can_move"] = target.can_move
 		target.can_move = false
-	elif target.has_property("movement_disabled"):
+	elif target.get("movement_disabled"):
 		original_values["movement_disabled"] = target.movement_disabled
 		target.movement_disabled = true
-	elif target.has_property("speed"):
+	elif target.get("speed"):
 		original_values["speed"] = target.speed
 		target.speed = 0
 
@@ -92,11 +92,11 @@ func _remove_immobilize() -> void:
 		target.set_movement_disabled(false)
 	elif target.has_method("enable_movement"):
 		target.enable_movement()
-	elif target.has_property("can_move") and original_values.has("can_move"):
+	elif target.get("can_move") and original_values.has("can_move"):
 		target.can_move = original_values["can_move"]
-	elif target.has_property("movement_disabled") and original_values.has("movement_disabled"):
+	elif target.get("movement_disabled") and original_values.has("movement_disabled"):
 		target.movement_disabled = original_values["movement_disabled"]
-	elif target.has_property("speed") and original_values.has("speed"):
+	elif target.get("speed") and original_values.has("speed"):
 		target.speed = original_values["speed"]
 
 ## 应用无敌效果[br]

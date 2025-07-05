@@ -83,7 +83,7 @@ func _apply_gather_to_enemy(enemy: Node, center: Vector2) -> bool:
 		return false
 	
 	# 检查敌人是否支持集聚（有位置属性）
-	if not enemy.has_method("get_global_position") and not enemy.has_property("global_position"):
+	if not enemy.has_method("get_global_position") and not enemy.get("global_position"):
 		return false
 	
 	# 禁用敌人移动（如果启用）

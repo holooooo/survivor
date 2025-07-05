@@ -1,17 +1,34 @@
-[gd_resource type="Resource" script_class="EmitterEquipmentResource" load_steps=10 format=3 uid="uid://dxknm8f2vboac"]
+[gd_resource type="Resource" script_class="EmitterEquipmentResource" load_steps=16 format=3 uid="uid://dxknm8f2vboac"]
 
 [ext_resource type="Script" uid="uid://cnwq8e5vm7df2" path="res://src/equipment/emitter/emitter_equipment_resource.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://c7nak4j2f8p1x" path="res://src/equipment/emitter/pistol/emitter/pistol_equipment.tscn" id="1_it6w0"]
+[ext_resource type="Script" uid="uid://c35f544qy6b84" path="res://src/entities/buff/buff_resource.gd" id="1_lsqhb"]
 [ext_resource type="Texture2D" uid="uid://d0ebkhbqp4fhd" path="res://icon.svg" id="2_0u8n4"]
-[ext_resource type="Script" uid="uid://c3ih2fukl5lb6" path="res://src/equipment/hit_effect/hit_effect_resource.gd" id="2_ku84u"]
 [ext_resource type="Resource" uid="uid://c5n8m3k4p7qxw" path="res://src/equipment/emitter/pistol/pistol_emitter_projectile_resource.tres" id="3_6d8bt"]
+[ext_resource type="Script" uid="uid://c3ih2fukl5lb6" path="res://src/equipment/hit_effect/hit_effect_resource.gd" id="3_vui4x"]
 [ext_resource type="Script" uid="uid://c8qngidog7spq" path="res://src/equipment/hit_effect/effects/knockback_hit_effect.gd" id="4_dalw7"]
-[ext_resource type="Script" uid="uid://c35f544qy6b84" path="res://src/entities/buff/buff_resource.gd" id="5_dalw7"]
+[ext_resource type="Script" uid="uid://c8fkkfpdwvc2t" path="res://src/equipment/hit_effect/effects/ricochet_hit_effect.gd" id="5_dalw7"]
 [ext_resource type="PackedScene" uid="uid://dqh8b3k5r7x2m" path="res://src/equipment/emitter/pistol/projectile/pistol_projectile.tscn" id="6_3w17x"]
+[ext_resource type="Script" uid="uid://bhi26pjk4ao0" path="res://src/equipment/hit_effect/effects/gather_hit_effect.gd" id="6_dalw7"]
+[ext_resource type="Script" uid="uid://cub2anbhkjxdd" path="res://src/equipment/hit_effect/effects/explosion_hit_effect.gd" id="7_vb222"]
 
 [sub_resource type="Resource" id="Resource_hib23"]
 script = ExtResource("4_dalw7")
 metadata/_custom_type_script = "uid://c8qngidog7spq"
+
+[sub_resource type="Resource" id="Resource_vb222"]
+script = ExtResource("5_dalw7")
+metadata/_custom_type_script = "uid://c8fkkfpdwvc2t"
+
+[sub_resource type="Resource" id="Resource_mdtod"]
+script = ExtResource("6_dalw7")
+metadata/_custom_type_script = "uid://bhi26pjk4ao0"
+
+[sub_resource type="Resource" id="Resource_ht33k"]
+script = ExtResource("7_vb222")
+explosion_radius = 200.0
+cooldown_time = 0.5
+metadata/_custom_type_script = "uid://cub2anbhkjxdd"
 
 [resource]
 script = ExtResource("1")
@@ -19,7 +36,7 @@ emit_interval = 5.0
 base_damage = 12
 attack_range = 1000.0
 magazine_capacity = 9
-hit_effects = Array[HitEffectResource]([SubResource("Resource_hib23")])
+hit_effects = Array[ExtResource("3_vui4x")]([SubResource("Resource_hib23"), SubResource("Resource_vb222"), SubResource("Resource_mdtod"), SubResource("Resource_ht33k")])
 equipment_name = "手枪"
 equipment_id = "pistol"
 equipment_type = 1

@@ -152,9 +152,8 @@ func _reset_projectile_flight_distance(projectile: ProjectileBase) -> void:
 	projectile.start_position = projectile.global_position
 	projectile.traveled_distance = 0.0
 	
-	# 重置生命周期计时器（如果需要）
-	if projectile.has_property("lifetime_timer"):
-		projectile.lifetime_timer = 0.0
+	# 重置生命周期计时器
+	projectile.lifetime_timer = 0.0
 
 ## 重定向投射物[br]
 ## [param projectile] 投射物实例[br]
@@ -173,9 +172,9 @@ func _redirect_projectile(projectile: ProjectileBase, new_direction: Vector2) ->
 		projectile._initialize_specific(new_direction)
 	
 	# 如果投射物有方向属性，直接设置
-	if projectile.has_property("direction"):
+	if projectile.get("direction"):
 		projectile.direction = new_direction
-	elif projectile.has_property("velocity"):
+	elif projectile.get("velocity"):
 		# 保持原速度大小，只改变方向
 		var current_speed = projectile.velocity.length()
 		projectile.velocity = new_direction * current_speed

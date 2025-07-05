@@ -1,6 +1,6 @@
-[gd_resource type="RicochetHitEffect" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="RicochetHitEffect" load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://src/equipment/hit_effect/ricochet_hit_effect.gd" id="1"]
+[ext_resource type="Script" uid="uid://c8fkkfpdwvc2t" path="res://src/equipment/hit_effect/effects/ricochet_hit_effect.gd" id="1"]
 
 [resource]
 script = ExtResource("1")

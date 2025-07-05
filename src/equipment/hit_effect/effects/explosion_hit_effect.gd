@@ -158,19 +158,19 @@ func _create_dummy_projectile_resource(damage: int, damage_type: Constants.Damag
 ## [param damage_type] 爆炸伤害类型
 func _configure_bomb_directly(bomb_projectile: Node2D, damage: int, damage_type: Constants.DamageType) -> void:
 	# 直接设置炸弹属性
-	if bomb_projectile.has_method("set") and bomb_projectile.has_property("current_damage"):
+	if bomb_projectile.has_method("set") and bomb_projectile.get("current_damage"):
 		bomb_projectile.current_damage = damage
 	
-	if bomb_projectile.has_method("set") and bomb_projectile.has_property("damage_type"):
+	if bomb_projectile.has_method("set") and bomb_projectile.get("damage_type"):
 		bomb_projectile.damage_type = damage_type
 	
-	if bomb_projectile.has_method("set") and bomb_projectile.has_property("detonation_time"):
+	if bomb_projectile.has_method("set") and bomb_projectile.get("detonation_time"):
 		bomb_projectile.detonation_time = detonation_delay
 	
-	if bomb_projectile.has_method("set") and bomb_projectile.has_property("explosion_radius"):
+	if bomb_projectile.has_method("set") and bomb_projectile.get("explosion_radius"):
 		bomb_projectile.explosion_radius = explosion_radius
 	
-	if bomb_projectile.has_method("set") and bomb_projectile.has_property("explosion_spread_speed"):
+	if bomb_projectile.has_method("set") and bomb_projectile.get("explosion_spread_speed"):
 		bomb_projectile.explosion_spread_speed = explosion_spread_speed
 
 ## 重写触发条件检查[br]

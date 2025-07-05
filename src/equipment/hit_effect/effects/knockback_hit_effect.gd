@@ -57,12 +57,10 @@ func _apply_knockback_buff(target: Node, buff_resource: BuffResource, caster: Pl
 	# 使用buff系统施加击退效果
 	var success = target.add_buff(buff_resource, caster)
 	if success:
-		print("击退效果：成功施加击退禁锢buff")
 		# 发送击退信号
 		var knockback_direction = buff_resource.get_effect_value("knockback_direction", Vector2.ZERO)
 		FightEventBus.on_knockback_applied.emit(target, knockback_direction, knockback_strength)
 	else:
-		print("击退效果：buff施加失败，使用传统方法")
 		_apply_legacy_knockback(target, buff_resource, caster)
 
 ## 传统击退方法（用于不支持buff的目标）[br]

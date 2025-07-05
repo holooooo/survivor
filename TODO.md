@@ -2,20 +2,7 @@
 
 ## 计划中
 
-### 设计局外成长玩法
-
-  - tags: [文档, 玩法, 局外]
-  - priority: medium
-  - workload: Hard
-
-### 实现安全屋功能
-
-  - tags: [玩法, 局外]
-  - priority: medium
-  - workload: Extreme
-
-### ui设计
-
+- ui设计
   - tags: [ui, 美术]
   - priority: low
   - workload: Extreme
@@ -24,36 +11,48 @@
     cyberpunk+电竞主题
     ```
 
+- 实现无人机系列装备
+  - priority: low
+  - workload: Hard
+  - defaultExpanded: false
+
+## Week2
+
+- 实现安全屋功能
+  - tags: [玩法, 局外]
+  - priority: medium
+  - workload: Extreme
+
+- 设计局外成长玩法
+  - tags: [文档, 玩法, 局外]
+  - priority: medium
+  - workload: Hard
+
 ## Week 1
 
-### 修复攻击效果-爆炸的错误
-
-  - tags: [Bug, 装备]
-  - priority: medium
-  - workload: Easy
-
-### 实现Mod系统
-
+- 实现Mod系统
   - tags: [战斗, 玩法]
   - priority: high
   - workload: Normal
 
-### 基础的战斗场景美术
-
+- 基础的战斗场景美术
   - tags: [美术, 战斗]
   - priority: medium
   - workload: Normal
 
-## Week 1 已完成
+## Week 1 已完成 [Archived]
 
-### 实现BuffSystem
-
+- 实现BuffSystem
   - tags: [战斗, 玩法]
   - priority: high
   - workload: Normal
 
-### 重构高分子线
+- 修复攻击效果-爆炸的错误
+  - tags: [Bug, 装备]
+  - priority: medium
+  - workload: Easy
 
+- 重构高分子线
   - tags: [重构, 玩法, 装备, Bug]
   - priority: medium
   - workload: Easy
