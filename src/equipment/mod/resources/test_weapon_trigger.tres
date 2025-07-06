@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TriggerEquipmentUse" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/equipment/mod/triggers/trigger_equipment_use.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+trigger_name = "手枪使用触发器"
+trigger_description = "手枪使用3次后触发"
+required_uses = 3
+target_equipment_class = "PistolEquipment"
+reset_on_cooldown = false 

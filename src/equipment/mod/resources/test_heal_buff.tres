@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="BuffResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/entities/buff/buff_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+buff_name = "瞬间治疗"
+buff_id = "instant_heal"
+buff_description = "瞬间治疗20点生命值"
+buff_type = 0
+effect_type = 3
+duration = 0.1
+is_permanent = false
+stackable = false
+max_stacks = 1
+stack_refresh_duration = false
+trigger_probability = 1.0
+apply_to_damage_types = []
+apply_to_all_damage_types = true
+effect_values = {
+"heal_amount": 20
+}
+effect_scripts = [] 

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="EffectApplyBuff" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/equipment/mod/effects/effect_apply_buff.gd" id="1"]
+[ext_resource type="Resource" path="res://src/equipment/mod/resources/test_heal_buff.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+effect_name = "治疗效果"
+effect_description = "给玩家添加治疗Buff"
+effect_duration = 0.0
+buff_resource = ExtResource("2")
+override_duration = 0.0
+buff_stacks = 1
+apply_to_self = true
+apply_to_target = false 

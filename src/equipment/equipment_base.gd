@@ -20,7 +20,6 @@ var emitter_config: Dictionary = {}
 
 # 属性系统
 var base_stats: Dictionary = {} ## 基础属性
-var external_mod_effects: Dictionary = {} ## 外部mod效果
 
 
 var owner_player: Player
@@ -61,21 +60,10 @@ func _setup_damage_type() -> void:
 	# 更新基础属性中的伤害类型
 	base_stats["damage_type"] = damage_type
 
-## 应用外部mod效果[br]
-## [param mod_effects] 从装备管理器传来的mod效果
-func apply_external_mod_effects(mod_effects: Dictionary) -> void:
-	external_mod_effects = mod_effects
-	_apply_all_effects()
-
 ## 应用所有效果到装备属性
 func _apply_all_effects() -> void:
 	# 从基础属性开始
 	var final_stats = base_stats.duplicate()
-	
-	# 应用外部mod效果
-	for stat_name in external_mod_effects:
-		if base_stats.has(stat_name):
-			final_stats[stat_name] = external_mod_effects[stat_name]
 	
 	# 更新装备属性
 	if final_stats.has("cooldown_time"):
@@ -152,11 +140,6 @@ func _get_current_stats() -> Dictionary:
 		if current_stats.has("attack_range"):
 			var bonus = player_stats.get_attack_range_bonus(equipment_damage_type)
 			current_stats.attack_range *= (1.0 + bonus)
-	
-	# 应用外部mod效果
-	for stat_name in external_mod_effects:
-		if current_stats.has(stat_name):
-			current_stats[stat_name] = external_mod_effects[stat_name]
 	
 	return current_stats
 

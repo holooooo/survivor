@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ModResource" load_steps=4 format=3 uid="uid://cldn7p8omriu3"]
+
+[ext_resource type="Script" path="res://src/equipment/mod/mod_resource.gd" id="1"]
+[ext_resource type="Resource" path="res://src/equipment/mod/resources/test_weapon_trigger.tres" id="2"]
+[ext_resource type="Resource" path="res://src/equipment/mod/resources/test_projectile_effect.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+mod_name = "武器强化"
+mod_description = "手枪使用3次后发射额外投射物"
+mod_rarity = 3
+trigger_resource = ExtResource("2")
+effect_resource = ExtResource("3")
+cooldown_time = 1.0

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="EffectSpawnProjectile" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/equipment/mod/effects/effect_spawn_projectile.gd" id="1"]
+[ext_resource type="Resource" path="res://src/equipment/emitter/pistol/pistol_emitter_projectile_resource.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+effect_name = "生成投射物"
+effect_description = "在玩家位置生成3个扩散的投射物"
+effect_duration = 0.0
+projectile_resource = ExtResource("2")
+spawn_count = 3
+spawn_spread = 30.0
+spawn_at_player = true
+spawn_at_target = false
+spawn_at_event_position = false
+target_nearest_enemy = true
+fixed_direction = Vector2(0, 0)
+randomize_direction = false 

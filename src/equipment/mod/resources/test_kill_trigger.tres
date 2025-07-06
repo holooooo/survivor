@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TriggerKills" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://src/equipment/mod/triggers/trigger_kills.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+trigger_name = "击杀计数触发器"
+trigger_description = "每击杀5个敌人时触发"
+required_kills = 5
+use_consecutive_kills = false
+reset_on_damage = false 

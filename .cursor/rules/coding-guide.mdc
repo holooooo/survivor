@@ -46,6 +46,8 @@ alwaysApply: true
 - 保持方法集中，尽可能在 30 行以内
 - 使用有意义的变量和函数名
 - 将相关属性和方法组合在一起
+- 便好组合，不要过度封装
+- 使用Time.get_ticks_msec()获取时间戳
 - 避免使用preload/load加载依赖，而是通过 class_name 将类注册为 global class 后直接引用
 
 ---

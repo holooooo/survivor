@@ -28,21 +28,21 @@
   - priority: medium
   - workload: Hard
 
-## Week 1
-
-- 实现Mod系统
-  - tags: [战斗, 玩法]
-  - priority: high
-  - workload: Normal
-
 - 基础的战斗场景美术
   - tags: [美术, 战斗]
   - priority: medium
   - workload: Normal
 
+## Week 1 [Archived]
+
 ## Week 1 已完成 [Archived]
 
 - 实现BuffSystem
+  - tags: [战斗, 玩法]
+  - priority: high
+  - workload: Normal
+
+- 实现Mod系统
   - tags: [战斗, 玩法]
   - priority: high
   - workload: Normal

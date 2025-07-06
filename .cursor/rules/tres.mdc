@@ -1,0 +1,22 @@
+---
+globs: *.tres
+alwaysApply: false
+---
+注意，在tres中gd_resource的type永远是Resource，script_class则是对应的Resource的子类实现。
+
+其次，uid可以不生成避免引用错误，但请确保在tres中引用的path是正确的。
+
+
+
+以下是一个EmitterProjectileResource类对应的tres的样例，请参考这个样例来编写tres文件。
+```tres
+[gd_resource type="Resource" script_class="EmitterProjectileResource" load_steps=2 format=3 uid="uid://ec7d3n02wsag"]
+
+[ext_resource type="Script" path="res://src/equipment/emitter/emitter_projectile_resource.gd" id="1_projectile_base"]
+
+[resource]
+script = ExtResource("1_projectile_base")
+projectile_name = "发射器拳击投射物"
+projectile_color = Color(1, 1, 0, 0.7)
+projectile_scale = Vector2(1.2, 1.2)
+```

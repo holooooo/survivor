@@ -28,9 +28,9 @@ signal on_armor_regeneration_finished(player: Player, armor_equipment: Node, reg
 signal on_armor_fully_restored(player: Player, armor_equipment: Node, restored_amount: int)
 
 # Buff相关信号
-signal buff_applied(target: Actor, buff_instance: Node)
-signal buff_removed(target: Actor, buff_instance: Node)
-signal buff_triggered(target: Actor, buff_instance: Node, trigger_type: String)
-signal buff_expired(target: Actor, buff_instance: Node)
-signal buff_stacks_changed(target: Actor, buff_instance: Node, old_stacks: int, new_stacks: int)
+signal buff_applied(target: Actor, buff_instance: BuffInstance)
+signal buff_removed(target: Actor, buff_instance: BuffInstance)
+signal buff_triggered(target: Actor, buff_instance: BuffInstance, trigger_type: String)
+signal buff_expired(target: Actor, buff_instance: BuffInstance)
+signal buff_stacks_changed(target: Actor, buff_instance: BuffInstance, old_stacks: int, new_stacks: int)
 

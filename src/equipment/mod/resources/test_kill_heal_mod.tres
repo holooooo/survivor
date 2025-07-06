@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ModResource" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/equipment/mod/mod_resource.gd" id="1"]
+[ext_resource type="Resource" path="res://src/equipment/mod/resources/test_kill_trigger.tres" id="2"]
+[ext_resource type="Resource" path="res://src/equipment/mod/resources/test_heal_effect.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+mod_name = "击杀治疗"
+mod_description = "每击杀5个敌人后治疗20点生命值"
+mod_rarity = 2
+trigger_resource = ExtResource("2")
+effect_resource = ExtResource("3")
+cooldown_time = 0.0
+max_triggers = 0 

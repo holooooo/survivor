@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://dog00wdohu7m1"]
+[gd_scene load_steps=28 format=3 uid="uid://dog00wdohu7m1"]
 
 [ext_resource type="Script" uid="uid://etsay58j6v62" path="res://src/fight/fight.gd" id="1_main_script"]
 [ext_resource type="PackedScene" uid="uid://dkeamf7f6v0g1" path="res://src/entities/enemies/enemy.tscn" id="2_enemy_scene"]
@@ -10,7 +10,9 @@
 [ext_resource type="Script" uid="uid://dpfjfe2ivnncr" path="res://src/entities/enemies/enemy_spawner.gd" id="4_vw57g"]
 [ext_resource type="Resource" uid="uid://dxknm8f2vboac" path="res://src/equipment/emitter/pistol/pistol_emitter_equipment_resource.tres" id="5_1s48r"]
 [ext_resource type="Script" uid="uid://dpxqtnxm6umfg" path="res://src/fight/global/damage_number_pool.gd" id="6_3q0a4"]
+[ext_resource type="Script" path="res://src/equipment/mod/mod_resource.gd" id="7_4rlrj"]
 [ext_resource type="PackedScene" uid="uid://bhdq3r65eieyf" path="res://src/ui/credits_display.tscn" id="8_credits"]
+[ext_resource type="Resource" path="res://src/equipment/mod/resources/test_weapon_boost_mod.tres" id="8_ytvfg"]
 [ext_resource type="Script" path="res://src/equipment/mod/mod_manager.gd" id="11_eyn13"]
 [ext_resource type="Script" path="res://src/equipment/equipment_slot_manager.gd" id="12_n86bo"]
 [ext_resource type="PackedScene" uid="uid://hjusjc3ewh33" path="res://src/scenes/common/pause_menu.tscn" id="14_1s48r"]
@@ -59,6 +61,7 @@ metadata/_custom_type_script = "uid://cutwsom3s04lv"
 [node name="ModManager" type="Node" parent="Player"]
 unique_name_in_owner = true
 script = ExtResource("11_eyn13")
+default_mods = Array[ExtResource("7_4rlrj")]([ExtResource("8_ytvfg")])
 
 [node name="PlayerStatsManager" type="Node" parent="Player"]
 unique_name_in_owner = true
