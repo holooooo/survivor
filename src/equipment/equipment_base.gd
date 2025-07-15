@@ -57,7 +57,6 @@ func _setup_base_stats() -> void:
 ## 设置装备伤害类型[br]
 ## 根据装备标签自动设置合适的伤害类型
 func _setup_damage_type() -> void:
-	# 更新基础属性中的伤害类型
 	base_stats["damage_type"] = damage_type
 
 ## 应用所有效果到装备属性
@@ -121,27 +120,38 @@ func _execute_equipment_effect() -> void:
 func _get_current_stats() -> Dictionary:
 	var current_stats = base_stats.duplicate()
 	
-	# 应用玩家属性加成
 	if owner_player and owner_player.stats_manager:
-		var player_stats = owner_player.stats_manager
-		var equipment_damage_type = get_damage_type()
-		
-		# 应用冷却时间缩减
-		if current_stats.has("cooldown_time"):
-			var reduction = player_stats.get_cooldown_reduction(equipment_damage_type)
-			current_stats.cooldown_time *= (1.0 - reduction)
-		
-		# 应用伤害倍率
-		if current_stats.has("base_damage"):
-			var multiplier = player_stats.get_damage_multiplier(equipment_damage_type)
-			current_stats.base_damage = int(current_stats.base_damage * multiplier)
-		
-		# 应用攻击范围加成
-		if current_stats.has("attack_range"):
-			var bonus = player_stats.get_attack_range_bonus(equipment_damage_type)
-			current_stats.attack_range *= (1.0 + bonus)
+		_apply_player_stats(current_stats)
 	
 	return current_stats
+
+## 应用玩家属性加成到装备[br]
+## [param stats] 要修改的属性字典
+func _apply_player_stats(stats: Dictionary) -> void:
+	var player_stats = owner_player.stats_manager
+	var equipment_damage_type = get_damage_type()
+	
+	_apply_cooldown_reduction(stats, player_stats, equipment_damage_type)
+	_apply_damage_multiplier(stats, player_stats, equipment_damage_type)
+	_apply_attack_range_bonus(stats, player_stats, equipment_damage_type)
+
+## 应用冷却时间缩减[br]
+func _apply_cooldown_reduction(stats: Dictionary, player_stats, damage_type: Constants.DamageType) -> void:
+	if stats.has("cooldown_time"):
+		var reduction = player_stats.get_cooldown_reduction(damage_type)
+		stats.cooldown_time *= (1.0 - reduction)
+
+## 应用伤害倍率[br]
+func _apply_damage_multiplier(stats: Dictionary, player_stats, damage_type: Constants.DamageType) -> void:
+	if stats.has("base_damage"):
+		var multiplier = player_stats.get_damage_multiplier(damage_type)
+		stats.base_damage = int(stats.base_damage * multiplier)
+
+## 应用攻击范围加成[br]
+func _apply_attack_range_bonus(stats: Dictionary, player_stats, damage_type: Constants.DamageType) -> void:
+	if stats.has("attack_range"):
+		var bonus = player_stats.get_attack_range_bonus(damage_type)
+		stats.attack_range *= (1.0 + bonus)
 
 ## 获取目标方向 - 根据配置的目标类型选择目标[br]
 ## [returns] 目标方向向量
@@ -152,23 +162,27 @@ func _get_target_direction() -> Vector2:
 	var target_type: Constants.TargetType = emitter_config.get("target_type", Constants.TargetType.最近敌人)
 	var continuous_attack: bool = emitter_config.get("continuous_attack", false)
 	
-	var target_direction: Vector2 = Vector2.ZERO
-	
-	match target_type:
-		Constants.TargetType.最近敌人:
-			target_direction = _get_direction_to_nearest_enemy()
-		Constants.TargetType.最低生命值敌人:
-			target_direction = _get_direction_to_lowest_health_enemy()
-		Constants.TargetType.随机敌人:
-			target_direction = _get_direction_to_random_enemy()
-		Constants.TargetType.随机位置:
-			target_direction = _get_random_direction_in_range()
+	var target_direction: Vector2 = _calculate_target_direction(target_type)
 	
 	# 如果没有找到目标且启用了持续攻击，使用默认方向
 	if target_direction == Vector2.ZERO and continuous_attack:
 		target_direction = Vector2.RIGHT
 	
 	return target_direction
+
+## 计算目标方向[br]
+func _calculate_target_direction(target_type: Constants.TargetType) -> Vector2:
+	match target_type:
+		Constants.TargetType.最近敌人:
+			return _get_direction_to_nearest_enemy()
+		Constants.TargetType.最低生命值敌人:
+			return _get_direction_to_lowest_health_enemy()
+		Constants.TargetType.随机敌人:
+			return _get_direction_to_random_enemy()
+		Constants.TargetType.随机位置:
+			return _get_random_direction_in_range()
+	
+	return Vector2.ZERO
 
 ## 获取投射物生成位置 - 子类可重写此方法[br]
 ## [returns] 投射物生成的世界坐标
@@ -198,97 +212,19 @@ func get_emitter_config() -> Dictionary:
 ## 使用敌人缓存的距离信息提高性能[br]
 ## [returns] 是否有敌人在攻击距离内
 func has_enemies_in_attack_range() -> bool:
-	if not owner_player:
-		return false
-	
-	# 检查是否启用攻击距离检查
-	var range_check_enabled: bool = emitter_config.get("range_check_enabled", true)
-	if not range_check_enabled:
-		return true # 如果未启用检查，始终返回true
-	
-	var attack_range: float = max(emitter_config.get("attack_range", 300.0), 0.0)
-
-	# 检查场景树是否可用
-	var scene_tree = owner_player.get_tree()
-	if not scene_tree:
-		return false
-	
-	# 查找所有敌人
-	var enemies: Array[Node] = scene_tree.get_nodes_in_group("enemies")
-	if enemies.is_empty():
-		return false
-	
-	# 检查是否有敌人在攻击距离内，使用敌人缓存的距离信息
-	for enemy in enemies:
-		if enemy is EnemyBase and is_instance_valid(enemy):
-			if enemy.is_within_distance_of_player(attack_range):
-				return true
-	
-	return false
+	return get_nearest_enemy_in_attack_range() != null
 
 ## 获取攻击距离内最近的敌人[br]
 ## 使用敌人缓存的距离信息提高性能[br]
 ## [returns] 最近的敌人节点，如果没有则返回null
 func get_nearest_enemy_in_attack_range() -> Node2D:
-	if not owner_player:
-		return null
-	
-	var attack_range: float = max(emitter_config.get("attack_range", 300.0), 0.0)
-	
-	# 检查场景树是否可用
-	var scene_tree = owner_player.get_tree()
-	if not scene_tree:
-		return null
-	
-	# 查找所有敌人
-	var enemies: Array[Node] = scene_tree.get_nodes_in_group("enemies")
-	if enemies.is_empty():
-		return null
-	
-	# 找到攻击距离内最近的敌人，使用敌人缓存的距离信息
-	var nearest_enemy: Node2D = null
-	var nearest_distance: float = INF
-	
-	for enemy in enemies:
-		if enemy is EnemyBase and is_instance_valid(enemy):
-			# 使用敌人缓存的距离信息
-			if enemy.is_within_distance_of_player(attack_range):
-				var cached_distance: float = enemy.get_cached_distance_to_player()
-				if cached_distance < nearest_distance:
-					nearest_distance = cached_distance
-					nearest_enemy = enemy
-	
-	return nearest_enemy
+	return _find_nearest_enemy_in_range(_get_attack_range())
 
 ## 获取最近的敌人（无距离限制）[br]
 ## 使用敌人缓存的距离信息提高性能[br]
 ## [returns] 最近的敌人节点，如果没有则返回null
 func _get_nearest_enemy() -> Node2D:
-	if not owner_player:
-		return null
-	
-	# 检查场景树是否可用
-	var scene_tree = owner_player.get_tree()
-	if not scene_tree:
-		return null
-	
-	# 查找所有敌人
-	var enemies: Array[Node] = scene_tree.get_nodes_in_group("enemies")
-	if enemies.is_empty():
-		return null
-	
-	# 找到最近的敌人，使用敌人缓存的距离信息
-	var nearest_enemy: Node2D = null
-	var nearest_distance: float = INF
-	
-	for enemy in enemies:
-		if enemy is EnemyBase and is_instance_valid(enemy):
-			var cached_distance: float = enemy.get_cached_distance_to_player()
-			if cached_distance < nearest_distance:
-				nearest_distance = cached_distance
-				nearest_enemy = enemy
-	
-	return nearest_enemy
+	return _find_nearest_enemy_in_range(INF)
 
 ## 获取指向最近敌人的方向[br]
 ## [returns] 目标方向向量
@@ -330,81 +266,102 @@ func _get_direction_to_random_enemy() -> Vector2:
 ## 获取攻击范围内的随机方向[br]
 ## [returns] 目标方向向量
 func _get_random_direction_in_range() -> Vector2:
-	# 生成随机角度
-	var random_angle: float = randf() * TAU
-	return Vector2.from_angle(random_angle)
+	return Vector2.from_angle(randf() * TAU)
 
 ## 获取攻击范围内生命值最低的敌人[br]
 ## [returns] 生命值最低的敌人节点，如果没有则返回null
 func _get_lowest_health_enemy_in_range() -> Node2D:
-	if not owner_player:
-		return null
-	
-	var attack_range: float = max(emitter_config.get("attack_range", 300.0), 0.0)
-	var range_check_enabled: bool = emitter_config.get("range_check_enabled", true)
-	
-	# 检查场景树是否可用
-	var scene_tree = owner_player.get_tree()
-	if not scene_tree:
-		return null
-	
-	# 查找所有敌人
-	var enemies: Array[Node] = scene_tree.get_nodes_in_group("enemies")
-	if enemies.is_empty():
-		return null
-	
-	# 找到攻击范围内生命值最低的敌人
-	var lowest_health_enemy: Node2D = null
-	var lowest_health: int = INF
-	
-	for enemy in enemies:
-		if enemy is EnemyBase and is_instance_valid(enemy):
-			# 检查距离（如果启用距离检查）
-			if range_check_enabled and not enemy.is_within_distance_of_player(attack_range):
-				continue
-			
-			if enemy.current_health < lowest_health:
-				lowest_health = enemy.current_health
-				lowest_health_enemy = enemy
-	
-	return lowest_health_enemy
+	return _find_enemy_in_range_by_health(true)
 
 ## 获取攻击范围内的随机敌人[br]
 ## [returns] 随机敌人节点，如果没有则返回null
 func _get_random_enemy_in_range() -> Node2D:
-	if not owner_player:
+	var enemies_in_range = _get_enemies_in_range()
+	if enemies_in_range.is_empty():
 		return null
 	
-	var attack_range: float = max(emitter_config.get("attack_range", 300.0), 0.0)
-	var range_check_enabled: bool = emitter_config.get("range_check_enabled", true)
-	
-	# 检查场景树是否可用
-	var scene_tree = owner_player.get_tree()
+	return enemies_in_range[randi() % enemies_in_range.size()]
+
+## 获取攻击范围[br]
+func _get_attack_range() -> float:
+	if not _is_range_check_enabled():
+		return INF
+	return max(emitter_config.get("attack_range", 300.0), 0.0)
+
+## 检查是否启用距离检查[br]
+func _is_range_check_enabled() -> bool:
+	return emitter_config.get("range_check_enabled", true)
+
+## 获取场景树[br]
+func _get_scene_tree() -> SceneTree:
+	return owner_player.get_tree() if owner_player else null
+
+## 获取所有有效敌人[br]
+func _get_valid_enemies() -> Array[Node2D]:
+	var scene_tree = _get_scene_tree()
 	if not scene_tree:
-		return null
+		return []
 	
-	# 查找所有敌人
 	var enemies: Array[Node] = scene_tree.get_nodes_in_group("enemies")
-	if enemies.is_empty():
-		return null
-	
-	# 收集攻击范围内的敌人
-	var enemies_in_range: Array[Node2D] = []
+	var valid_enemies: Array[Node2D] = []
 	
 	for enemy in enemies:
 		if enemy is EnemyBase and is_instance_valid(enemy):
-			# 检查距离（如果启用距离检查）
-			if range_check_enabled and not enemy.is_within_distance_of_player(attack_range):
-				continue
-			
+			valid_enemies.append(enemy)
+	
+	return valid_enemies
+
+## 获取范围内的敌人[br]
+func _get_enemies_in_range() -> Array[Node2D]:
+	var enemies = _get_valid_enemies()
+	if enemies.is_empty():
+		return []
+	
+	var attack_range = _get_attack_range()
+	var range_check_enabled = _is_range_check_enabled()
+	
+	var enemies_in_range: Array[Node2D] = []
+	for enemy in enemies:
+		if not range_check_enabled or enemy.is_within_distance_of_player(attack_range):
 			enemies_in_range.append(enemy)
 	
-	# 随机选择一个敌人
-	if enemies_in_range.size() > 0:
-		var random_index: int = randi() % enemies_in_range.size()
-		return enemies_in_range[random_index]
+	return enemies_in_range
+
+## 在范围内查找最近的敌人[br]
+func _find_nearest_enemy_in_range(max_range: float) -> Node2D:
+	var enemies = _get_valid_enemies()
+	if enemies.is_empty():
+		return null
 	
-	return null
+	var nearest_enemy: Node2D = null
+	var nearest_distance: float = INF
+	
+	for enemy in enemies:
+		var cached_distance: float = enemy.get_cached_distance_to_player()
+		if cached_distance < nearest_distance and cached_distance <= max_range:
+			nearest_distance = cached_distance
+			nearest_enemy = enemy
+	
+	return nearest_enemy
+
+## 根据生命值查找敌人[br]
+func _find_enemy_in_range_by_health(find_lowest: bool) -> Node2D:
+	var enemies_in_range = _get_enemies_in_range()
+	if enemies_in_range.is_empty():
+		return null
+	
+	var target_enemy: Node2D = null
+	var target_health: int = INF if find_lowest else -INF
+	
+	for enemy in enemies_in_range:
+		if find_lowest and enemy.current_health < target_health:
+			target_health = enemy.current_health
+			target_enemy = enemy
+		elif not find_lowest and enemy.current_health > target_health:
+			target_health = enemy.current_health
+			target_enemy = enemy
+	
+	return target_enemy
 
 ## 获取装备伤害类型[br]
 ## [returns] 伤害类型

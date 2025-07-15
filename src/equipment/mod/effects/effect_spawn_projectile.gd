@@ -103,8 +103,6 @@ func _spawn_single_projectile(target: Node, spawn_position: Vector2, index: int,
 		var equipment = event_args.get("equipment")
 		var stats = _get_equipment_stats(equipment)
 		projectile.setup_from_resource(equipment, projectile_resource, direction, stats)
-	
-	print("EffectSpawnProjectile: 生成投射物 %d/%d 在位置 %s" % [index + 1, spawn_count, spawn_position])
 
 ## 获取投射物方向[br]
 ## [param target] 目标节点[br]

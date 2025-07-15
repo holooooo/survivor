@@ -47,11 +47,6 @@ func _get_projectile_type() -> String:
 func _on_target_entered(target: Node) -> void:
 	# 调用基类的目标进入处理，会自动处理穿透逻辑
 	super._on_target_entered(target)
-	
-	# 如果还有穿透次数，更新穿透后的速度
-	if pierce_remaining >= 0 and projectile_resource:
-		var current_pierce = projectile_resource.pierce_count - pierce_remaining
-		current_speed = projectile_resource.get_pierce_speed(current_pierce)
 
 ## 更新拖尾[br]
 ## [param delta] 每一帧的时间

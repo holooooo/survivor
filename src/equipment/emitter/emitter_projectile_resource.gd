@@ -87,17 +87,6 @@ func get_pierce_damage(current_pierce: int) -> int:
 	
 	return int(base_damage * damage_multiplier)
 
-## 计算当前穿透后的速度[br]
-## [param current_pierce] 当前穿透次数[br]
-## [returns] 计算后的速度值
-func get_pierce_speed(current_pierce: int) -> float:
-	if current_pierce <= 0:
-		return projectile_speed
-	
-	var speed_multiplier: float = 1.0 - (pierce_speed_reduction * current_pierce)
-	speed_multiplier = max(speed_multiplier, 0.3) # 最少保留30%速度
-	
-	return projectile_speed * speed_multiplier
 
 ## 验证投射物资源的有效性[br]
 ## [returns] 是否有效

@@ -32,8 +32,8 @@ func _execute_equipment_effect() -> void:
 
 ## 获取攻击范围内的敌人[br]
 ## [returns] 敌人节点数组
-func _get_enemies_in_range() -> Array[Node]:
-	var enemies_in_range: Array[Node] = []
+func _get_enemies_in_range() -> Array[Node2D]:
+	var enemies_in_range: Array[Node2D] = []
 	var attack_range: float = emitter_config.get("attack_range", 300.0)
 	
 	if not owner_player:

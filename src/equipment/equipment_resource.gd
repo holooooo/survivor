@@ -48,20 +48,27 @@ func _apply_config_to_instance(instance: EquipmentBase) -> void:
 	if not instance:
 		return
 	
-	# 设置基础属性
+	_apply_base_config(instance)
+	_apply_projectile_config(instance)
+	_apply_buff_config(instance)
+
+## 应用基础配置[br]
+func _apply_base_config(instance: EquipmentBase) -> void:
 	instance.equipment_name = equipment_name
 	instance.equipment_quality = equipment_quality
 	instance.equipment_id = equipment_id
 	instance.icon_texture = icon_texture
 	instance.cooldown_time = cooldown_time
-	
-	# 设置投射物相关
+
+## 应用投射物配置[br]
+func _apply_projectile_config(instance: EquipmentBase) -> void:
 	if projectile_scene:
 		instance.projectile_scene = projectile_scene
 	if projectile_resource:
 		instance.projectile_resource = projectile_resource
-	
-	# 设置附带buff
+
+## 应用buff配置[br]
+func _apply_buff_config(instance: EquipmentBase) -> void:
 	if attached_buffs.size() > 0:
 		instance.attached_buffs = attached_buffs
 

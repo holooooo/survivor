@@ -68,15 +68,18 @@ func _setup_emitter_system() -> void:
 ## 更新弹药系统[br]
 ## [param delta] 时间增量
 func _update_ammo_system(delta: float) -> void:
-	if magazine_capacity <= 0:
-		return # 无限弹药，不需要管理
+	if _should_skip_ammo_update():
+		return
 	
-	# 根据装弹模式处理不同逻辑
 	match reload_mode:
 		EmitterEquipmentResource.ReloadMode.换弹:
 			_update_magazine_reload(delta)
 		EmitterEquipmentResource.ReloadMode.充能:
 			_update_regenerative_reload(delta)
+
+## 检查是否应该跳过弹药更新[br]
+func _should_skip_ammo_update() -> bool:
+	return magazine_capacity <= 0
 
 ## 换弹型装弹更新[br]
 ## [param delta] 时间增量
@@ -117,43 +120,58 @@ func _update_burst_system(delta: float) -> void:
 ## 检查是否可以使用装备[br]
 ## [returns] 是否可以使用
 func can_use() -> bool:
-	# 检查基类冷却
 	if not super.can_use():
 		return false
 	
-	# 检查弹药和装弹状态
-	if magazine_capacity > 0 and not _has_infinite_ammo():
-		match reload_mode:
-			EmitterEquipmentResource.ReloadMode.换弹:
-				# 换弹型：装弹期间或弹药耗尽时无法攻击
-				if is_reloading or current_ammo <= 0:
-					if current_ammo <= 0 and not is_reloading:
-						_start_reload()
-					return false
-			EmitterEquipmentResource.ReloadMode.充能:
-				# 充能型：只要有弹药就可以攻击，弹药耗尽时无法攻击
-				if current_ammo <= 0:
-					return false
+	if not _check_ammo_availability():
+		return false
 	
-	# 检查特定条件
 	return _can_use_specific()
+
+## 检查弹药可用性[br]
+func _check_ammo_availability() -> bool:
+	if magazine_capacity <= 0 or _has_infinite_ammo():
+		return true
+	
+	match reload_mode:
+		EmitterEquipmentResource.ReloadMode.换弹:
+			return _check_magazine_ammo()
+		EmitterEquipmentResource.ReloadMode.充能:
+			return current_ammo > 0
+	
+	return true
+
+## 检查换弹型弹药状态[br]
+func _check_magazine_ammo() -> bool:
+	if is_reloading or current_ammo <= 0:
+		if current_ammo <= 0 and not is_reloading:
+			_start_reload()
+		return false
+	return true
 
 ## 执行装备效果[br]
 func _execute_equipment_effect() -> void:
-	# 消耗弹药
+	_consume_ammo()
+	_start_burst_sequence()
+	_check_auto_reload()
+
+## 消耗弹药[br]
+func _consume_ammo() -> void:
 	if magazine_capacity > 0 and not _has_infinite_ammo():
 		current_ammo -= 1
 		ammo_changed.emit(current_ammo, magazine_capacity)
-	
-	# 开始连发
+
+## 开始连发序列[br]
+func _start_burst_sequence() -> void:
 	current_burst_count = emit_count
 	burst_timer = 0.0
 	
 	# 立即发射第一发
 	_fire_single_projectile()
 	current_burst_count -= 1
-	
-	# 检查是否需要自动装弹（仅换弹型）
+
+## 检查自动装弹[br]
+func _check_auto_reload() -> void:
 	if magazine_capacity > 0 and current_ammo <= 0 and not _has_infinite_ammo():
 		if reload_mode == EmitterEquipmentResource.ReloadMode.换弹:
 			_start_reload()

@@ -112,6 +112,36 @@ func _world_to_grid(world_pos: Vector2) -> Vector2i:
 		int(world_pos.y / GRID_SIZE)
 	)
 
+## 检查位置是否在摄像机可见范围内[br]
+## [param world_position] 世界坐标位置[br]
+## [returns] 是否在可见范围内
+func _is_position_visible(world_position: Vector2) -> bool:
+	var viewport: Viewport = get_viewport()
+	if not viewport:
+		return true  # 无法获取视口时，默认显示
+	
+	# 获取屏幕大小
+	var screen_size: Vector2 = viewport.get_visible_rect().size
+	var screen_rect: Rect2
+	
+	# 如果有相机，基于相机位置计算屏幕区域
+	var camera: Camera2D = viewport.get_camera_2d()
+	if camera:
+		var camera_pos: Vector2 = camera.global_position
+		screen_rect = Rect2(
+			camera_pos - screen_size * 0.5,
+			screen_size
+		)
+	else:
+		# 没有相机时，使用默认屏幕区域
+		screen_rect = Rect2(Vector2.ZERO, screen_size)
+	
+	# 添加一定的边距，确保边缘伤害数字也能显示
+	var screen_margin: float = 100.0
+	var expanded_screen: Rect2 = screen_rect.grow(screen_margin)
+	
+	return expanded_screen.has_point(world_position)
+
 ## 查找无重叠的显示位置[br]
 ## [param base_position] 基础位置[br]
 ## 返回避免重叠的最终显示位置
@@ -157,6 +187,10 @@ func _find_non_overlapping_position(base_position: Vector2) -> Vector2:
 ## [param world_position] 世界坐标位置[br]
 ## [param color] 伤害数字颜色
 func create_damage_number(damage: int, world_position: Vector2, color: Color) -> void:
+	# 检查位置是否在摄像机可见范围内，不可见则直接返回
+	if not _is_position_visible(world_position):
+		return
+	
 	# 高效获取对象池实例
 	var damage_number: Label = _get_next_damage_number()
 	

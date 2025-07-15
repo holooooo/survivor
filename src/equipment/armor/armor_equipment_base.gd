@@ -105,55 +105,68 @@ func _stop_regeneration() -> void:
 ## 更新护甲回复系统[br]
 ## [param delta] 时间增量
 func _update_armor_regeneration(delta: float) -> void:
-	if not owner_player or owner_player.max_armor <= 0:
+	if not _should_regenerate():
 		return
 	
-	# 如果护甲已满，停止回复
-	if owner_player.current_armor >= owner_player.max_armor:
-		if is_regenerating:
-			# 护甲完全恢复
-			var restored_amount = owner_player.max_armor - owner_player.current_armor
-			armor_fully_restored.emit(restored_amount)
-			FightEventBus.on_armor_fully_restored.emit(owner_player, self, restored_amount)
-			_stop_regeneration()
-		return
-	
-	# 更新无伤害计时器
 	no_damage_timer += delta
 	
-	# 检查是否应该开始回复（5秒无伤害且护甲未满）
-	if no_damage_timer >= no_damage_delay and not is_regenerating:
-		is_regenerating = true
-		regeneration_timer = 0.0
-		armor_regeneration_started.emit()
-		FightEventBus.on_armor_regeneration_started.emit(owner_player, self)
+	if _should_start_regeneration():
+		_start_regeneration()
 	
-	# 护甲回复逻辑
 	if is_regenerating:
-		regeneration_timer += delta
+		_process_regeneration(delta)
+
+## 检查是否应该进行护甲回复[br]
+func _should_regenerate() -> bool:
+	return owner_player and owner_player.max_armor > 0 and owner_player.current_armor < owner_player.max_armor
+
+## 检查是否应该开始回复[br]
+func _should_start_regeneration() -> bool:
+	return no_damage_timer >= no_damage_delay and not is_regenerating
+
+## 开始护甲回复[br]
+func _start_regeneration() -> void:
+	is_regenerating = true
+	regeneration_timer = 0.0
+	armor_regeneration_started.emit()
+	FightEventBus.on_armor_regeneration_started.emit(owner_player, self)
+
+## 处理护甲回复逻辑[br]
+func _process_regeneration(delta: float) -> void:
+	regeneration_timer += delta
+	
+	if regeneration_timer >= regeneration_interval:
+		var restore_amount = _calculate_restore_amount()
 		
-		if regeneration_timer >= regeneration_interval:
-			# 计算实际回复量
-			var base_regen_rate = _get_total_armor_regeneration_rate()
-			var player_multiplier = _get_player_armor_regeneration_multiplier()
-			var restore_amount = int(base_regen_rate * player_multiplier)
-			
-			if restore_amount > 0:
-				# 限制回复量不超过最大护甲值
-				restore_amount = min(restore_amount, owner_player.max_armor - owner_player.current_armor)
-				
-				if restore_amount > 0:
-					owner_player.restore_armor(restore_amount)
-					regeneration_timer = 0.0
-					
-					# 检查是否已满
-					if owner_player.current_armor >= owner_player.max_armor:
-						armor_fully_restored.emit(restore_amount)
-						FightEventBus.on_armor_fully_restored.emit(owner_player, self, restore_amount)
-						_stop_regeneration()
-			else:
-				# 无法继续回复，停止
-				_stop_regeneration()
+		if restore_amount > 0:
+			_perform_armor_restore(restore_amount)
+		else:
+			_stop_regeneration()
+
+## 计算回复量[br]
+func _calculate_restore_amount() -> int:
+	var base_regen_rate = _get_total_armor_regeneration_rate()
+	var player_multiplier = _get_player_armor_regeneration_multiplier()
+	var restore_amount = int(base_regen_rate * player_multiplier)
+	
+	if restore_amount <= 0:
+		return 0
+	
+	return min(restore_amount, owner_player.max_armor - owner_player.current_armor)
+
+## 执行护甲回复[br]
+func _perform_armor_restore(restore_amount: int) -> void:
+	owner_player.restore_armor(restore_amount)
+	regeneration_timer = 0.0
+	
+	if owner_player.current_armor >= owner_player.max_armor:
+		_handle_full_restore(restore_amount)
+
+## 处理护甲完全恢复[br]
+func _handle_full_restore(restore_amount: int) -> void:
+	armor_fully_restored.emit(restore_amount)
+	FightEventBus.on_armor_fully_restored.emit(owner_player, self, restore_amount)
+	_stop_regeneration()
 
 ## 获取总护甲回复速度[br]
 ## [returns] 所有装备提供的护甲回复速度之和

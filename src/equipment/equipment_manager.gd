@@ -29,31 +29,44 @@ func _process(delta: float) -> void:
 ## [param equipment_resource] 要装备的装备资源[br]
 ## [returns] 装备成功的槽位索引，失败返回-1
 func equip_item(equipment_resource: EquipmentResource) -> int:
+	if not _validate_equipment_input(equipment_resource):
+		return -1
+	
+	var equipment_instance = _create_equipment_instance_safe(equipment_resource)
+	if not equipment_instance:
+		return -1
+	
+	return _equip_to_slot(equipment_resource, equipment_instance)
+
+## 验证装备输入[br]
+func _validate_equipment_input(equipment_resource: EquipmentResource) -> bool:
 	if not equipment_resource or not player:
 		print("装备失败：装备资源或玩家为空")
-		return -1
+		return false
 	
-	# 验证装备资源
 	if not equipment_resource.is_valid():
 		push_error("无效的装备资源: " + equipment_resource.equipment_name)
-		return -1
+		return false
 	
-	# 使用装备资源创建装备实例
+	return true
+
+## 安全创建装备实例[br]
+func _create_equipment_instance_safe(equipment_resource: EquipmentResource) -> EquipmentBase:
 	var equipment_instance: EquipmentBase = equipment_resource.create_equipment_instance(player)
 	if not equipment_instance:
 		push_error("无法创建装备实例: " + equipment_resource.equipment_name)
-		return -1
+		return null
 	
 	add_child(equipment_instance)
+	return equipment_instance
 
-	# 尝试装备到槽位
+## 装备到槽位[br]
+func _equip_to_slot(equipment_resource: EquipmentResource, equipment_instance: EquipmentBase) -> int:
 	var slot_index = slot_manager.try_equip_equipment(equipment_resource, equipment_instance)
 	if slot_index == -1:
-		# 装备失败，清理实例
 		equipment_instance.queue_free()
 		push_warning("没有可用槽位装备: " + equipment_resource.equipment_name)
 		return -1
-
 	
 	return slot_index
 
@@ -136,21 +149,22 @@ func _auto_use_equipment() -> void:
 ## 装备默认装备
 func _equip_default_equipment() -> void:
 	if default_equipments.size() > 0:
-		for equipment_resource in default_equipments:
-			equip_item(equipment_resource)
+		_equip_multiple_resources(default_equipments)
 	else:
-		print("没有默认装备，使用备用方案")
-		# 备用方案：创建默认拳击装备资源
-		_create_default_fist_equipment()
+		_create_and_equip_fallback()
 
+## 装备多个资源[br]
+func _equip_multiple_resources(resources: Array[EquipmentResource]) -> void:
+	for equipment_resource in resources:
+		equip_item(equipment_resource)
 
-## 创建默认装备
-func _create_default_fist_equipment() -> void:
-	print("创建默认装备...")
-	var fist_equipment_resource: EquipmentResource = _create_fallback_fist_resource()
-	if fist_equipment_resource:
-		print("成功创建装备资源: ", fist_equipment_resource.equipment_name)
-		equip_item(fist_equipment_resource)
+## 创建并装备备用装备[br]
+func _create_and_equip_fallback() -> void:
+	print("没有默认装备，使用备用方案")
+	var fallback_resource = _create_fallback_fist_resource()
+	if fallback_resource:
+		print("成功创建装备资源: ", fallback_resource.equipment_name)
+		equip_item(fallback_resource)
 	else:
 		push_error("无法创建拳击装备资源")
 
