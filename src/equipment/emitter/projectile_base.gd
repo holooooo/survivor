@@ -208,15 +208,35 @@ func _is_valid_target(target: Node) -> bool:
 ## [param target] 目标节点[br]
 ## [param damage_amount] 伤害数值
 func _deal_damage_to_target(target: Node, damage_amount: int) -> void:
-	target.take_damage(damage_amount)
+	# 获取实际的Actor目标（如果目标是CollisionArea，获取其父节点）
+	var actual_target = _get_actual_target(target)
+	if not actual_target:
+		return
+	
+	actual_target.take_damage(damage_amount)
 
 	# 根据伤害类型显示不同颜色的伤害数字
 	var damage_color: Color = get_damage_type_color()
-	EventBus.show_damage_number(damage_amount, target.global_position, damage_color)
-	FightEventBus.on_projectile_hit.emit(equipment.owner_player, equipment, self, target, damage_amount, damage_type)
+	EventBus.show_damage_number(damage_amount, actual_target.global_position, damage_color)
+	FightEventBus.on_projectile_hit.emit(equipment.owner_player, equipment, self, actual_target, damage_amount, damage_type)
 	
 	# 施加附带的buff
-	_apply_attached_buffs_to_target(target)
+	_apply_attached_buffs_to_target(actual_target)
+
+## 获取实际的Actor目标[br]
+## [param target] 检测到的目标节点[br]
+## [returns] 实际的Actor节点
+func _get_actual_target(target: Node) -> Node:
+	# 如果目标是Actor的CollisionArea，返回其父节点（Actor）
+	if target.name == "CollisionArea" and target.get_parent() is Actor:
+		return target.get_parent()
+	
+	# 如果目标本身是Actor，直接返回
+	if target is Actor:
+		return target
+	
+	# 其他情况返回null
+	return null
 
 ## 检查是否应该销毁[br]
 ## [returns] 是否应该销毁

@@ -106,14 +106,21 @@ func _check_target_at_end_position() -> void:
 	if has_hit_target:
 		return
 	
-	# 获取场景树中的所有敌人
+	# 获取场景树中的所有敌人（包括Actor和CollisionArea）
 	var enemies = get_tree().get_nodes_in_group("enemies")
 	var target_found: Node2D = null
 	var min_distance: float = 30.0 # 30像素内算命中
 	
 	for enemy in enemies:
 		if enemy and is_instance_valid(enemy):
-			var distance = enemy.global_position.distance_to(end_position)
+			# 获取实际位置（如果是CollisionArea，使用其父节点Actor的位置）
+			var target_position: Vector2
+			if enemy.name == "CollisionArea" and enemy.get_parent() is Actor:
+				target_position = enemy.get_parent().global_position
+			else:
+				target_position = enemy.global_position
+				
+			var distance = target_position.distance_to(end_position)
 			if distance < min_distance:
 				target_found = enemy
 				min_distance = distance

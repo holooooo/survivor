@@ -78,15 +78,18 @@ func _detect_targets() -> void:
 	var all_enemies = get_tree().get_nodes_in_group("enemies")
 	
 	for enemy in all_enemies:
-		if enemy and is_instance_valid(enemy) and not enemy.is_dead:
-			var distance = owner_player.global_position.distance_to(enemy.global_position)
-			
-			if distance <= attack_range:
-				if enemy not in current_targets:
-					current_targets.append(enemy)
-			else:
-				if enemy in current_targets:
-					current_targets.erase(enemy)
+		if enemy and is_instance_valid(enemy):
+			# 获取实际的Actor目标
+			var actual_enemy = _get_actual_enemy_target(enemy)
+			if actual_enemy and not actual_enemy.is_dead:
+				var distance = owner_player.global_position.distance_to(actual_enemy.global_position)
+				
+				if distance <= attack_range:
+					if actual_enemy not in current_targets:
+						current_targets.append(actual_enemy)
+				else:
+					if actual_enemy in current_targets:
+						current_targets.erase(actual_enemy)
 
 
 ## 尝试自动攻击目标
@@ -157,4 +160,19 @@ func _on_enemy_exited_range(area: Area2D) -> void:
 	var enemy = area.get_parent()
 	if enemy in current_targets:
 		current_targets.erase(enemy)
+
+## 获取实际的敌人Actor目标[br]
+## [param enemy] 检测到的敌人节点[br]
+## [returns] 实际的敌人Actor节点
+func _get_actual_enemy_target(enemy: Node) -> Node:
+	# 如果是敌人的CollisionArea，返回其父节点（敌人Actor）
+	if enemy.name == "CollisionArea" and enemy.get_parent() is Actor:
+		return enemy.get_parent()
+	
+	# 如果本身是Actor，直接返回
+	if enemy is Actor:
+		return enemy
+	
+	# 其他情况返回null
+	return null
 

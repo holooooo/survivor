@@ -1,13 +1,10 @@
 extends Node
 
 ## 游戏管理器 - 负责管理游戏的整体状态和流程[br]
-## 包括游戏状态切换、分数管理、波次管理等核心功能
+## 包括游戏状态切换、分数管理等核心功能
 
 var current_state: GameConstants.GameState = GameConstants.GameState.MENU
 var score: int = 0
-var current_wave: int = 1
-var enemies_killed_this_wave: int = 0
-var enemies_needed_for_next_wave: int = 10
 
 # 生存时间追踪
 var survival_time: float = 0.0
@@ -31,8 +28,6 @@ func _process(delta: float) -> void:
 func start_game() -> void:
 	current_state = GameConstants.GameState.PLAYING
 	score = 0
-	current_wave = 1
-	enemies_killed_this_wave = 0
 	survival_time = 0.0
 	game_start_time = Time.get_time_dict_from_system()["hour"] * 3600 + Time.get_time_dict_from_system()["minute"] * 60 + Time.get_time_dict_from_system()["second"]
 	state_changed.emit(current_state)
@@ -70,9 +65,6 @@ func end_game() -> void:
 func reset_game() -> void:
 	current_state = GameConstants.GameState.MENU
 	score = 0
-	current_wave = 1
-	enemies_killed_this_wave = 0
-	enemies_needed_for_next_wave = 10
 	survival_time = 0.0
 	game_start_time = 0.0
 	get_tree().paused = false
@@ -100,20 +92,7 @@ func _on_player_died() -> void:
 ## [param enemy] 死亡的敌人节点
 func _on_enemy_died(enemy: Node2D) -> void:
 	add_score(10)  # 每个敌人10分
-	enemies_killed_this_wave += 1
-	
-	# 检查是否完成当前波次
-	if enemies_killed_this_wave >= enemies_needed_for_next_wave:
-		_advance_to_next_wave()
 
 ## 游戏开始处理
 func _on_game_started() -> void:
-	print("游戏开始！当前波次: ", current_wave)
-
-## 推进到下一波次
-func _advance_to_next_wave() -> void:
-	current_wave += 1
-	enemies_killed_this_wave = 0
-	enemies_needed_for_next_wave += 5  # 每波增加5个敌人
-	EventBus.wave_completed.emit(current_wave - 1)
-	print("波次 ", current_wave - 1, " 完成！进入波次 ", current_wave) 
+	print("游戏开始！") 

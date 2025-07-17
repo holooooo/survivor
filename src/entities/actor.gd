@@ -1,4 +1,4 @@
-extends Area2D
+extends CharacterBody2D
 class_name Actor
 
 ## 基础actor类，所有游戏实体的基类[br]
@@ -24,6 +24,9 @@ var current_armor: int = 0 ## 当前护甲值
 # Buff系统
 var buff_manager: BuffManager
 
+# 碰撞检测区域 - 用于伤害检测和触发器
+var collision_area: Area2D
+
 signal health_changed(new_health: int, max_health: int)
 signal armor_changed(new_armor: int, max_armor: int)
 signal died(actor: Actor)
@@ -32,30 +35,86 @@ func _ready() -> void:
 	current_health = max_health
 	current_armor = max_armor
 	_initialize_buff_manager()
+	_setup_collision_area()
+	
+	# 启用碰撞监听
+	set_collision_monitoring(true, true)
 	
 	# 监听生命值变化，用于检查收割标记触发条件
 	health_changed.connect(_on_health_changed)
 	armor_changed.connect(_on_armor_changed)
 	died.connect(_on_died)
 
+## 设置碰撞检测区域[br]
+## 创建Area2D子节点用于伤害检测和触发器
+func _setup_collision_area() -> void:
+	# 先尝试获取场景中已存在的CollisionArea
+	collision_area = get_node_or_null("CollisionArea")
+	if not collision_area:
+		# 如果场景中没有CollisionArea，动态创建一个
+		collision_area = Area2D.new()
+		collision_area.name = "CollisionArea"
+		add_child(collision_area)
+		
+		# 为动态创建的Area2D添加碰撞形状
+		var collision_shape = CollisionShape2D.new()
+		collision_shape.name = "AreaCollision"
+		var shape = RectangleShape2D.new()
+		shape.size = Vector2(120, 120)
+		collision_shape.shape = shape
+		collision_area.add_child(collision_shape)
+	
+	# 确保CollisionArea属于正确的组
+	if not collision_area.is_in_group("actors"):
+		collision_area.add_to_group("actors")
+
+## 获取碰撞检测区域[br]
+## [return] Area2D碰撞检测区域
+func get_collision_area() -> Area2D:
+	return collision_area
+
+## 设置碰撞区域的监听状态[br]
+## [param enable_monitoring] 是否启用监听[br]
+## [param enable_monitorable] 是否可被监听
+func set_collision_monitoring(enable_monitoring: bool = true, enable_monitorable: bool = true) -> void:
+	if collision_area:
+		collision_area.set_deferred("monitoring", enable_monitoring)
+		collision_area.set_deferred("monitorable", enable_monitorable)
+
 ## 移动到指定位置[br]
 ## [param target_position] 目标位置[br]
 ## [param delta] 帧时间间隔
 func move_towards(target_position: Vector2, delta: float) -> void:
 	if is_dead or is_immobilized():
+		velocity = Vector2.ZERO
 		return
 		
 	var direction = (target_position - global_position).normalized()
-	global_position += direction * speed * delta
+	velocity = direction * speed
+	move_and_slide()
 
 ## 按方向移动[br]
 ## [param direction] 移动方向向量[br]
 ## [param delta] 帧时间间隔
 func move_by_direction(direction: Vector2, delta: float) -> void:
 	if is_dead or is_immobilized():
+		velocity = Vector2.ZERO
 		return
 		
-	global_position += direction.normalized() * speed * delta
+	velocity = direction.normalized() * speed
+	move_and_slide()
+
+## 设置移动速度[br]
+## [param new_velocity] 新的移动速度向量
+func set_velocity_direct(new_velocity: Vector2) -> void:
+	if is_dead or is_immobilized():
+		velocity = Vector2.ZERO
+		return
+	velocity = new_velocity
+
+## 停止移动[br]
+func stop_movement() -> void:
+	velocity = Vector2.ZERO
 	
 ## 设置生命值[br]
 ## [param health] 新的生命值

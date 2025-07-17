@@ -30,7 +30,9 @@ func _ready() -> void:
 
 	# 将敌人添加到enemies组，便于其他系统获取敌人引用
 	add_to_group("enemies")
-
+	
+	# 确保CollisionArea也在enemies组中，用于投射物检测
+	call_deferred("_setup_enemy_collision_area")
 
 	player = get_tree().get_first_node_in_group(Constants.GROUP_PLAYER)
 	
@@ -202,14 +204,17 @@ func update_screen_status() -> void:
 func get_effective_speed() -> float:
 	return speed * current_speed_multiplier
 
-## 优化的移动方法 - 使用Area2D的移动逻辑[br]
+## 优化的移动方法 - 使用CharacterBody2D的velocity系统[br]
 ## [param direction] 移动方向[br]
 ## [param delta] 时间增量
 func move_optimized(direction: Vector2, delta: float) -> void:
 	if direction != Vector2.ZERO and not movement_disabled:
-		# 使用Actor基类的移动方法，考虑当前速度倍数
-		var target_position = global_position + direction * get_effective_speed() * delta
-		global_position = target_position
+		# 使用velocity系统进行移动，考虑当前速度倍数
+		velocity = direction * get_effective_speed()
+		move_and_slide()
+	else:
+		# 停止移动
+		velocity = Vector2.ZERO
 
 ## 应用击退效果[br]
 ## [param direction] 击退方向[br]
@@ -218,21 +223,32 @@ func apply_knockback(direction: Vector2, strength: float) -> void:
 	# 禁用移动
 	movement_disabled = true
 	
-	# 创建击退动画
+	# 使用velocity实现击退效果
+	var knockback_velocity = direction * strength * 200.0  # 调整击退速度倍数
+	velocity = knockback_velocity
+	
+	# 创建击退衰减效果
 	var tween = create_tween()
 	if not tween:
 		# 如果无法创建Tween，立即恢复移动
 		movement_disabled = false
+		velocity = Vector2.ZERO
 		return
 	
-	var start_position = global_position
-	var target_position = start_position + direction * strength
-	
-	# 击退动画
-	tween.tween_property(self, "global_position", target_position, 0.3)
+	# 击退velocity逐渐衰减到0
+	tween.tween_method(_apply_knockback_velocity, knockback_velocity, Vector2.ZERO, 0.3)
 	
 	# 击退结束后恢复移动
-	tween.tween_callback(func(): movement_disabled = false)
+	tween.tween_callback(func(): 
+		movement_disabled = false
+		velocity = Vector2.ZERO
+	)
+
+## 应用击退速度并移动[br]
+## [param kb_velocity] 击退速度向量
+func _apply_knockback_velocity(kb_velocity: Vector2) -> void:
+	velocity = kb_velocity
+	move_and_slide()
 
 ## 设置移动禁用状态[br]
 ## [param disabled] 是否禁用移动
@@ -246,3 +262,16 @@ func disable_movement() -> void:
 ## 启用移动
 func enable_movement() -> void:
 	movement_disabled = false
+
+## 设置敌人碰撞区域[br]
+## 确保投射物能够正确检测到敌人
+func _setup_enemy_collision_area() -> void:
+	var collision_area = get_collision_area()
+	if collision_area:
+		# 确保CollisionArea在enemies组中
+		if not collision_area.is_in_group("enemies"):
+			collision_area.add_to_group("enemies")
+		
+		# 设置正确的碰撞层和掩码
+		collision_area.collision_layer = 2  # 敌人层
+		collision_area.collision_mask = 4   # 武器层（用于被投射物检测）

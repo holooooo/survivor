@@ -3,15 +3,9 @@ extends Node2D
 ## 主场景控制器 - 游戏的主要入口点[br]
 ## 负责初始化各个系统并启动游戏
 
-@export var enemy_scenes: Array[PackedScene] = []
-@onready var enemy_spawner: EnemySpawner = $EnemySpawner
 @onready var performance_monitor: Control = $UI/PerformanceMonitor
 
 func _ready() -> void:
-	# 设置敌人生成器的场景列表
-	if enemy_spawner and not enemy_scenes.is_empty():
-		enemy_spawner.enemy_scenes = enemy_scenes
-	
 	# 启动游戏
 	GameManager.start_game()
 

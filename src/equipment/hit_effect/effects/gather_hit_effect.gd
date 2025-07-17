@@ -122,12 +122,12 @@ func _disable_enemy_movement(enemy: Node) -> void:
 		enemy.set_movement_disabled(true)
 	elif enemy.has_method("disable_movement"):
 		enemy.disable_movement()
-	elif enemy.has_property("can_move"):
+	elif enemy.get("can_move"):
 		enemy.can_move = false
-	elif enemy.has_property("movement_disabled"):
+	elif enemy.get("movement_disabled"):
 		enemy.movement_disabled = true
 	# 如果敌人有速度属性，可以临时保存并设为0
-	elif enemy.has_property("speed"):
+	elif enemy.get("speed"):
 		if not enemy.has_meta("original_speed"):
 			enemy.set_meta("original_speed", enemy.speed)
 		enemy.speed = 0
@@ -140,12 +140,12 @@ func _enable_enemy_movement(enemy: Node) -> void:
 		enemy.set_movement_disabled(false)
 	elif enemy.has_method("enable_movement"):
 		enemy.enable_movement()
-	elif enemy.has_property("can_move"):
+	elif enemy.get("can_move"):
 		enemy.can_move = true
-	elif enemy.has_property("movement_disabled"):
+	elif enemy.get("movement_disabled"):
 		enemy.movement_disabled = false
 	# 恢复原始速度
-	elif enemy.has_property("speed") and enemy.has_meta("original_speed"):
+	elif enemy.get("speed") and enemy.has_meta("original_speed"):
 		enemy.speed = enemy.get_meta("original_speed")
 		enemy.remove_meta("original_speed")
 

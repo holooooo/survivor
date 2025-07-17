@@ -21,6 +21,9 @@ func _ready() -> void:
 	# 将玩家添加到player组，便于其他系统获取玩家引用
 	add_to_group(Constants.GROUP_PLAYER)
 	
+	# 设置玩家碰撞区域
+	call_deferred("_setup_player_collision_area")
+	
 	# 初始化属性管理器
 	stats_manager.initialize(self)
 	stats_manager.stats_changed.connect(_on_damage_type_stats_changed)
@@ -42,6 +45,9 @@ func _physics_process(delta):
 		direction.y -= 1
 	if Input.is_action_pressed("move_down"):
 		direction.y += 1
+	
+	# 记录移动前的位置
+	var old_position: Vector2 = global_position
 	
 	# 使用Actor基类的移动方法
 	if direction != Vector2.ZERO:
@@ -134,3 +140,16 @@ func update_equipment_armor(total_armor: int) -> void:
 	# 如果当前护甲值小于最大值，恢复到最大值
 	if current_armor < max_armor:
 		set_armor(max_armor)
+
+## 设置玩家碰撞区域[br]
+## 确保敌人能够正确检测到玩家进行伤害判定
+func _setup_player_collision_area() -> void:
+	var collision_area = get_collision_area()
+	if collision_area:
+		# 确保CollisionArea在player组中
+		if not collision_area.is_in_group(Constants.GROUP_PLAYER):
+			collision_area.add_to_group(Constants.GROUP_PLAYER)
+		
+		# 设置正确的碰撞层和掩码
+		collision_area.collision_layer = 1  # 玩家层
+		collision_area.collision_mask = 2   # 敌人层（用于被敌人检测）
