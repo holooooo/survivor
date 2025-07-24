@@ -1,7 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://dkeamf7f6v0g1"]
+[gd_scene load_steps=5 format=3 uid="uid://d2gxlfo6cs4a4"]
 
-[ext_resource type="Script" uid="uid://ysstk5v75mkr" path="res://src/entities/enemies/types/melee/melee.gd" id="1_md0e3"]
-[ext_resource type="Texture2D" uid="uid://b5f03p4iplljt" path="res://resources/entities/kenney_animal-pack-redux/PNG/Square (outline)/bear.png" id="2_bxar5"]
+[ext_resource type="Script" uid="uid://ysstk5v75mkr" path="res://src/entities/enemies/types/melee/melee.gd" id="1_2gp7f"]
+[ext_resource type="Texture2D" uid="uid://b5f03p4iplljt" path="res://resources/entities/kenney_animal-pack-redux/PNG/Square (outline)/bear.png" id="2_4cgtb"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_physics"]
 size = Vector2(120, 120)
@@ -13,11 +13,11 @@ size = Vector2(128, 128)
 scale = Vector2(0.5, 0.5)
 disable_mode = 1
 collision_layer = 2
-script = ExtResource("1_md0e3")
+script = ExtResource("1_2gp7f")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 modulate = Color(1, 0.4, 0.4, 1)
-texture = ExtResource("2_bxar5")
+texture = ExtResource("2_4cgtb")
 
 [node name="PhysicsCollision" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_physics")

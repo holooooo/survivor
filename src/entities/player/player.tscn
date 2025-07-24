@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dwgta3t7x2j6u" path="res://src/entities/player/player.gd" id="1_qwer"]
 [ext_resource type="Texture2D" uid="uid://dm6qwho4kdprd" path="res://resources/entities/kenney_animal-pack-redux/PNG/Round/penguin.png" id="2_muk8e"]
-[ext_resource type="PackedScene" uid="uid://b8j2k5n7naq1" path="res://src/ui/health_bar.tscn" id="3_muk8e"]
+[ext_resource type="PackedScene" uid="uid://b8j2k5n7naq1" path="res://src/entities/ui/health_bar/health_bar.tscn" id="3_muk8e"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_physics"]
 size = Vector2(120, 120)
@@ -13,6 +13,8 @@ size = Vector2(128, 128)
 [node name="Player" type="CharacterBody2D"]
 scale = Vector2(0.5, 0.5)
 disable_mode = 2
+collision_layer = 1
+collision_mask = 3
 script = ExtResource("1_qwer")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

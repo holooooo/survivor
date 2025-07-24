@@ -7,7 +7,7 @@ class_name ModManager
 @export var default_mods: Array[ModResource] = [] ## 默认Mod资源数组
 
 @onready var equipment_slot_manager: EquipmentSlotManager = get_node("../EquipmentSlotManager")
-@onready var player: Player = get_node("..")
+@onready var player: Player = %Player
 
 ## 周期性检查计时器
 var periodic_check_timer: Timer

@@ -1,6 +1,6 @@
-[gd_resource type="EmitterEquipmentResource" format=3]
+[gd_resource type="EmitterEquipmentResource" load_steps=0 format=3]
 
-[ext_resource type="Resource" uid="uid://dpxqtnxm6umfg" path="res://src/equipment/hit_effect/resources/burn_hit_effect.tres" id="1_burn_hit_effect"]
+[ext_resource type="Resource" uid="uid://dpxqtnxm6umfg" path="res://src/globals/damage_number_pool.gd" id="1_burn_hit_effect"]
 
 [resource]
 equipment_name = "火焰喷射器"

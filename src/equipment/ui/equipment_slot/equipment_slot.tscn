@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://bsxkjhq4ow8ry"]
 
-[ext_resource type="Script" uid="uid://bxo4v8nf7xqwg" path="res://src/ui/equipment_slot.gd" id="1_7k2xm"]
+[ext_resource type="Script" uid="uid://bxo4v8nf7xqwg" path="res://src/equipment/ui/equipment_slot/equipment_slot.gd" id="1_7k2xm"]
 [ext_resource type="FontFile" uid="uid://oritvbydbrk0" path="res://resources/fonts/fusion-pixel-12px-monospaced-zh_hans.ttf" id="2_mgmqg"]
 
 [node name="EquipmentSlot" type="Control"]

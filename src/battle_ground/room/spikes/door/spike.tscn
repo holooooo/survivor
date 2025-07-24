@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://dk8bicnl5tlqf"]
+
+[ext_resource type="Script" uid="uid://c1taltrfcspeu" path="res://src/battle_ground/room/spikes/door/spike.gd" id="1_fuihk"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ed4ki"]
+
+[node name="Spike" type="Area2D"]
+script = ExtResource("1_fuihk")
+on_ready = false
+on_player_entered = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+scale = Vector2(5, 5)
+shape = SubResource("CircleShape2D_ed4ki")

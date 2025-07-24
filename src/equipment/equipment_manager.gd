@@ -7,7 +7,7 @@ class_name EquipmentManager
 @export var default_equipments: Array[EquipmentResource] = [] ## 默认装备资源数组
 
 @onready var slot_manager: EquipmentSlotManager = %EquipmentSlotManager
-@onready var player: Player = get_parent() as Player
+@onready var player: Player = %Player
 
 var global_mod_effects: Dictionary = {} ## 全局mod效果缓存
 
